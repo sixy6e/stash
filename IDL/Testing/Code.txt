@@ -1,0 +1,111 @@
+files = FILE_SEARCH('process','QACheckList.txt',COUNT=numfiles, /FULLY_QUALIFY_PATH)
+dir_name = FILE_DIRNAME(files, /MARK_DIRECTORY)
+
+OPENW, unit, 'C:\WINNT\Profiles\u08087\My Documents\murrumbidgee_radiance\SceneID_List.txt', /GET_LUN
+
+FOR i = 0, numfiles - 1 DO BEGIN $
+	array = js_read_ascii(files[i]) & $
+	scene = STRPOS(array, 'Scene Date') & $
+	pos = WHERE(scene eq 0) & $
+	printf, unit, array[pos1] + '   Location:   ' + files[i] & $
+ENDFOR
+
+FREE_LUN, unit
+
+
+files = FILE_SEARCH('process','QACheckList.txt',COUNT=numfiles, /FULLY_QUALIFY_PATH)
+
+
+
+OPENW, unit, 'C:\WINNT\Profiles\u08087\My Documents\murrumbidgee_radiance\SceneID_List_v2.txt', /GET_LUN
+
+FOR i = 0, numfiles - 1 DO BEGIN $
+	array = js_read_ascii(files[i]) & $
+	scene = STRPOS(array, 'Scene Date') & $
+	sensor = STRPOS(array, 'Satellite/Sensor') & $
+	pos1 = WHERE(scene eq 0) & $
+	pos2 = WHERE(sensor eq 0) & $
+	printf, unit, array[pos1] + '   ' + array[pos2] + '   Location:   ' + files[i] & $
+ENDFOR
+
+FREE_LUN, unit
+
+
+
+
+OPENW, unit, 'C:\WINNT\Profiles\u08087\My Documents\murrumbidgee_radiance\Test.txt', /GET_LUN
+
+for i = 0, b[0] - 1 DO BEGIN $
+printf, unit, a[i] & $
+endfor
+
+FREE_LUN, unit
+
+
+;Include cloud cover percentage
+;file = 'C:\WINNT\Profiles\u08087\My Documents\Testing\ReadText\QACheckList.txt'
+;openr, lun, file, /get_lun
+
+cd, 'W:\'
+
+files = FILE_SEARCH('process','QACheckList.txt',COUNT=numfiles, /FULLY_QUALIFY_PATH)
+
+outfile = 'C:\WINNT\Profiles\u08087\My Documents\murrumbidgee_radiance\SceneID_List_v3.txt'
+
+OPENW, unit, outfile, /GET_LUN
+
+FOR i = 0, numfiles - 1 DO BEGIN $
+	array = js_read_ascii(files[i]) & $
+	scene = STRPOS(array, 'Scene Date') & $
+	sensor = STRPOS(array, 'Satellite/Sensor') & $
+	cloud = STRPOS(array, 'Cloud') & $
+	pos1 = WHERE(scene eq 0) & $
+	pos2 = WHERE(sensor eq 0) & $
+	pos3 = WHERE(cloud gt 0) & $
+	space = STRPOS(array[pos3], '  ') & $
+	colon = STRPOS(array[pos3], ':') & $
+	combined = STRMID(array[pos3], 0, space) + STRMID(array[pos3], colon) & $
+	printf, unit, array[pos1] + '   ' + array[pos2] + '   ' + combined $
+	    + '   Location:   ' + files[i] & $
+ENDFOR
+
+FREE_LUN, unit
+
+;--------------------------------------------------------------------------------------------
+
+;Include cloud cover percentage
+;Also only print those with cloud cover >= 25%
+
+cd, 'W:\'
+
+files = FILE_SEARCH('process','QACheckList.txt',COUNT=numfiles, /FULLY_QUALIFY_PATH)
+dir_name = FILE_DIRNAME(files, /MARK_DIRECTORY)
+
+outfile = 'C:\WINNT\Profiles\u08087\My Documents\murrumbidgee_radiance\SceneID_List_v4.txt'
+
+
+OPENW, unit, outfile, /GET_LUN
+
+
+FOR i = 0, numfiles - 1 DO BEGIN $
+	array = js_read_ascii(files[i]) & $
+	scene = STRPOS(array, 'Scene Date') & $
+	sensor = STRPOS(array, 'Satellite/Sensor') & $
+	cloud = STRPOS(array, 'Cloud') & $
+	pos1 = WHERE(scene eq 0) & $
+	pos2 = WHERE(sensor eq 0) & $
+	pos3 = WHERE(cloud gt 0) & $
+	space = STRPOS(array[pos3], '  ') & $
+	colon = STRPOS(array[pos3], ':') & $
+	combined = STRMID(array[pos3], 0, space) + STRMID(array[pos3], colon) & $
+	b1 = STRPOS(combined, '[') & $
+	b2 = STRPOS(combined, ']') & $
+	num = fix(strtrim(strmid(combined, b1 +1, b2 -(b1 +1)), 2)) & $
+	IF num GE 25 THEN BEGIN $
+		printf, unit, array[pos1] + '   ' + array[pos2] + '   ' + combined $
+	        + '   Location:   ' + dir_name[i] & $
+	ENDIF & $
+ENDFOR
+
+FREE_LUN, unit
+

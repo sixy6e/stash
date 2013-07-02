@@ -1,0 +1,26 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+subroutine cast_shadow_prj(dem,mask,dy,dx,zenith,k_max,az_case,d0,pi,zmax,xoff,yoff,cosphc,sinphc,dem_x,dem_y,msk_x,msk_y) ! in fortran_topo_shadow_v2.f90
+    real dimension(dem_y,dem_x),intent(in) :: dem
+    integer*1 dimension(msk_y,msk_x),intent(inout) :: mask
+    real intent(in) :: dy
+    real intent(in) :: dx
+    real dimension(msk_y,msk_x),intent(in),depend(msk_y,msk_x) :: zenith
+    integer*2 dimension(msk_y,msk_x),intent(in),depend(msk_y,msk_x) :: k_max
+    integer*1 dimension(msk_y,msk_x),intent(inout),depend(msk_y,msk_x) :: az_case
+    real dimension(msk_y,msk_x),intent(in),depend(msk_y,msk_x) :: d0
+    double precision intent(in) :: pi
+    integer intent(in) :: zmax
+    integer intent(in) :: xoff
+    integer intent(in) :: yoff
+    real dimension(msk_y,msk_x),intent(in),depend(msk_y,msk_x) :: cosphc
+    real dimension(msk_y,msk_x),intent(in),depend(msk_y,msk_x) :: sinphc
+    integer, optional,intent(in),check(shape(dem,1)==dem_x),depend(dem) :: dem_x=shape(dem,1)
+    integer, optional,intent(in),check(shape(dem,0)==dem_y),depend(dem) :: dem_y=shape(dem,0)
+    integer, optional,intent(in),check(shape(mask,1)==msk_x),depend(mask) :: msk_x=shape(mask,1)
+    integer, optional,intent(in),check(shape(mask,0)==msk_y),depend(mask) :: msk_y=shape(mask,0)
+end subroutine cast_shadow_prj
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

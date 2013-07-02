@@ -1,0 +1,28 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+subroutine cast_shadow(dem,cols,rows,sub_col,sub_row,mask,dy,dx,zenith,lat,lon,k_max,az_case,d0,pi,zmax,l_xoff,l_yoff,cosphc,sinphc) ! in cast_shadow3.f90
+    integer dimension(rows,cols),intent(in) :: dem
+    integer, optional,intent(in),check(shape(dem,1)==cols),depend(dem) :: cols=shape(dem,1)
+    integer, optional,intent(in),check(shape(dem,0)==rows),depend(dem) :: rows=shape(dem,0)
+    integer intent(in) :: sub_col
+    integer intent(in) :: sub_row
+    integer*1 dimension(rows,cols),intent(inout),depend(rows,cols) :: mask
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: dy
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: dx
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: zenith
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: lat
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: lon
+    integer dimension(rows,cols),intent(in),depend(rows,cols) :: k_max
+    integer dimension(rows,cols),intent(in),depend(rows,cols) :: az_case
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: d0
+    double precision intent(in) :: pi
+    integer intent(in) :: zmax
+    integer intent(in) :: l_xoff
+    integer intent(in) :: l_yoff
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: cosphc
+    real dimension(rows,cols),intent(in),depend(rows,cols) :: sinphc
+end subroutine cast_shadow
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

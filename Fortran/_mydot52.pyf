@@ -1,0 +1,17 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+module prog ! in mydot52.f90
+    subroutine dot(m1,nr1,nc1,m2,nr2,nc2,mtx) ! in mydot52.f90:prog
+        double precision dimension(nr1,nc1),intent(in) :: m1
+        integer, optional,intent(in),check(shape(m1,0)==nr1),depend(m1) :: nr1=shape(m1,0)
+        integer, optional,intent(in),check(shape(m1,1)==nc1),depend(m1) :: nc1=shape(m1,1)
+        double precision dimension(nr2,nc2),intent(in) :: m2
+        integer, optional,intent(in),check(shape(m2,0)==nr2,nc1==nr2),depend(m2) :: nr2=shape(m2,0)
+        integer, optional,intent(in),check(shape(m2,1)==nc2),depend(m2) :: nc2=shape(m2,1)
+        double precision dimension(nr1,nc2),intent(inout),depend(nr1,nc2) :: mtx
+    end subroutine dot
+end module prog
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

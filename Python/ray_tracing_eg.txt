@@ -1,0 +1,139 @@
+import numpy
+from scipy import ndimage
+from matplotlib import pyplot as plt
+import numexpr
+import image_tools
+import datetime
+
+azimuth = numpy.radians(42.67)
+elevation = numpy.radians(35.23)
+R = 15.0
+r = 150.0
+
+# dummy cloud
+a = numpy.zeros((100,100)).astype('bool')
+a[75,75] = True
+a[25,25] = True
+a[25,75] = True
+a[75,25] = True
+b = ndimage.binary_dilation(a, iterations=7) 
+#plt.imshow(b)
+#plt.show()
+
+rand_heights = numpy.random.randint(100,201,(100,100))
+c = b * rand_heights
+
+cloud_spheres = numpy.zeros((3,100,100))
+
+a = numpy.zeros((100,100)).astype('bool')
+wh = numpy.where(a == False)
+
+geo_trans = (404175.00, 30.0, 0.0, 6157465.00, 0.0, -30.0)
+
+map_x, map_y = image_tools.img2map(geo_trans, wh)
+origin = numpy.zeros((3,100,100))
+#x_origin = numpy.zeros(a.shape)
+#y_origin = numpy.zeros(a.shape)
+#z_origin = numpy.zeros(a.shape)
+#x_origin[wh] = map_x
+#y_origin[wh] = map_y
+origin[0][wh] = map_x
+origin[1][wh] = map_y
+
+cloud_spheres[0][wh] = map_x
+cloud_spheres[1][wh] = map_y
+cloud_spheres[2] = c
+
+
+xdist = r * numpy.cos(azimuth)
+ydist = r * numpy.sin(azimuth)
+zdist = r * numpy.tan(elevation)
+
+#x_end = x_origin + xdist
+#y_end = y_origin + ydist
+#z_end = z_origin + zdist
+end = numpy.zeros((3,100,100))
+end[0] = origin[0] + xdist
+end[1] = origin[1] + ydist
+end[2] = origin[2] + zdist
+
+vec = end - origin
+length = numpy.sqrt(numpy.sum(vec**2, axis=0))
+norm_vec = vec / length
+
+#now to test intersections against cloud spheres
+#for y-coord
+#    for x-coord
+#        for cloud_shere
+whc = numpy.where(b == True)
+# the cloud_sphere loop can work like
+#for i in numpy.arange(whc[0].shape)
+# sphere = cloud_sheres[:, whc[0][i], whc[1][i]]
+A = 1.0
+# L = origin[:,y,x] - sphere
+# B = (2*(norm_vec dot L)
+# C = (L dot L) - R**2
+# discriminant = B**2 -4*A*C
+
+shadow = numpy.zeros((100,100),dtype='bool')
+fff = 0
+st = datetime.datetime.now()
+for y in numpy.arange(100):
+    for x in numpy.arange(100):
+        for i in numpy.arange(whc[0].shape[0]):
+            if (shadow[y,x]):
+                continue
+            sphere = cloud_spheres[:, whc[0][i], whc[1][i]]
+            pix = origin[:,y,x]
+            pix_norm = norm_vec[:,y,x]
+            L = pix - sphere
+            B = 2*(numpy.sum(pix_norm * L))
+            C = numpy.sum(L * L) - R**2
+            discrim = B**2 -4*A*C
+            if (discrim > 0):
+                fff += 1
+                shadow[y,x] = True
+
+et = datetime.datetime.now()
+print 'time taken = ', et - st
+
+shadow = numpy.zeros((100,100), dtype='bool')
+st = datetime.datetime.now()
+for y in numpy.arange(100):
+    for x in numpy.arange(100):
+        for i in numpy.arange(whc[0].shape[0]):
+            if (shadow[y,x]):
+                continue
+            sphere = cloud_spheres[:, whc[0][i], whc[1][i]]
+            pix = origin[:,y,x]
+            pix_norm = norm_vec[:,y,x]
+            L = pix - sphere
+            B = 2.0*(numpy.sum(pix_norm * L))
+            C = numpy.sum(L * L) - R**2
+            shadow[y,x] = ((B**2 -4.0*A*C) > 0)
+
+et = datetime.datetime.now()
+print 'time taken = ', et - st
+
+
+plt.subplot(121)
+plt.imshow(b)
+plt.subplot(122)
+plt.imshow(shadow)
+plt.show()
+
+
+f = numpy.zeros((100,100)).astype('uint8')
+f[b] = 100
+f[shadow] = 200
+#plt.imshow(f)
+#plt.show()
+
+plt.subplot(131)
+plt.imshow(b)
+plt.subplot(132)
+plt.imshow(shadow)
+plt.subplot(133)
+plt.imshow(f)
+plt.show()
+
