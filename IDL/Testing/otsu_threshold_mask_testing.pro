@@ -164,11 +164,13 @@ PRO otsu_threshold_mask_testing, event
                END
         ENDCASE
         
+        print, h
+        
         rh = REVERSE(h)
         rloc = REVERSE(loc)
         
         cumu_hist  = TOTAL(h, /CUMULATIVE, /DOUBLE)
-        rcumu_hist = REVERSE(cumu_hist)
+        rcumu_hist = TOTAL(rh, /CUMULATIVE, /DOUBLE)
         
         h_dim = N_ELEMENTS(h)
         
@@ -184,7 +186,7 @@ PRO otsu_threshold_mask_testing, event
         mean_fground = DBLARR(h_dim)
         
         ; Calculate background class means
-        tmp = TOTAL(h * loc, /CUMULATIVE, /DOUBLE)
+        tmp = TOTAL(h * loc, /CUMULATIVE, /DOUBLE) / cumu_hist
         mean_bground[0:h_dim-2] = tmp[0:h_dim-2]
         
         ; Calculate foreground class means
@@ -196,11 +198,15 @@ PRO otsu_threshold_mask_testing, event
         
         thresh = MAX(sigma_between, mx_loc)
         
+        print, mx_loc
+        
         ; The above could be replaced with a function call.
         ; thresh = calculate_otsu_threshold(histogram=h, locations=loc)
         ; thresh_convert = thresh * binsz + omin
         
-        thresh_convert = (mx_loc * binsz) + omin
+        thresh_convert = (mx_loc * binsz) + mn_
+        
+        print, thresh_convert
 
         samples = (dims[2] - dims[1]) + 1
         lines = (dims[4] - dims[3]) + 1
@@ -296,7 +302,7 @@ PRO otsu_threshold_mask_testing, event
         mean_fground = DBLARR(h_dim)
         
         ; Calculate background class means
-        tmp = TOTAL(h * loc, /CUMULATIVE, /DOUBLE)
+        tmp = TOTAL(h * loc, /CUMULATIVE, /DOUBLE) / cumu_hist
         mean_bground[0:h_dim-2] = tmp[0:h_dim-2]
         
         ; Calculate foreground class means
@@ -312,7 +318,7 @@ PRO otsu_threshold_mask_testing, event
         ; thresh = calculate_otsu_threshold(histogram=h, locations=loc)
         ; thresh_convert = thresh * binsz + omin
         
-        thresh_convert = (mx_loc * binsz) + omin
+        thresh_convert = (mx_loc * binsz) + mn_
 
         samples = (dims[2] - dims[1]) + 1
         lines = (dims[4] - dims[3]) + 1
@@ -364,7 +370,7 @@ PRO otsu_threshold_mask_testing, event
 
         ; An undocumented routine, sp_import
         ;http://www.exelisvis.com/Learn/VideoDetail/TabId/323/ArtMID/1318/ArticleID/3974/3974.aspx
-        sp_import, plot_base, [thresh,thresh], !Y.CRange, plot_color=[0,255,0]
+        sp_import, plot_base, [mx_loc,mx_loc], !Y.CRange, plot_color=[0,255,0]
     ENDIF 
 
     IF (result.segment EQ 1) THEN BEGIN
