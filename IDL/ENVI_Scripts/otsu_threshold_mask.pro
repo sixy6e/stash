@@ -1,7 +1,7 @@
 ;+
 ; Name:
 ; -----
-;     KAPPA_SIGMA_THRESHOLD_MASK
+;     OTSU_THRESHOLD_MASK
 ;-
 ;
 ;+

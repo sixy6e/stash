@@ -26,6 +26,7 @@
 ; Requires:
 ; ---------
 ;     This function is written for use only with an interactive ENVI session.
+;     Either the Binsize or the the number of bins (Nbins) must be selected.
 ;-
 ;
 ;+ 
@@ -73,7 +74,7 @@
 ;                 in order to maintain visual aspects when resizing the plot.
 ;-
 ;
-;+
+;
 ; :Copyright:
 ; 
 ;     Copyright (c) 2013, Josh Sixsmith
@@ -102,7 +103,7 @@
 ;     The views and conclusions contained in the software and documentation are those
 ;     of the authors and should not be interpreted as representing official policies, 
 ;     either expressed or implied, of the FreeBSD Project.
-;-
+;
 ;
 
 ;Adding an extra button to the ENVI Menu bar
