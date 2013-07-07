@@ -121,6 +121,9 @@ PRO tri_button_help, ev
 ;+
 ; :Hidden:
 ;-
+    COMPILE_OPT STRICTARR
+    COMPILE_OPT IDL2
+
     e_pth   = ENVI_GET_PATH()
     pth_sep = PATH_SEP()
     
@@ -133,6 +136,9 @@ FUNCTION calculate_triangle_threshold, histogram=h, xone=x1, ytwo=y2
 ;+
 ; :Hidden:
 ;-
+    COMPILE_OPT STRICTARR
+    COMPILE_OPT IDL2
+
     mx = MAX(h, mx_loc)
     wh = WHERE(h NE 0, count)
     first_non_zero = wh[0]
@@ -405,3 +411,4 @@ PRO triangle_threshold_mask, event
     ENDIF
     
  END
+ 

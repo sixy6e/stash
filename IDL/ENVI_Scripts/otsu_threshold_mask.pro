@@ -118,6 +118,9 @@ PRO otsu_button_help, ev
 ;+
 ; :Hidden:
 ;-
+    COMPILE_OPT STRICTARR
+    COMPILE_OPT IDL2
+
     e_pth   = ENVI_GET_PATH()
     pth_sep = PATH_SEP()
     
@@ -130,6 +133,9 @@ FUNCTION calculate_otsu_threshold, histogram=h, locations=loc
 ;+
 ; :Hidden:
 ;-
+    COMPILE_OPT STRICTARR
+    COMPILE_OPT IDL2
+
     rh = REVERSE(h)
     rloc = REVERSE(loc)
 
