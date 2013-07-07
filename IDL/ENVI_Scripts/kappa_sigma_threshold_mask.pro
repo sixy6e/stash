@@ -208,7 +208,6 @@ PRO kappa_sigma_threshold_mask, event
     NaN = !Values.F_NAN
      
     IF ((result.outfm.in_memory) EQ 1) THEN BEGIN
-        PRINT, 'Output to memory selected'
         
         ; Set up the image tiling routine
         tile_id = ENVI_INIT_TILE(fid, pos, num_tiles=num_tiles, $
@@ -224,11 +223,6 @@ PRO kappa_sigma_threshold_mask, event
             cnt    = 0.D
             title = STRING(FORMAT='(%"Iteration %i")', i+1)
             ENVI_REPORT_INIT, rstr, title=title, base=rbase
-            
-            print, 'mn_: ', mn_
-            print, 'mx_: ', mx_
-            print, 'sum: ', sum
-            print, 'sq_sum: ', sq_sum
             
             FOR t=0, num_tiles-1 DO BEGIN
                 ;print, 'cnt: ', cnt
@@ -246,14 +240,9 @@ PRO kappa_sigma_threshold_mask, event
             
             ; Calculate the mean
             mu_     = sum/cnt
-            print, 'mu_: ', mu_
-            print, 'cnt: ', cnt
-            print, 'sum: ', sum
-            print, 'sq_sum: ', sq_sum
             
             ; This is a way of calculating the standard deviation in a tiling mechanism
             sigma_  = SQRT((sq_sum - cnt * mu_^2)/(cnt - 1))
-            print, 'sigma_', sigma_
             
             CASE thresh_method OF
                 0 : BEGIN
@@ -277,8 +266,6 @@ PRO kappa_sigma_threshold_mask, event
                     mn_     = (thresh_lower LT mn_start) ? mn_start : thresh_lower
                     END
             ENDCASE
-            PRINT, 'mn_: ', mn_
-            PRINT, 'mx_: ', mx_            
         ENDFOR
             
         samples = (dims[2] - dims[1]) + 1
@@ -425,9 +412,6 @@ PRO kappa_sigma_threshold_mask, event
         
         ; Using 'Ceil' should conform with ENVI
         binsz = CONVERT_TO_TYPE((mx_start - mn_start) / (nbins - 1), dtype, /CEIL)
-        PRINT, 'mn_start: ', mn_start
-        PRINT, 'binsz: ', binsz
-        PRINT, 'mx_ change: ', nbins * binsz + mn_start
 
         ; get the histogram of the first tile
         data = ENVI_GET_TILE(tile_id, 0, ye=ye, ys=ys)
@@ -454,8 +438,6 @@ PRO kappa_sigma_threshold_mask, event
         plot_dtype = SIZE(h, /TYPE)
         mn_ = CONVERT_TO_TYPE((mn_ / binsz + mn_start), plot_dtype)
         mx_ = CONVERT_TO_TYPE((mx_ / binsz + mn_start), plot_dtype)
-        PRINT, 'mn_ thresh: ', mn_
-        PRINT, 'mx_ thresh: ', mx_
         sp_import, plot_base, [mn_,mn_], !Y.CRange, plot_color=[0,255,0]
         sp_import, plot_base, [mx_,mx_], !Y.CRange, plot_color=[0,0,255]
      
