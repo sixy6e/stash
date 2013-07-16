@@ -12,6 +12,9 @@ PRO otsu_button_help, ev
 ;+
 ; :Hidden:
 ;-
+    COMPILE_OPT STRICTARR
+    COMPILE_OPT IDL2
+
     e_pth   = ENVI_GET_PATH()
     pth_sep = PATH_SEP()
     
