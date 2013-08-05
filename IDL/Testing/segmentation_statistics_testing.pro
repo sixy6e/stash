@@ -123,31 +123,48 @@ PRO segmentation_statistics_testing, event
     ;class_stats = STRARR(4,count+1)
     ;class_stats[*,0] = ['Class', 'Mean', 'Variance', 'Standard Deviation']
     ;If one method is faster, go with that.
-    class_stats = (dbl EQ 0) ? FLTARR(4,count) : DBLARR(4,count)
+    ;The string method may not work as well as first thought. As we need to calculate
+    ;stats using recursive formulae, converting to and from strings everytime may
+    ;degrade performance.
+    class_stats = (dbl EQ 0) ? FLTARR(5,count) : DBLARR(5,count)
     class_stats[0,*] = class_ids
     
     rstr = ['Base File: ' + bfname, 'Band Number: ' + STRING(bpos + 1), $
            'Segmentation File: ' + sfname, 'Band Number: ' + STRING(spos + 1)]
     ENVI_REPORT_INIT, rstr, title="Calculating Class Statistics", base=rbase
     
+    ;Generate a histogram per tile, and loop through each class 
     FOR i=0, bnum_tiles-1 DO BEGIN
         ENVI_REPORT_STAT, rbase, i, bnum_tiles
         bdata = ENVI_GET_TILE(btile_id, i, ys=ys, ye=ye)
         sdata = ENVI_GET_TILE(stile_id, i, ys=ys, ye=ye)
         h = HISTOGRAM(sdata, min=1, reverse_indices=ri)
         num_bins = N_ELEMENTS(h)
-        FOR b=0, num_bins-1 DO BEGIN
-            IF h[b] EQ 0 THEN CONTINUE
-            class_stats[1,b] = MEAN(bdata[ri[ri[b]:ri[b+1]-1]])
-            class_stats[2,b] = VARIANCE(bdata[ri[ri[b]:ri[b+1]-1]])
+        FOR c=0, num_bins-1 DO BEGIN
+            IF h[c] EQ 0 THEN CONTINUE
+            cdata = bdata[ri[ri[c]:ri[c+1]-1]]
+            ;class_stats[2,c] = MEAN(bdata[ri[ri[c]:ri[c+1]-1]])
+            ;class_stats[3,c] = VARIANCE(bdata[ri[ri[c]:ri[c+1]-1]])
+            class_stats[1,c] += h[c] ;Count
+            class_stats[2,c] += TOTAL(cdata) ;Sum
+            class_stats[3,c] += TOTAL(cdata^2) ;Sum of Squares
         ENDFOR
     ENDFOR
     
     ENVI_REPORT_INIT, base=rbase, /FINISH
     
-    class_stats[3,*] = SQRT(class_stats[2,*])
+    ;class_stats[3,*] = SQRT(class_stats[2,*])
     ;if we use a string array
     ;class_stats[3,*] = SQRT(FLOAT(class_stats[2,*]))
+    
+    ;Mean
+    class_stats[2,*] /= class_stats[1,*]
+    
+    ;Variance
+    class_stats[3,*] = (class_stats[3,*] - class_stats[1,*] * class_stats[2,*]^2) / (class_stats[1,*] - 1)
+    
+    ;Std Dev
+    class_stats[4,*] = SQRT(class_stats[3,*])
     
     ;str_class_stats = STRARR(4, count+1)
     ;str_class_stats[*,0] = ['Class', 'Mean', 'Variance', 'Standard Deviation']
