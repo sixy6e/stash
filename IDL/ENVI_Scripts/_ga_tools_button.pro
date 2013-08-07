@@ -4,7 +4,10 @@ PRO _ga_tools_define_buttons, buttonInfo
         /MENU, REF_VALUE = 'Help', /SIBLING, POSITION = 'after'
     ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE= 'Thresholding', $
         /MENU, REF_VALUE = 'GA Tools', POSITION = 'last'
-        
+    ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE= 'Segmentation', $
+        /MENU, REF_VALUE = 'GA Tools', POSITION = 'last'
+    ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE= 'General Tools', $
+        /MENU, REF_VALUE = 'GA Tools', POSITION = 'last'    
 END
 
 PRO _ga_tools
