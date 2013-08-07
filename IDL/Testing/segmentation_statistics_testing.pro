@@ -2,7 +2,7 @@ PRO segmentation_statistics_testing_define_buttons, buttonInfo
 ;+
 ; :Hidden:
 ;-
-ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE = 'Seg_Stats', $
+ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE = 'Region Statistics', $
    EVENT_PRO = 'segmentation_statistics_testing', $
    REF_VALUE = 'Segmentation', POSITION = 'last', UVALUE = ''
 
@@ -218,6 +218,6 @@ PRO segmentation_statistics_testing, event
         str_class_stats[s+4] = STRING(class_stats[*,s], format='(2(I20), 5(F20.6))')
     ENDFOR
     
-    ENVI_INFO_WID, str_class_stats
+    ENVI_INFO_WID, str_class_stats, title='Segmented Regions Statistics Report'
     
 END
