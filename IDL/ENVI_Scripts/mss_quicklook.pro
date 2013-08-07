@@ -17,7 +17,7 @@ pro mss_quicklook
     ;the search method for finding files. Assuming *.H1 are the header files for nlaps files.
     files=file_search(dir,'*.H1',COUNT=numfiles)
 
-    for i=0, n_elements(files)-1 do begin
+    for i=0L, n_elements(files)-1 do begin
         dirname = file_dirname(files[i], /mark_directory)
         envi_open_data_file, files[i], r_fid=fid, /nlaps
         envi_file_query, fid, dims=dims, fname=fname, ns=ns, nl=nl, nb=nb, data_type=dtype

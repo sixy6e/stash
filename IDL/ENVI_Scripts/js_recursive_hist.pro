@@ -18,7 +18,7 @@ pro js_recursive_hist
     ; an array to store the histogram value. looking for a value of 1.
     res = lonarr(n_elements(pos))
 
-    FOR i=0, n_elements(pos)-1 DO BEGIN
+    FOR i=0L, n_elements(pos)-1 DO BEGIN
         data = envi_get_data(fid=fid, dims=dims, pos=i)
         hist = histogram(data, min=0)
         ; check that hist has values other than 0
@@ -30,7 +30,7 @@ pro js_recursive_hist
     print, format = '(%"The band number you are looking for is %i")', loc+1
     str_res = strarr(n_elements(pos))
 
-    for i=0, n_elements(pos)-1 DO BEGIN
+    for i=0L, n_elements(pos)-1 DO BEGIN
         str_res[i] = 'Band ' + strtrim(string(i+1),1) + ':' + string(res[i])
     endfor
 
