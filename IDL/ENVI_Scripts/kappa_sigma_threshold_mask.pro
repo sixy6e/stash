@@ -219,7 +219,7 @@ PRO kappa_sigma_threshold_mask, event
         
         rstr = ['Input File: ' + fname, 'Band Number: ' + STRING(pos + 1)]
         
-        FOR i=0, iter-1 DO BEGIN
+        FOR i=0L, iter-1 DO BEGIN
             ; Initialise the sum, square sums and pixel count. Double Precision.
             sum    = 0.D
             sq_sum = 0.D
@@ -227,7 +227,7 @@ PRO kappa_sigma_threshold_mask, event
             title = STRING(FORMAT='(%"Iteration %i")', i+1)
             ENVI_REPORT_INIT, rstr, title=title, base=rbase
             
-            FOR t=0, num_tiles-1 DO BEGIN
+            FOR t=0L, num_tiles-1 DO BEGIN
                 ;print, 'cnt: ', cnt
                 ENVI_REPORT_STAT, rbase, t, num_tiles
                 data = (dtype EQ 5) ? DOUBLE(ENVI_GET_TILE(tile_id, t, ye=ye, ys=ys)) : $
@@ -282,14 +282,14 @@ PRO kappa_sigma_threshold_mask, event
         
         CASE invert_mask OF
             0: BEGIN
-               FOR t=0, num_tiles-1 DO BEGIN
+               FOR t=0L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, t, num_tiles
                    data = ENVI_GET_TILE(tile_id, t, ys=ys, ye=ye)
                    mask[0:xe,ys:ye] = (data GE mn_) AND (data LE mx_)
                ENDFOR
                END
             1: BEGIN
-               FOR t=0, num_tiles-1 DO BEGIN
+               FOR t=0L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, t, num_tiles
                    data = ENVI_GET_TILE(tile_id, t, ys=ys, ye=ye)
                    mask[0:xe,ys:ye] = ((data LE mn_) AND (data GE mn_start)) OR ((data GE mx_) AND (data LE mx_start))
@@ -314,7 +314,7 @@ PRO kappa_sigma_threshold_mask, event
             interleave=0, xs=dims[1], xe=dims[2], $
             ys=dims[3], ye=dims[4])
             
-        FOR i=0, iter-1 DO BEGIN
+        FOR i=0L, iter-1 DO BEGIN
             ; Initialise the sum, square sums and pixel count. Double Precision.
             sum    = 0.D
             sq_sum = 0.D
@@ -323,7 +323,7 @@ PRO kappa_sigma_threshold_mask, event
             title = STRING(FORMAT='(%"Iteration %i")', i+1)
             ENVI_REPORT_INIT, rstr, title=title, base=rbase
             
-            FOR t=0, num_tiles-1 DO BEGIN
+            FOR t=0L, num_tiles-1 DO BEGIN
                 ENVI_REPORT_STAT, rbase, t, num_tiles
                 data = (dtype EQ 5) ? DOUBLE(ENVI_GET_TILE(tile_id, t, ye=ye, ys=ys)) : $
                     FLOAT(ENVI_GET_TILE(tile_id, t, ye=ye, ys=ys))
@@ -370,7 +370,7 @@ PRO kappa_sigma_threshold_mask, event
         
         CASE invert_mask OF
             0: BEGIN
-               FOR t=0, num_tiles-1 DO BEGIN
+               FOR t=0L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, t, num_tiles
                    data = ENVI_GET_TILE(tile_id, t, ys=ys, ye=ye)
                    mask = (data GE mn_) AND (data LE mx_)
@@ -378,7 +378,7 @@ PRO kappa_sigma_threshold_mask, event
                ENDFOR
                END
             1: BEGIN
-               FOR t=0, num_tiles-1 DO BEGIN
+               FOR t=0L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, t, num_tiles
                    data = ENVI_GET_TILE(tile_id, t, ys=ys, ye=ye)
                    mask = ((data LE mn_) AND (data GE mn_start)) OR ((data GE mx_) AND (data LE mx_start))
@@ -424,7 +424,7 @@ PRO kappa_sigma_threshold_mask, event
         ENVI_REPORT_INIT, rstr, title="Calculating Histogram", base=rbase
 
         ;now loop over tiles
-        FOR i=1, num_tiles-1 DO BEGIN
+        FOR i=1L, num_tiles-1 DO BEGIN
             ENVI_REPORT_STAT, rbase, i, num_tiles
             data = FLOAT(ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye))
             h = HISTOGRAM(data, input=h, min=mn_start, max=mx_start, binsize=binsz)

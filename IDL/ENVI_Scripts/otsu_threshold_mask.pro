@@ -251,7 +251,7 @@ PRO otsu_threshold_mask, event
                ENVI_REPORT_INIT, rstr, title="Calculating Histogram", base=rbase
 
                ;now loop over tiles
-               FOR i=1, num_tiles-1 DO BEGIN
+               FOR i=1L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, i, num_tiles
                    data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                    h = HISTOGRAM(data, input=h, min=mn_, max=mx_, binsize=binsz)
@@ -267,7 +267,7 @@ PRO otsu_threshold_mask, event
                ENVI_REPORT_INIT, rstr, title="Calculating Histogram", base=rbase
 
                ;now loop over tiles
-               FOR i=1, num_tiles-1 DO BEGIN
+               FOR i=1L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, i, num_tiles
                    data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                    h = HISTOGRAM(data, input=h, min=mn_, max=mx_, nbins=nbins_)
@@ -294,14 +294,14 @@ PRO otsu_threshold_mask, event
         ;now loop over tiles again and apply threshold
         CASE invert_mask OF
             0: BEGIN
-                FOR i=0, num_tiles-1 DO BEGIN 
+                FOR i=0L, num_tiles-1 DO BEGIN 
                     ENVI_REPORT_STAT, rbase, i, num_tiles
                     data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                     mask[0:xe,ys:ye] = (data GE thresh_convert) AND (data LE mx_)
                 ENDFOR
                END
             1: BEGIN
-                FOR i=0, num_tiles-1 DO BEGIN 
+                FOR i=0L, num_tiles-1 DO BEGIN 
                     ENVI_REPORT_STAT, rbase, i, num_tiles
                     data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                     mask[0:xe,ys:ye] = (data LT thresh_convert) AND (data GE mn_)
@@ -332,7 +332,7 @@ PRO otsu_threshold_mask, event
                ENVI_REPORT_INIT, rstr, title="Calculating Histogram", base=rbase
 
                ;now loop over tiles
-               FOR i=1, num_tiles-1 DO BEGIN
+               FOR i=1L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, i, num_tiles
                    data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                    h = HISTOGRAM(data, input=h, min=mn_, max=mx_, binsize=binsz)
@@ -348,7 +348,7 @@ PRO otsu_threshold_mask, event
                ENVI_REPORT_INIT, rstr, title="Calculating Histogram", base=rbase
 
                ;now loop over tiles
-               FOR i=1, num_tiles-1 DO BEGIN
+               FOR i=1L, num_tiles-1 DO BEGIN
                    ENVI_REPORT_STAT, rbase, i, num_tiles
                    data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                    h = HISTOGRAM(data, input=h, min=mn_, max=mx_, nbins=nbins_)
@@ -374,7 +374,7 @@ PRO otsu_threshold_mask, event
         ;now loop over tiles again and apply threshold
         CASE invert_mask OF
             0: BEGIN
-                FOR i=0, num_tiles-1 DO BEGIN 
+                FOR i=0L, num_tiles-1 DO BEGIN 
                     ENVI_REPORT_STAT, rbase, i, num_tiles
                     data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                     mask = (data LT thresh_convert) AND (data GE mn_)
@@ -382,7 +382,7 @@ PRO otsu_threshold_mask, event
                 ENDFOR
                END
             1: BEGIN
-                FOR i=0, num_tiles-1 DO BEGIN 
+                FOR i=0L, num_tiles-1 DO BEGIN 
                     ENVI_REPORT_STAT, rbase, i, num_tiles
                     data=ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
                     mask = (data LT thresh_convert) AND (data GE mn_)
