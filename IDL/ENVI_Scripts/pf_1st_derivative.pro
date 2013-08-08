@@ -6,3 +6,4 @@ if (count ge 3) then $
    result(ptr) = deriv(x[ptr], y[ptr])
 return, result
 end
+
