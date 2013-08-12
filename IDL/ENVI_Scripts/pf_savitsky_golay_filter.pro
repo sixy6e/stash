@@ -7,3 +7,4 @@ savgolFilter = SAVGOL(3,3,0,2)
 result(ptr) = CONVOL(y[ptr], savgolFilter, /EDGE_TRUNCATE)
 return, result
 end
+
