@@ -208,7 +208,7 @@ PRO ula_pq_extract, event
     wm = WIDGET_MENU(base, list=list, uvalue='menu',rows=4, /AUTO)
     wo = WIDGET_OUTF(base, uvalue='outf', /auto)
     wc = WIDGET_MENU(base, uvalue='compressed', list=c_list, /AUTO)
-    wb  = WIDGET_BUTTON(tlb, value='Help', event_pro='ula_pq_extract_button_help', /ALIGN_CENTER, /HELP)
+    wb  = WIDGET_BUTTON(base, value='Help', event_pro='ula_pq_extract_button_help', /ALIGN_CENTER, /HELP)
     result = AUTO_WID_MNG(base)
 
     IF (result.accept EQ 0) THEN RETURN
