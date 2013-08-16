@@ -24,5 +24,10 @@ PRO maximum_entropy_button_help, ev
 END
 
 PRO maximum_entropy_threshold_mask_testing, event
+;+
+; :Hidden:
+;-
+    COMPILE_OPT STRICTARR
+    COMPILE_OPT IDL2
 
 END
