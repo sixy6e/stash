@@ -283,7 +283,7 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
     #sfind      = hdr_data[find]
     #interleave = sfind.split()[2]
     #if (interleave != 'bsq'): # probably should use regex here
-    if (hdr_dict['interleave' != 'bsq'): # probably should use regex here, or something similar to match upper/lowercase.
+    if (hdr_dict['interleave'] != 'bsq'): # probably should use regex here, or something similar to match upper/lowercase.
         raise Exception('Error. File interleave must be BSQ in order for bands to be appended!')
 
     # Find the data type of the existing envi file.
