@@ -138,7 +138,7 @@ def prep_envi_header(dict):
     dict_cp = dict.copy()
     hdr_list = []
     hdr_list.append('ENVI\n')
-    if ('description' in dict_cp.copy()):
+    if ('description' in dict_cp):
         hdr_list.append('description = {\n')
         hdr_list.append(dict_cp['description'] + '}\n')
         del dict_cp['description']
