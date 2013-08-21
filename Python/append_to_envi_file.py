@@ -149,7 +149,7 @@ def prep_envi_header(dict):
     bn = False
     if ('band names' in dict_cp.keys()):
         bn = True
-        bn_list = dict_cp['band names']
+        bn_list = list(dict_cp['band names'])
         del dict_cp['band names']
         bn_list = [bname + ',\n' for bname in bn_list]
         bn_list[-1] = bn_list[-1].replace(',','}')
@@ -350,7 +350,7 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
     #    bn_stuff[-1] = bn_stuff[-1].replace('}',',')
     #    bn_stuff.append(os.path.basename(hdf_file) + '}\n')
     if ('band names' in hdr_dict.keys()):
-        hdr_dict['band names'] = hdr_dict['band names'].append(os.path.basename(hdf_file))
+        hdr_dict['band names'].append(os.path.basename(hdf_file))
 
     #hdr_len = len(hdr_data)
 
