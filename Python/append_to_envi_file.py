@@ -309,7 +309,7 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
         raise Exception('Error. Was expecting an image with only one band!')
 
     #nb = nb + 1
-    hdr_dict['bands'] = hdr_dict['bands'] + 1
+    hdr_dict['bands'] += 1
 
     # Now to write out the file. This file should already be in existance.
     append = open(envi_file, 'ab')
@@ -350,7 +350,8 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
     #    bn_stuff[-1] = bn_stuff[-1].replace('}',',')
     #    bn_stuff.append(os.path.basename(hdf_file) + '}\n')
     if ('band names' in hdr_dict.keys()):
-        hdr_dict['band names'].append(os.path.basename(hdf_file))
+        bname = 'Band ' + str(hdr_dict['bands']) + ' ' + os.path.basename(hdf_file)
+        hdr_dict['band names'].append(bname)
 
     #hdr_len = len(hdr_data)
 
