@@ -256,43 +256,16 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
     hdf_basename  = os.path.basename(hdf_file)
     envi_basename = os.path.basename(envi_file)
 
-    # Find the machine byte ordering (little vs big endian)
-    #find       = line_num_finder(hdr_data, 'byte order')
-    #sfind      = hdr_data[find]
-    #byte_order = int(sfind.split()[3])
-
     # Map the byte order to Python's struct module byte order characters
-    #struct_byt_char = struct_byte_order(byte_order)
     struct_byt_char = struct_byte_order(hdr_dict['byte order'])
     if (struct_byt_char == 'Error'):
         raise Exception('Error. Incompatable Byte Order Value. Compatable ENVI Byte Order Values Are: 0, 1')
 
-    # Find the number of bands
-    #fnb   = line_num_finder(hdr_data, 'bands')
-    #sfind = hdr_data[fnb]
-    #nb    = int(sfind.split()[2])
-
-    # Find the band names
-    #fbn = line_num_finder(hdr_data, 'band names')
-    #if (fbn != None):
-    #    f_endbrace = line_num_finder(hdr_data, '}', offset=fbn)
-    #    bn_stuff   = hdr_data[fbn:f_endbrace+1]
-
     # Find the interleave. If not BSQ then we can't append new bands.
-    #find       = line_num_finder(hdr_data, 'interleave')
-    #sfind      = hdr_data[find]
-    #interleave = sfind.split()[2]
-    #if (interleave != 'bsq'): # probably should use regex here
     if (hdr_dict['interleave'] != 'bsq'): # probably should use regex here, or something similar to match upper/lowercase.
         raise Exception('Error. File interleave must be BSQ in order for bands to be appended!')
 
-    # Find the data type of the existing envi file.
-    #fdt = line_num_finder(hdr_data, 'data type')
-    #sfind      = hdr_data[fdt]
-    #dtype = int(sfind.split()[3])
-
     # Map the datatype to Python's struct module datatype characters.
-    #struct_dtype = struct_datatype(dtype)
     struct_dtype = struct_datatype(hdr_dict['data type'])
     if (struct_dtype == 'Error'):
        raise Exception('Error. Incompatable Data Type. Compatable ENVI Data Types Are: 1, 2, 3, 4, 5, 12, 13, 14, 15')
@@ -308,7 +281,7 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
     if (num_bands != 1):
         raise Exception('Error. Was expecting an image with only one band!')
 
-    #nb = nb + 1
+    # Update the number of bands
     hdr_dict['bands'] += 1
 
     # Now to write out the file. This file should already be in existance.
@@ -343,67 +316,20 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
     # Now to re-create the ENVI header file, updating the necessary parameters.
     create_hdr = open(hdr_fname, 'r')
 
-    #out_num_bands = 'bands   = %i\n'  %nb
-
     # Set up the new bands list
-    #if (fbn != None):
-    #    bn_stuff[-1] = bn_stuff[-1].replace('}',',')
-    #    bn_stuff.append(os.path.basename(hdf_file) + '}\n')
     if ('band names' in hdr_dict.keys()):
         bname = 'Band ' + str(hdr_dict['bands']) + ' ' + os.path.basename(hdf_file)
         hdr_dict['band names'].append(bname)
 
-    #hdr_len = len(hdr_data)
-
     new_hdr = prep_envi_header(hdr_dict)
 
-    # We only need to change the number of bands and band names.
-    # If 'bands' was written before 'band names', write data till the bands
-    # line, then write modifed bands, then write data till bands names, write 
-    # modified band names, then write the rest of the header. Else, reverse the logic.
-    # TODO Write a better routine!!!
-    #if (fbn != None): # Band name info exists
-    #    if (fnb < fbn): # Number of bands is written before band names
-    #        new_hdr = hdr_data[0:fnb]
-    #        new_hdr.append(out_num_bands)
-    #        for i in range(len(hdr_data[fnb+1:fbn])):
-    #            new_hdr.append(hdr_data[i+fnb+1])
-    #        for i in range(len(bn_stuff)):
-    #            new_hdr.append(bn_stuff[i])
-    #        # check that band name endbrace is the end of the file
-    #        # if not, then get the extra stuff and append it
-    #        if (hdr_len > (f_endbrace +1)):
-    #            extra_hdr = hdr_data[f_endbrace+1]
-    #            for i in range(len(extra_hdr)):
-    #                new_hdr.append(extra_hdr[i])
-    #    else: # band names is written before number of bands
-    #        new_hdr = hdr_data[0:fbn]
-    #        for i in range(len(bn_stuff)):
-    #            new_hdr.append(bn_stuff)
-    #        for i in range(len(hdr_data[fbn+1:fnb])):
-    #            new_hdr.append(hdr_data[i+fnb+1])
-    #        new_hdr.append(out_num_bands)
-    #        if (hdr_len > (fnb +1)): # Check for end of hdr file
-    #            extra_hdr = hdr_data[fnb+1]
-    #            for i in range(len(extra_hdr)):
-    #                new_hdr.append(extra_hdr[i])
-    #else: # No band name info
-    #    new_hdr = hdr_data[0:fnb]
-    #    new_hdr.append(out_num_bands)
-    #    if (hdr_len > (fnb +1)): # Check for end of hdr file
-    #        extra_hdr = hdr_data[fnb+1:]
-    #        for i in range(len(extra_hdr)):
-    #            new_hdr.append(extra_hdr[i])
- 
- 
-
-    # open the hdr file again for writing
+    # Open the hdr file again for writing
     hdr_open = open(hdr_fname, 'w')
 
     for line in new_hdr:
         hdr_open.write(line)
 
-    # close the hdr file
+    # Close the hdr file
     hdr_open.close()
 
     # File cleanup
