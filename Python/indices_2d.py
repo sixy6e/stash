@@ -1,7 +1,7 @@
 import numpy
 
 def indices_2d(array, indices):
-    ''' Converts 1D indices into their 2D counterparts.
+    """ Converts 1D indices into their 2D counterparts.
 
         Args:
             array: 
@@ -17,7 +17,7 @@ def indices_2d(array, indices):
         Author:
             Josh Sixsmith, joshua.sixsmith@ga.gov.au
 
-    '''
+    """
 
     dims = array.shape
     if (len(dims) == 3):
