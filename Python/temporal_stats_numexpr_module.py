@@ -11,7 +11,7 @@ import numexpr
 import get_tiles
 
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
-'''
+"""
     Calculates statistics over the temporal/spectral/z domain of an array 
     containing [z,y,x] data.
     Statistics produced in this order are:
@@ -57,7 +57,7 @@ import get_tiles
     required from the command line, as the script will attempt to find the 
     no data value from the metadata.
 
-'''
+"""
 
 NaN     = numpy.float32(numpy.NaN)
     
@@ -210,7 +210,7 @@ def main(infile, outfile, file_driver='ENVI', xtile=None, ytile=None, noData=Non
 
 
 def temporal_stats(array, no_data=None, as_bip=False):
-    '''Calculates statistics over the temporal/spectral/z domain.
+    """Calculates statistics over the temporal/spectral/z domain.
 
     Calculates statistics over the temporal/spectral/z domain of an array
     containing [z,y,x] data.
@@ -251,7 +251,7 @@ def temporal_stats(array, no_data=None, as_bip=False):
     Author:
         Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
-    '''
+    """
 
     # assuming a 3D array, [bands,rows,cols]
     dims  = array.shape

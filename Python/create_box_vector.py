@@ -1,8 +1,8 @@
-'''
+"""
 Created on 14/03/2013
 
 @author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
-'''
+"""
 
 import ogr
 import osr

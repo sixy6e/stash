@@ -10,7 +10,7 @@ import gc
 from osgeo import gdal
 
 def locate(pattern, root):
-    ''' Finds files that match the given pattern.
+    """ Finds files that match the given pattern.
 
         This will not search any sub-directories.
 
@@ -19,7 +19,7 @@ def locate(pattern, root):
         root: The path directory to search
 
     Returns: A list of file-path name strings of files that match the given pattern.
-    '''
+    """
 
     matches = []
     for file in os.listdir(root):
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser(description='Converts a single multi-band Fractional Cover product and into single-band files.')
     parser.add_argument('--indir', required=True, help='The input directory that contains the Fractional Cover products for a specific year-month, eg 2008-11')
-    parser.add_argument('--ext', default='*.tif', help='''The file extension to search for.  The default is '*.tif'.''')
+    parser.add_argument('--ext', default='*.tif', help="""The file extension to search for.  The default is '*.tif'.""")
     parser.add_argument('--driver', default='GTiff', help='The output file type. The default is GTiff.')
 
     parsed_args = parser.parse_args()

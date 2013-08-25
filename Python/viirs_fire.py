@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-'''
+"""
 Created on 13/02/2013
 
 @author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
@@ -24,7 +24,7 @@ History:
 2013/02/13: Initial transcription from IDL code
 2013/05/17: Added a check to see whether or not the array is actually empty.
             Changed function name run_hotspost to run_hotspots
-'''
+"""
 
 import sys
 import os
@@ -34,7 +34,7 @@ import fnmatch
 import argparse
 
 def locate(pattern, root):
-    ''' Finds files that match the given pattern.
+    """ Finds files that match the given pattern.
 
         This will not search any sub-directories.
 
@@ -43,7 +43,7 @@ def locate(pattern, root):
         root: The path directory to search
 
     Returns: A list of file-path name strings of files that match the given pattern.
-    '''
+    """
 
     matches = []
     for file in os.listdir(root):

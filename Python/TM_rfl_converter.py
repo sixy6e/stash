@@ -15,7 +15,7 @@ import datetime
 
 # Returns the required line from a list of strings
 def linefinder(array, string = ""):
-    '''Searches a list for the specified string.
+    """Searches a list for the specified string.
 
        Args:
            array: A list containing searchable strings.
@@ -23,7 +23,7 @@ def linefinder(array, string = ""):
 
        Returns:
            The line containing the found sting.
-    '''
+    """
 
     for line in array:
         if string in str(line):
@@ -31,14 +31,14 @@ def linefinder(array, string = ""):
 
 # Reads the metadata file in order to extract the needed parameters
 def read_metafile(metafile):
-    '''Opens the metadata file and extracs relevant parameters.
+    """Opens the metadata file and extracs relevant parameters.
 
        Args:
            metafile: A full string path name to the metadata file.
 
        Returns:
            Dictionary containing the parameters.
-    '''
+    """
 
     f         = open(metafile, 'r')
     met_array = f.readlines()
@@ -323,7 +323,7 @@ def read_metafile(metafile):
 
 def radiance_conversion(image, gain, bias):
 
-    '''Converts the input image into radiance.
+    """Converts the input image into radiance.
 
        Two methods could be used; the Gain and bias or the spectral radiance
        scaling. Defined to use the spectral radiance scaling method
@@ -344,7 +344,7 @@ def radiance_conversion(image, gain, bias):
        Returns:
            The thermal band converted to at-sensor radiance in
            watts/(meter squared * ster * um) as an ndaray.
-    '''
+    """
 
     rad = numexpr.evaluate("gain * image + bias").astype("float32")
 
@@ -357,7 +357,7 @@ def radiance_conversion(image, gain, bias):
     return rad
 
 def reflectance_conversion(image, sol_zenith, esun_dist, sol_irrad):
-    '''Converts the input image into Top Of Atmosphere Reflectance (TOAR).
+    """Converts the input image into Top Of Atmosphere Reflectance (TOAR).
 
        Args:
            image: An nd-array containing top of atmosphere calibrated 
@@ -370,7 +370,7 @@ def reflectance_conversion(image, sol_zenith, esun_dist, sol_irrad):
        Returns:
            A float32 nd-array containing TOAR.
        
-    '''
+    """
 
     pi = numpy.float32(numpy.pi)
     sol_zenith = numpy.float32(sol_zenith)
@@ -381,7 +381,7 @@ def reflectance_conversion(image, sol_zenith, esun_dist, sol_irrad):
     return ref
 
 def earth_sun_dist(DOY):
-    '''A look up table for earth-sun distance in astronmical units.
+    """A look up table for earth-sun distance in astronmical units.
       
        Args:
            DOY: An integer value between 1 and 366 (Day Of Year)
@@ -389,7 +389,7 @@ def earth_sun_dist(DOY):
        Rerturns:
            The earth-sun distance in astronomical units.
 
-    '''
+    """
 
     assert (DOY >= 1 and DOY <= 366), 'Invalid Day of Year %i' % DOY
 
@@ -506,7 +506,7 @@ def datatype(val):
         }.get(instr, 'float64')
 
 def locate(pattern, root):
-    '''Searches for filenames specified by the pattern.
+    """Searches for filenames specified by the pattern.
 
        Args:
            pattern: A string containing the relevant file pattern. The
@@ -515,7 +515,7 @@ def locate(pattern, root):
 
        Returns:
            A list containing the files found.
-    '''
+    """
 
     matches = []
 

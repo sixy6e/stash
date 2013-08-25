@@ -19,12 +19,12 @@ def map2img(geoTransform, location):
     return (imgy,imgx)
 
 if __name__ == '__main__':
-    '''
+    """
     Extracts a DEM based on the bounding co-ordinates of the input image.
     At this stage assuming the input image is projected in metres and the DEM
     is in geographics. Output will be the extent and co-ordinate system of the
     input file.
-    '''
+    """
 
     parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser(description='Extracts the DEM covering the extent of the input file. At this stage assuming the input image is projected in metres and the DEM is in geographics. Output will be the extent and co-ordinate system of the input file.')

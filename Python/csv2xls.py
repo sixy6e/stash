@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-'''
+"""
 Converts csv files to excel (xls). Designed specifically for the DLCD project.
 Looks for csv files in the specified directory.
 Creates a single xls file with multiple tabs. Each tab named from a certain 
@@ -12,7 +12,7 @@ xlwt; http://pypi.python.org/pypi/xlwt/0.7.4
 Created on 13/08/2012
 
 @author: Josh Sixsmith, joshua.sixsmith@ga.gov.au
-'''
+"""
 
 import sys
 import os
@@ -25,7 +25,7 @@ import re
 path = r'C:\WINNT\Profiles\u08087\My Documents\Staff\Alexis'
 
 def locate(pattern, root):
-    ''' Finds files that match the given pattern.
+    """ Finds files that match the given pattern.
     
         This will not search any sub-directories.
     
@@ -34,7 +34,7 @@ def locate(pattern, root):
         root: The path directory to search
     
     Returns: A list of file-path name strings of files that match the given pattern.
-    '''
+    """
     
     matches = []
     for file in os.listdir(root):

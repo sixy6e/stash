@@ -3,7 +3,7 @@
 import numpy
 
 def median(array, even_left=False, even_right=False):
-    '''Calculates the median of a 1D array.
+    """Calculates the median of a 1D array.
 
     This function can support even arrays and return a non-interpolated value.
 
@@ -19,7 +19,7 @@ def median(array, even_left=False, even_right=False):
 
     Author:
         Josh Sixsmith; joshua.sixsmith@ga.gov.au
-    '''
+    """
 
     if (array.size == 0):
         return numpy.float32(numpy.NaN)

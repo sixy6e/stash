@@ -4,7 +4,7 @@ import numpy
 from IDL_functions import IDL_Histogram
 
 def otsu_threshold(image, Binsize=None, Max=None, Min=None, Nbins=None, Fast=True, Apply=False):
-    '''Calculates the Otsu threshold.
+    """Calculates the Otsu threshold.
 
        Seperates the input array into background and foreground components
        by finding the maximum between class variance.
@@ -40,7 +40,7 @@ def otsu_threshold(image, Binsize=None, Max=None, Min=None, Nbins=None, Fast=Tru
         http://en.wikipedia.org/wiki/Otsu's_method
 
 
-    '''
+    """
 
     if image == None:
         print 'No input image!!!'

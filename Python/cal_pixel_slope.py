@@ -4,7 +4,7 @@ import numpy
 
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
-'''
+"""
 This routine needs the solar azimuth, view azimuth, solar zenith, view zenith angles.  Will need to take the code from NBAR to duplicate these rasters.
 As these rasters are calculated for the extents of the landsat raster; The DEM
 will need to be projected to the landsat grid. However as a buffer is needed
@@ -22,17 +22,17 @@ don't really account for negative values. So for large negative values, the
 algorithm could be searching outside the buffer extent. Anything less than -500
 should be sufficient engouh to not include real features that are below sea
 level, eg Lake Eyre.
-'''
+"""
 
 
 def cal_pole(zenith, azimuth, slope, aspect):
 
-    '''
+    """
       The zenith argument is not necessarily the zenith. The first call to this
       function will be solar_zenith, solar_azimuth, slope & aspect. The second
       call to this function is the sensor_view_angle, sensor_azimuth, slope &
       aspect.
-    '''
+    """
 
     ierr=0.0
     offset=0.0

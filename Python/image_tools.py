@@ -7,7 +7,7 @@ from scipy import ndimage
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
 def img2map(geoTransform, pixel):
-    '''Converts a pixel (image) co-ordinate into a map co-ordinate.
+    """Converts a pixel (image) co-ordinate into a map co-ordinate.
 
        Args:
            geoTransform: A list or tuple containing the upper left co-ordinate
@@ -28,7 +28,7 @@ def img2map(geoTransform, pixel):
 
        Author: 
            Josh Sixsmith; joshua.sixsmith@ga.gov.au
-    '''
+    """
 
     if len(geoTransform) != 6:
         raise Exception('Need 6 parameters for the geoTransform variable')
@@ -53,7 +53,7 @@ def img2map(geoTransform, pixel):
 
 
 def map2img(geoTransform, location):
-    '''Converts a map co-ordinate into a pixel (image) co-ordinate.
+    """Converts a map co-ordinate into a pixel (image) co-ordinate.
 
       Args:
           geoTransform: A list or tuple containing the upper left co-ordinate of          the image. This info can be retrieved from gdal. Otherwise create your          own using the following as a guide. Must have 6 elements.
@@ -74,7 +74,7 @@ def map2img(geoTransform, location):
 
        Author:
            Josh Sixsmith; joshua.sixsmith@ga.gov.au
-    '''
+    """
 
     if len(geoTransform) != 6:
         raise Exception('Need 6 parameters for the geoTransform variable')
@@ -99,7 +99,7 @@ def map2img(geoTransform, location):
 
 
 def region_grow(array, seed, stdv_multiplier=None, ROI=None, All_Neighbours=True):
-    '''Grows a single pixel or a group of pixels into a region.
+    """Grows a single pixel or a group of pixels into a region.
 
        Similar to IDL's REGION_GROW function. 
        For the single pixel case, the seed and its neighbours
@@ -124,7 +124,7 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=None, All_Neighbours=True
 
        Author:
            Josh Sixsmith; joshua.sixsmith@ga.gov.au
-    '''
+    """
 
     if len(array.shape) != 2:
         raise Exception('Input array needs to be 2D in shape')
@@ -208,7 +208,7 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=None, All_Neighbours=True
 
 
 def linear_percent(array, percent=2):
-    '''Image contrast enhancement.
+    """Image contrast enhancement.
 
     A 2D image is ehanced via a specifed percentage (Default 2%).
 
@@ -222,7 +222,7 @@ def linear_percent(array, percent=2):
 
        Author:
            Josh Sixsmith; joshua.sixsmith@ga.gov.au
-    '''
+    """
 
     if len(array.shape) != 2:
         raise Exception('Only 2D arrays are supported.')

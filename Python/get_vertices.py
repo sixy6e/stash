@@ -1,8 +1,8 @@
-'''
+"""
 Created on 28/11/2011
 
 @author: u08087
-'''
+"""
 # Only returns lat and long, not elevation coords
 
 import numpy
