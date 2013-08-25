@@ -8,6 +8,9 @@ from IDL_functions import IDL_Histogram
 
 
 class IDL_Hist_Tester(unittest.TestCase):
+    """
+    A unit testing procedure for the IDL Histogram funciton.
+    """
 
     def setUp(self):
         self.array1 = numpy.arange(10)
@@ -18,17 +21,19 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.array5 = numpy.random.randint(0,11,(100,100))
 
     def test_true_false_a(self):
-        ''' Test that TRUE = 1 and FALSE = 0
-        '''
+        """
+        Test that TRUE = 1 and FALSE = 0
+        """
         # Using an array 0->9, test how many are > 5
         bool_ = numpy.zeros((10), dtype='int8')
         unit_test_IDL_Hist.test_bool(self.array1, 10, bool_)
         self.assertEqual(self.control1.sum(), 4)
 
     def test_true_false_b(self):
-        ''' Test that the boolean array returned by Fortran gives the same
-            result as that given by numpy.
-        '''
+        """
+        Test that the boolean array returned by Fortran gives the same
+        result as that given by numpy.
+        """
         # Using an array 0->9, test how many are > 5
         bool_ = numpy.zeros((10), dtype='int8')
         unit_test_IDL_Hist.test_bool(self.array1, 10, bool_)
@@ -36,40 +41,45 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.assertEqual(eq.sum(), 10)
 
     def test_hist(self):
-        ''' Test that the histogram works. Default binsize is 1, so there 
-            should be 256 bins.
-        '''
+        """
+        Test that the histogram works. Default binsize is 1, so there 
+        should be 256 bins.
+        """
         h = IDL_Histogram(self.array2)
         # Should be 256 elements, and the value 1 contained within each.
         self.assertEqual(h['histogram'].shape[0], 256)
         self.assertEqual((h['histogram'] == 1).sum(), 256)
 
     def test_hist_max(self):
-        ''' Test that the max keyword works.
-        '''
+        """
+        Test that the max keyword works.
+        """
         # Using an array 0->255, check that 255 gets omitted
         h = IDL_Histogram(self.array2, max=254)
         self.assertEqual(h['histogram'].shape[0], 255)
         self.assertEqual((h['histogram'] == 1).sum(), 255)
 
     def test_hist_min(self):
-        ''' Test that the min keyword works.
-        '''
+        """
+        Test that the min keyword works.
+        """
         # Using an array 0->255, check that 0 gets omitted
         h = IDL_Histogram(self.array2, min=1)
         self.assertEqual(h['histogram'].shape[0], 255)
         self.assertEqual((h['histogram'] == 1).sum(), 255)
 
     def test_omin(self):
-        ''' Test that the omin keyword works.
-        '''
+        """
+        Test that the omin keyword works.
+        """
         # The output should be the same. Using an array 0->255
         h = IDL_Histogram(self.array2, omin='omin')
         self.assertEqual(h['omin'], 0)
 
     def test_omax(self):
-        ''' Test that the omin keyword works.
-        '''
+        """
+        Test that the omin keyword works.
+        """
         # Using an array 0->255
         # The returned value should be the same as the derived max, unless
         # the nbins keyword is set, in which case the max gets rescaled by
@@ -78,8 +88,9 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.assertEqual(h['omax'], 255)
 
     def test_nan(self):
-        ''' Test that the NaN keyword works.
-        '''
+        """
+        Test that the NaN keyword works.
+        """
         a = self.array2.astype('float64')
         a[0] = numpy.NaN
         h = IDL_Histogram(a, NaN=True)
@@ -88,15 +99,17 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.assertEqual(h['histogram'].shape[0], 255)
 
     def test_binsize(self):
-        ''' Test that the binsize keyword works.
-        '''
+        """
+        Test that the binsize keyword works.
+        """
         h = IDL_Histogram(self.array3, binsize=0.5)
         # should be 20 bins to contain the values 10 -> 19.5
         self.assertEqual(h['histogram'].shape[0], 20)
 
     def test_default_binsize(self):
-        ''' Test that the default binsize is 1 and works accordingly.
-        '''
+        """
+        Test that the default binsize is 1 and works accordingly.
+        """
         # Using an array of values in range 0->1
         h = IDL_Histogram(self.array4)
         self.assertEqual(h['histogram'].shape[0], 1)
@@ -104,20 +117,23 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.assertEqual(self.array4.shape[0], h['histogram'][0])
 
     def test_nbins(self):
-        ''' Test that the nbins keyword works.
-        '''
+        """
+        Test that the nbins keyword works.
+        """
         h = IDL_Histogram(self.array4, nbins=256)
         # There should be 256 bins
         self.assertEqual(h['histogram'].shape[0], 256)
 
     def test_two_dimensional(self):
-        ''' Test that inputing a 2D array will raise an error.
-        '''
+        """
+        Test that inputing a 2D array will raise an error.
+        """
         self.assertRaises(Exception, IDL_Histogram, self.array5)
 
     def test_reverse_indices1(self):
-        ''' Test that the reverse indices keyword works.
-        '''
+        """
+        Test that the reverse indices keyword works.
+        """
         # Make a copy then shuffle the array. Elements are in a random order.
         a = self.array2.copy()
         numpy.random.shuffle(a)
@@ -133,9 +149,10 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.assertEqual(bin, data)
 
     def test_reverse_indices2(self):
-        ''' Test whether mulitple values in a single bin are correctly returned
-            by the reverse indices.
-        '''
+        """
+        Test whether mulitple values in a single bin are correctly returned
+        by the reverse indices.
+        """
         # Make a copy then shuffle the array. Elements are in a random order.
         a = self.array2.copy()
         numpy.random.shuffle(a)
@@ -151,9 +168,10 @@ class IDL_Hist_Tester(unittest.TestCase):
         self.assertEqual((control - data).sum(), 0)
 
     def test_reverse_indices3(self):
-        ''' Test that the reverse indices keyword works across multiple bins 
-            and values.
-        '''
+        """
+        Test that the reverse indices keyword works across multiple bins 
+        and values.
+        """
         # A random floating array in range 0-20
         a = (self.array4)*20
         # Specifying min=0 should give bin start points 0, 2.5, 5, 7.5 etc
