@@ -21,7 +21,7 @@ from frtn_topo_shad import topo_shadow
 create_shapefile = False
 
 def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_angle, sensor_view_angle, solar_azi, solar_zen, bitpos=14):
-    '''Creates a 2D array of topographic shadow.
+    """Creates a 2D array of topographic shadow.
 
 
        Args:
@@ -48,28 +48,28 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
        Author Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
-    '''
+    """
 
     def img2map(geoTransform, pixel):
-        '''Converts a pixel (image) co-ordinate into a map co-ordinate.
+        """Converts a pixel (image) co-ordinate into a map co-ordinate.
 
-        '''
+        """
 
         mapx = pixel[1] * geoTransform[1] + geoTransform[0]
         mapy = geoTransform[3] - (pixel[0] * (numpy.abs(geoTransform[5])))
         return (mapx,mapy)
 
     def map2img(geoTransform, location):
-        '''Converts a map co-ordinate into a pixel (image) co-ordinate.
+        """Converts a map co-ordinate into a pixel (image) co-ordinate.
 
-        '''
+        """
 
         imgx = int(numpy.round((location[0] - geoTransform[0])/geoTransform[1]))
         imgy = int(numpy.round((geoTransform[3] - location[1])/numpy.abs(geoTransform[5])))
         return (imgy,imgx)
 
     def map2img_array(mapx, mapy, geoTransform):
-        '''Converts the x and y map locations in image co-ordinates.
+        """Converts the x and y map locations in image co-ordinates.
 
            Rather than operating over single co-ordinates, this will operate
            over an array.
@@ -82,7 +82,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
           Returns:
                A tuple containing the indices of the locations.
-        '''
+        """
 
         dict = { 'a': numpy.float32(geoTransform[0]), 'b': numpy.float32(geoTransform[1]) }
         imgx = numpy.round(numexpr.evaluate("(mapx - a)/b", dict, locals())).astype('int32')
@@ -95,7 +95,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
     # Returns the required line from a list of strings
     def linefinder(array, string = ""):
-        '''Searches a list for the specified string.
+        """Searches a list for the specified string.
 
            Args:
                array: A list containing searchable strings.
@@ -103,7 +103,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
            Returns:
                The line containing the found sting.
-        '''
+        """
 
         for line in array:
             if string in str(line):
@@ -111,14 +111,14 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
     # Reads the metadata file in order to extract the needed parameters
     def read_metafile(metafile):
-        '''Opens the metadata file and extracs relevant parameters.
+        """Opens the metadata file and extracs relevant parameters.
 
            Args:
                metafile: A full string path name to the metadata file.
 
            Returns:
                Dictionary containing the parameters.
-        '''
+        """
 
         f         = open(metafile, 'r')
         met_array = f.readlines()
@@ -139,7 +139,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
         return params
 
     def slope_aspect(array, pxsize, pysize):
-        '''Calculates the slope and aspect of an array.
+        """Calculates the slope and aspect of an array.
 
            Args:
                array: A 2D numpy array, generally a DEM.
@@ -148,7 +148,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
            Returns:
                Two seperate 2D numpy arrays; the first containing the slope
                and the second containing the aspect.
-        '''
+        """
         dzdx = numpy.zeros(array.shape, dtype='float32')
         dzdy = numpy.zeros(array.shape, dtype='float32')
         slp  = numpy.zeros(array.shape, dtype='float32')
@@ -164,12 +164,12 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
     def cal_pole(zenith, azimuth, slope, aspect):
     
-        '''
+        """
           The zenith argument is not necessarily the zenith. The first call to this
           function will be solar_zenith, solar_azimuth, slope & aspect. The second
           call to this function is the sensor_view_angle, sensor_azimuth, slope &
           aspect.
-        '''
+        """
     
         eps= 0.000001
         pi = numpy.pi
@@ -426,7 +426,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
         #prjDEM_L_subs = prjDEM[y_off:y_end+1, x_off:x_end+1]
         prjDEM_L_subs = prjDEM[y_off:y_end, x_off:x_end]
       
-        ''' 
+        """ 
         # Write out the projected DEM
         driver = gdal.GetDriverByName("ENVI")
         outds  = driver.Create('projected_dem', dims[1], dims[0],1, gdal.GDT_Float32)
@@ -435,7 +435,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
         outband = outds.GetRasterBand(1)
         outband.WriteArray(prjDEM_L_subs)
         outds = None
-        '''
+        """
 
         # Lat/lon grids will now be generated from the same code as that which
         # is in the NBAR algorithm.
@@ -498,7 +498,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
         # Self shadow algorithm !!!!!!!!
 
-        '''
+        """
         This routine needs the solar azimuth, view azimuth, solar zenith, view 
         zenith angles.  Will need to take the code from NBAR to duplicate these
         rasters. As these rasters are calculated for the extents of the landsat
@@ -525,7 +525,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
         The algorithms created by Fuqin don't really account for negative
         values. So for large negative values, the algorithm could be searching          outside the buffer extent. Mostly only a problem for negative null 
         values. 
-        '''
+        """
         
         
         # Fortran input order (not including header and DEM)
@@ -755,7 +755,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
         del query; gc.collect()
 
-        '''
+        """
         Have re-written the fortran module.
         The following is a list of what is needed.
         DEM, dem_cols, dem_rows, sub_col, sub_row, mask, dy, dx, zenith,
@@ -768,7 +768,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
         cosphc, sinphc, zenith, dx, dy, lat, lon, d0 are float32.
         pi, zmax are float32.
         dem_cols, dem_rows, sub_col, sub_row, l_xoff, l_yoff are integers.
-        '''
+        """
 
         print 'Converting to fortran contiguous arrays'
         print 'zmax: ', zmax
@@ -862,7 +862,7 @@ def TopographicShadow(image, img_geoT, img_prj, DEM, metafile, lat, sensor_azi_a
 
 # The following is the original Fortran code for the cast shadow algorithm.
 # Filename: shade_main_landsat_pixel.f
-'''
+"""
       program shade_main
 c
 c     Program to calculate cast shadow for a standard Landsat scene
@@ -1665,11 +1665,11 @@ c     semi-minor axis
       dx=rr*ddx
       return
       end
-'''
+"""
 
 # The following is the original Fortran code for the self shadow algorithm.
 # Filename: slope_pixelsize_newpole.f
-'''
+"""
       program slope
 c     this program is used to calculate slope and aspect angles
 c     using Sobel filter and then calculate incident and
@@ -1941,4 +1941,4 @@ c
 c
         return
         end
-'''
+"""

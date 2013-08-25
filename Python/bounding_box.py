@@ -13,18 +13,18 @@ import pdb
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
 def img2map(geoTransform, pixel):
-    '''Converts a pixel (image) co-ordinate into a map co-ordinate.
+    """Converts a pixel (image) co-ordinate into a map co-ordinate.
 
-    '''
+    """
 
     mapx = pixel[1] * geoTransform[1] + geoTransform[0]
     mapy = geoTransform[3] - (pixel[0] * (numpy.abs(geoTransform[5])))
     return (mapx,mapy)
 
 def map2img(geoTransform, location):
-    '''Converts a map co-ordinate into a pixel (image) co-ordinate.
+    """Converts a map co-ordinate into a pixel (image) co-ordinate.
 
-    '''
+    """
 
     imgx = int(numpy.round((location[0] - geoTransform[0])/geoTransform[1]))
     imgy = int(numpy.round((geoTransform[3] - location[1])/numpy.abs(geoTransform[5])))
