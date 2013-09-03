@@ -1,21 +1,23 @@
 import numpy
 
 def indices_2d(array, indices):
-    """ Converts 1D indices into their 2D counterparts.
+    """
+    Converts 1D indices into their 2D counterparts.
 
-        Args:
-            array: 
-                 A 2D array on which the indices were derived. Can accept a 3D 
-                 array but indices are assumed to be in 2D.
-            indices:
-                 The 1D array containing the indices. Can accept the tuple
-                 returned from a 'where' statement.
+    :param array:
+         2D array on which the indices were derived. Can accept a 3D array but indices are assumed to be in 2D.
 
-        Returns:
-            A tuple containing the 2D indices.
+    :param indices:
+         The 1D array containing the indices. Can accept the tuple returned from a 'where' statement.
 
-        Author:
-            Josh Sixsmith, joshua.sixsmith@ga.gov.au
+    :return:
+        A tuple containing the 2D indices.
+
+    :author:
+        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+
+    :history:
+        * 03/03/2013: Created
 
     """
 
@@ -52,5 +54,4 @@ def indices_2d(array, indices):
     ind = (r,c)
 
     return ind
-
 
