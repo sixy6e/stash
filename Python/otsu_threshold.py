@@ -4,41 +4,43 @@ import numpy
 from IDL_functions import IDL_Histogram
 
 def otsu_threshold(image, Binsize=None, Max=None, Min=None, Nbins=None, Fast=True, Apply=False):
-    """Calculates the Otsu threshold.
+    """
+    Calculates the Otsu threshold.
 
-       Seperates the input array into background and foreground components
-       by finding the maximum between class variance.
+    Seperates the input array into background and foreground components
+    by finding the maximum between class variance.
 
-       Inputs:
-             image: A numpy array of maximum three dimensions.
-             Fast: Default is True. Will find the optimal threshold using the
-                   fast method which approximates the mean value per class.
-             Apply: Default is False. If True then a mask/masks of the same 
-                    dimensions as image will be returned. Otherwise only the
-                    threshold/thresholds will be returned.
-             Binsize: (Optional) The binsize (Default is 1) to be used for
-                 creating the histogram.
-             Max: (Optional) The maximum value to be used in creating the
-               histogram. If not specified the array will be searched for max.
-             Min: (Optional) The minimum value to be used in creating the
-               histogram. If not specified the array will be searched for min.
-             Nbins: (Optional) The number of bins to be used for creating the
-               histogram. If set binsize is calculated as
-               (max - min) / (nbins - 1), and the max value will be adjusted
-               to (nbins*binsize + min).
-             
+    :param image:
+        A numpy array of maximum three dimensions.
 
-       Author: Josh Sixsmith, joshua.sixsmith@ga.gov.au
-       History: 06/02/2013--Created
-                04/06/2013--Keywords Binsize, Nbins, Min, Max, Fast and Apply
-                            added.
+    :param Fast:
+        Default is True. Will find the optimal threshold using the fast method which approximates the mean value per class.
 
-       Sources:
+    :param Apply:
+        Default is False. If True then a mask/masks of the same dimensions as image will be returned. Otherwise only the threshold/thresholds will be returned.
+
+    :param Binsize:
+        (Optional) The binsize (Default is 1) to be used for creating the histogram.
+
+    :param Max:
+        (Optional) The maximum value to be used in creating the histogram. If not specified the array will be searched for max.
+
+    :param Min: (Optional) The minimum value to be used in creating the histogram. If not specified the array will be searched for min.
+
+    :param Nbins: (Optional) The number of bins to be used for creating the histogram. If set binsize is calculated as (max - min) / (nbins - 1), and the max value will be adjusted to (nbins*binsize + min).
+          
+    :author:
+        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+
+    :history:
+        * 06/02/2013--Created
+        * 04/06/2013--Keywords Binsize, Nbins, Min, Max, Fast and Apply added.
+
+    :sources:
         http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
         http://www.codeproject.com/Articles/38319/Famous-Otsu-Thresholding-in-C
         http://en.wikipedia.org/wiki/Cumulative_frequency_analysis
         http://en.wikipedia.org/wiki/Otsu's_method
-
 
     """
 

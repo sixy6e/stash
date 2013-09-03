@@ -100,7 +100,8 @@ def hillshade(dem, elevation=45.0, azimuth=315.0, scalearray=False, scalefactor=
     :param driver:
         A string containing a GDAL compliant image driver. Defaults to ENVI.
     
-    :author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
+    :author: 
+        Josh Sixsmith; joshua.sixsmith@ga.gov.au
     
     :history:
         2012/07: Created
