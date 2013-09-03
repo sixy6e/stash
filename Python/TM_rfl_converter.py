@@ -541,13 +541,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser(description='Calculates Top of Atmosphere Reflectance for Landsat 5 & 7.')
 
-    parser.add_argument('-MTL', help='The landsat MTL text file. Or the directory to where the MTL file is located.')
-    parser.add_argument('-outfile', default='TOAR.tif', help='The output filename.  At this stage only tif files are created. Defaults to TOAR.tif.')
+    parser.add_argument('--MTL', help='The landsat MTL text file. Or the directory to where the MTL file is located.')
+    parser.add_argument('--outfile', required=True, help='The output filename.')
+    parser.add_argument('--driver', default='ENVI', help="The file driver type for the output file. See GDAL's list of valid file types. (Defaults to ENVI).")
 
     parsed_args = parser.parse_args()
 
     folder_path = parsed_args.MTL
     outname = parsed_args.outfile
+    drv  = parsed_args.driver
 
     if os.path.isdir(folder_path):
         mfile  = locate('*MTL*', folder_path)
@@ -568,8 +570,7 @@ if __name__ == '__main__':
     band     = obj.GetRasterBand(1)
     datype   = datatype(band.DataType)
 
-    driver = gdal.GetDriverByName('GTiff')
-    #outds  = driver.Create(outname, m_info['Columns'], m_info['Rows'], nbands, 6)
+    driver = gdal.GetDriverByName(drv)
     outds  = driver.Create(outname, m_info['Columns'], m_info['Rows'], nbands, 3)
     
     # see G. Chander et al. RSE 113 (2009) 893-903
