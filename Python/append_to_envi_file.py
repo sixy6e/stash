@@ -8,6 +8,7 @@ import argparse
 import re
 import numpy
 from osgeo import gdal
+import get_tiles
 
 """
 This script is designed to take an ENVI file and append an extra band.
@@ -160,28 +161,6 @@ def prep_envi_header(dict):
         hdr_list.extend(bn_list)
     return hdr_list
 
-def get_tile3(samples, lines, xtile=100,ytile=100):
-    """
-    A function that pre-calculates tile indices for a 2D array.
-    """
-    ncols = samples
-    nrows = lines
-    tiles = []
-    xstart = numpy.arange(0,ncols,xtile)
-    ystart = numpy.arange(0,nrows,ytile)
-    for ystep in ystart:
-        if ystep + ytile < nrows:
-            yend = ystep + ytile
-        else:
-            yend = nrows
-        for xstep in xstart:
-            if xstep + xtile < ncols:
-                xend = xstep + xtile
-            else:
-                xend = ncols
-            tiles.append((ystep,yend,xstep, xend))
-    return tiles
-
 def struct_datatype(val):
     """
     Maps ENVI's datatypes to Python's struct datatypes.
@@ -289,7 +268,7 @@ def main(envi_file, hdf_file, scratch_space, ytiles):
 
     # Should we implement a tiling mechanism?
     # If so, then xsize is always all samples, and ysize can vary.
-    tiles = get_tile3(samples, lines, xtile=samples,ytile=ytiles)
+    tiles = get_tiles.get_tile3(samples, lines, xtile=samples,ytile=ytiles)
 
     print 'Appending data from %s to %s' %(hdf_basename, envi_basename)
 
