@@ -8,27 +8,32 @@ from osgeo import gdal
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
 def img2map(geoTransform, pixel):
-    """Converts a pixel (image) co-ordinate into a map co-ordinate.
+    """
+    Converts a pixel (image) co-ordinate into a map co-ordinate.
 
-       Args:
-           geoTransform: A list or tuple containing the upper left co-ordinate
-           of the image. This info can be retrieved from gdal. Otherwise create            your own using the following as a guide. Must have 6 elements.
-           geoT = (350415.0, 30.0, 0.0, -3718695.0, 0.0, -30.0)
-           geoT[0] is top left x co-ordinate.
-           geoT[1] is west to east pixel size.
-           geoT[2] is image rotation (0 if image is north up).
-           geoT[3] is to left y co-ordinate.
-           geoT[4] is image rotation (0 if image is north up).
-           geoT[5] is north to south pixel size.
-           pixel: A tuple containing the image index of a pixel (row,column).
-           This can contain a series of co-ordinates, eg a tuple containing 2
-           numpy.array's of pixel co-ordinates.
+    :param geoTransform:
+        A list or tuple containing the upper left co-ordinate of the image.
+        This info can be retrieved from gdal. Otherwise create your own using
+        the following as a guide. Must have 6 elements.
+        geoT = (350415.0, 30.0, 0.0, -3718695.0, 0.0, -30.0)
+        geoT[0] is top left x co-ordinate.
+        geoT[1] is west to east pixel size.
+        geoT[2] is image rotation (0 if image is north up).
+        geoT[3] is to left y co-ordinate.
+        geoT[4] is image rotation (0 if image is north up).
+        geoT[5] is north to south pixel size.
 
-       Returns:
-           A tuple containing the (x,y) location co-ordinate.
 
-       Author: 
-           Josh Sixsmith; joshua.sixsmith@ga.gov.au
+    :param pixel:
+        A tuple containing the image index of a pixel (row,column).
+        This can contain a series of co-ordinates, eg a tuple containing 2
+        numpy.array's of pixel co-ordinates.
+
+    :return:
+        A tuple containing the (x,y) location co-ordinate.
+
+    :author: 
+        Josh Sixsmith; joshua.sixsmith@ga.gov.au
     """
 
     if len(geoTransform) != 6:
@@ -54,27 +59,31 @@ def img2map(geoTransform, pixel):
 
 
 def map2img(geoTransform, location):
-    """Converts a map co-ordinate into a pixel (image) co-ordinate.
+    """
+    Converts a map co-ordinate into a pixel (image) co-ordinate.
 
-      Args:
-          geoTransform: A list or tuple containing the upper left co-ordinate of          the image. This info can be retrieved from gdal. Otherwise create your          own using the following as a guide. Must have 6 elements.
-          geoT = (350415.0, 30.0, 0.0, -3718695.0, 0.0, -30.0)
-          geoT[0] is top left x co-ordinate.
-          geoT[1] is west to east pixel size.
-          geoT[2] is image rotation (0 if image is north up).
-          geoT[3] is to left y co-ordinate.
-          geoT[4] is image rotation (0 if image is north up).
-          geoT[5] is north to south pixel size.
-          location: A tuple containing the location co-ordinate (x,y)       
-          This can contain a series of co-ordinates, eg a tuple containing 2
-          numpy.array's of location co-ordinates.
+    :param geoTransform:
+        A list or tuple containing the upper left co-ordinate of the image. 
+	This info can be retrieved from gdal. Otherwise create your own using 
+	the following as a guide. Must have 6 elements.
+        geoT = (350415.0, 30.0, 0.0, -3718695.0, 0.0, -30.0)
+        geoT[0] is top left x co-ordinate.
+        geoT[1] is west to east pixel size.
+        geoT[2] is image rotation (0 if image is north up).
+        geoT[3] is to left y co-ordinate.
+        geoT[4] is image rotation (0 if image is north up).
+        geoT[5] is north to south pixel size.
 
+    :param location:
+        A tuple containing the location co-ordinate (x,y).
+        This can contain a series of co-ordinates, eg a tuple containing 2
+        numpy.array's of location co-ordinates.
 
-      Returns:
-          A tuple containing the (row,column) pixel co-ordinate.
+    :return:
+        A tuple containing the (row,column) pixel co-ordinate.
 
-       Author:
-           Josh Sixsmith; joshua.sixsmith@ga.gov.au
+    :author:
+        Josh Sixsmith; joshua.sixsmith@ga.gov.au
     """
 
     if len(geoTransform) != 6:
@@ -100,31 +109,41 @@ def map2img(geoTransform, location):
 
 
 def region_grow(array, seed, stdv_multiplier=None, ROI=None, All_Neighbours=True):
-    """Grows a single pixel or a group of pixels into a region.
+    """
+    Grows a single pixel or a group of pixels into a region.
 
-       Similar to IDL's REGION_GROW function. 
-       For the single pixel case, the seed and its neighbours
-       are used to generate statistical thresholds by which to grow
-       connected pixels. If the keyword 'ROI' is set to anything but None, then
-       the seed will be assumed to be a region of neighbouring pixels. Otherwise       the region grow function will iterate through the seed points and treat
-       them individually.
+    Similar to IDL's REGION_GROW function. 
+    For the single pixel case, the seed and its neighbours
+    are used to generate statistical thresholds by which to grow
+    connected pixels. If the keyword 'ROI' is set to anything but None, then
+    the seed will be assumed to be a region of neighbouring pixels. Otherwise       the region grow function will iterate through the seed points and treat
+    them individually.
 
-       Args:
-           array: A single 2D numpy array.
-           seed: A tuple containing a the location of a single pixel, or 
-           multiple pixel locations.
-           stdv_multiplier: A value containing the standard deviation multiplier           that defines the upper and lower threshold limits. Defaulted to None,           in which case the min and max will be used as defining threshold 
-           limits.
-           ROI: The seed will be assumed to be a region of neighbouring pixels,            and gather stats from the ROI to perform the threholding. Defaults to
-           None; eg pixels are not neighbouring and will iterate through all
-           pixels contained in the seed.
-           All_Neighbours: If set to True, then all 8 neighbours will be used to           search for connectivity.    
+    :param array:
+        A single 2D numpy array.
+
+    :param seed:
+        A tuple containing a the location of a single pixel, or multiple pixel locations.
+
+    :param stdv_multiplier:
+        A value containing the standard deviation multiplier that defines the 
+	upper and lower threshold limits. Defaulted to None, in which case the 
+	min and max will be used as defining threshold limits.
+
+    :param ROI:
+        The seed will be assumed to be a region of neighbouring pixels, and 
+	gather stats from the ROI to perform the threholding. Defaults to
+        None; eg pixels are not neighbouring and will iterate through all
+        pixels contained in the seed.
+
+    :param All_Neighbours:
+        If set to True, then all 8 neighbours will be used to search for connectivity.    
  
-       Returns:
-           A mask containing the grown locations.
+    :return:
+        A mask containing the grown locations.
 
-       Author:
-           Josh Sixsmith; joshua.sixsmith@ga.gov.au
+    :author:
+        Josh Sixsmith; joshua.sixsmith@ga.gov.au
     """
 
     if len(array.shape) != 2:
@@ -209,20 +228,22 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=None, All_Neighbours=True
 
 
 def linear_percent(array, percent=2):
-    """Image contrast enhancement.
+    """
+    Image contrast enhancement.
 
     A 2D image is ehanced via a specifed percentage (Default 2%).
 
-    Args:
-        array: A single 2D array of any data type.
-        perecent: A value in the range of 0-100. Default is 2.
+    :param array:
+        A single 2D array of any data type.
+	
+    :param perecent:
+        A value in the range of 0-100. Default is 2.
 
-    Returns:
-        A 2D array of the same dimensions as the input array, with values
-        scaled by the specified percentage.
+    :return:
+        A 2D array of the same dimensions as the input array, with values scaled by the specified percentage.
 
-       Author:
-           Josh Sixsmith; joshua.sixsmith@ga.gov.au
+    :author:
+        Josh Sixsmith; joshua.sixsmith@ga.gov.au
     """
 
     if len(array.shape) != 2:
