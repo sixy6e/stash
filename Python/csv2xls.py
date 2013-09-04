@@ -25,15 +25,20 @@ import re
 path = r'C:\WINNT\Profiles\u08087\My Documents\Staff\Alexis'
 
 def locate(pattern, root):
-    """ Finds files that match the given pattern.
+    """
+    Finds files that match the given pattern.
     
-        This will not search any sub-directories.
+    :param pattern:
+        A string containing the pattern to search, eg '*.csv'
+
+    :param root:
+        The path directory to search
     
-    Args:
-        pattern: A string containing the pattern to search, eg '*.csv'
-        root: The path directory to search
-    
-    Returns: A list of file-path name strings of files that match the given pattern.
+    :return:
+        A list of file-path name strings of files that match the given pattern.
+
+    :limitations:
+        This function will not search any sub-directories.
     """
     
     matches = []
