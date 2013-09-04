@@ -3,6 +3,7 @@
 import numpy
 import scipy
 from scipy import ndimage
+from osgeo import gdal
 
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
 
@@ -272,4 +273,64 @@ def linear_percent(array, percent=2):
 
     return scl_img
     
+def write_img(array, name='', format='ENVI', projection=None, geotransform=None):
+    """
+    Write a 2D/3D image to disk using GDAL.
+
+    :param array:
+        A 2D/3D Numpy array.
+
+    :param name:
+        A string containing the output file name.
+
+    :param format:
+        A string containing a GDAL compliant image format.
+
+    :param projection:
+        A variable containing the projection information of the array.
+
+    :param geotransform:
+        A variable containing the geotransform information for the array.
+
+    :author:
+        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+
+    :history:
+        * 04/09/2013--Created
+    """
+    dims   = array.shape
+    if (len(dims) == 2):
+        samples = dims[1]
+        lines   = dims[0]
+        bands   = 1
+    elif (len(dims) == 3):
+        samples = dims[2]
+        lines   = dims[1]
+        bands   = dims[0]
+    else:
+        print 'Input array is not of 2 or 3 dimensions!!!'
+        print 'Array dimensions: ', len(dims)
+        return
+
+    dtype  = datatype(data.dtype.name)
+    driver = gdal.GetDriverByName(format)
+    outds  = driver.Create(name, samples, lines, bands, dtype)
+
+    if (projection != None):
+        outds.SetProjection(projection)
+
+    if (geotransform != None):
+        outds.SetGeoTransform(geotransform)
+
+    if (bands > 1):
+        for i in range(bands):
+            band   = outds.GetRasteraBand(i+1)
+            band.WriteArray(array[i])
+            band.FlushCache()
+    else:
+        band   = outds.GetRasteraBand(1)
+        band.WriteArray(array)
+        band.FlushCache()
+
+    outds = None
 
