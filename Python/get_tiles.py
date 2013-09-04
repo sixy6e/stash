@@ -109,10 +109,6 @@ def get_tile3(samples, lines, xtile=100,ytile=100):
     :history:
         * 01/08/2012: Created
 
-    :copyright:
-        Copyright (c) 2012, Josh Sixsmith
-        All rights reserved.
-
     """
     ncols = samples
     nrows = lines
