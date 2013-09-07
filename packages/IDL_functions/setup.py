@@ -1,12 +1,16 @@
 import sys
 
-# we should build this module in two steps:
+# we should build this module in three steps:
 # unix:
 # 1. python setup.py build --fcompiler=gnu95
-# 2. python setup.py install
+# 2. python setup.py test.py
+# If all tests have passed, then it is ok to install.
+# 3. python setup.py install
 # windows
 # 1. python setup.py build --fcompiler=gnu95 --compiler=mingw32
-# 2. python setup.py install
+# 2. python setup.py test.py
+# If all tests have passed, then it is ok to install.
+# 3. python setup.py install
 
 # Gather up all the files we need.
 #files = ['Src/IDL_Histogram.f90', 'tests/unit_test_IDL_Hist.f90']
