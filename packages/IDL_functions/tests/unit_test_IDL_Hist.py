@@ -1,9 +1,13 @@
 #! /usr/bin/env python
-
+import sys
+import os
 import unittest
 import numpy
 import unit_test_IDL_Hist
 
+# Need to temporarily append to the PYTHONPATH in order to import the 
+# newly built IDL_Histogram function
+sys.path.append(os.getcwd())
 from IDL_functions import IDL_Histogram
 
 
