@@ -43,7 +43,7 @@ CONTAINS
        INTEGER*4, DIMENSION(nbins), INTENT(INOUT) :: hist
        !f2py depend(nbins), hist
 
-       INTEGER :: min_, max_
+       INTEGER*2 :: min_, max_
        REAL*8 :: binsz, max_bin
        INTEGER :: tf
 
@@ -222,6 +222,7 @@ CONTAINS
        REAL*8 :: binsz, max_bin
        INTEGER :: tf
 
+       ri(2) = nbins
        hist(1) = 0
 
        !print*, 'compute ivec'
