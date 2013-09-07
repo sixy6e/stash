@@ -30,6 +30,7 @@ MODULE idl_histogram
     ! The views and conclusions contained in the software and documentation are those
     ! of the authors and should not be interpreted as representing official policies, 
     ! either expressed or implied, of the FreeBSD Project.
+    !
 
 CONTAINS
 
@@ -42,10 +43,10 @@ CONTAINS
        INTEGER*4, DIMENSION(nbins), INTENT(INOUT) :: hist
        !f2py depend(nbins), hist
 
-       INTEGER :: min_, max_
+       INTEGER*2 :: min_, max_
        REAL*8 :: binsz, max_bin
        INTEGER :: tf
-       
+
        ! need to check that the value of array(i) is le max
        do i = 1, a_sz
           tf = (array(i) .le. max_) .and. (array(i) .ge. min_) .and. (array(i) .lt. max_bin)
@@ -221,6 +222,7 @@ CONTAINS
        REAL*8 :: binsz, max_bin
        INTEGER :: tf
 
+       ri(2) = nbins
        hist(1) = 0
 
        !print*, 'compute ivec'
@@ -239,7 +241,7 @@ CONTAINS
           ri(ri(ind) + hist(ind) + 1) = i - 1
           ri(1) = 1
           hist(1) = 0
-          ri(2) = nbins 
+          ri(2) = nbins
        enddo
 
 
