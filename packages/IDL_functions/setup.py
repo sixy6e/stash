@@ -3,13 +3,13 @@ import sys
 # we should build this module in three steps:
 # Unix/Linux:
 # 1. python setup.py build --fcompiler=gnu95
-# 2. python setup.py test.py
+# 2. python test.py
 # If all tests have passed, then it is ok to install.
 # 3. python setup.py install
 
 # Windows
 # 1. python setup.py build --fcompiler=gnu95 --compiler=mingw32
-# 2. python setup.py test.py
+# 2. python test.py
 # If all tests have passed, then it is ok to install.
 # 3. python setup.py install
 
