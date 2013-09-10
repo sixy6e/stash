@@ -13,7 +13,7 @@ from IDL_functions import IDL_Histogram
 
 class IDL_Hist_Tester(unittest.TestCase):
     """
-    A unit testing procedure for the IDL Histogram funciton.
+    A unit testing procedure for the IDL Histogram function.
     """
 
     def setUp(self):
