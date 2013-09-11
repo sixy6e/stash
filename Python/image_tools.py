@@ -334,12 +334,6 @@ def write_img(array, name='', format='ENVI', projection=None, geotransform=None)
         return
 
     dtype  = datatype(array.dtype.name)
-    print dtype
-    print type(array)
-    print name
-    print samples
-    print lines
-    print bands
     driver = gdal.GetDriverByName(format)
     outds  = driver.Create(name, samples, lines, bands, dtype)
 
@@ -485,6 +479,9 @@ def indices_2d(array, indices):
     return ind
 
 def datatype(val):
+    """
+    Provides a map to convert a numpy datatype to a GDAL datatype.
+    """
     instr = str(val)
     return {
         'uint8'     : 1,
