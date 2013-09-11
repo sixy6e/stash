@@ -333,7 +333,13 @@ def write_img(array, name='', format='ENVI', projection=None, geotransform=None)
         print 'Array dimensions: ', len(dims)
         return
 
-    dtype  = datatype(data.dtype.name)
+    dtype  = datatype(array.dtype.name)
+    print dtype
+    print type(array)
+    print name
+    print samples
+    print lines
+    print bands
     driver = gdal.GetDriverByName(format)
     outds  = driver.Create(name, samples, lines, bands, dtype)
 
@@ -345,11 +351,11 @@ def write_img(array, name='', format='ENVI', projection=None, geotransform=None)
 
     if (bands > 1):
         for i in range(bands):
-            band   = outds.GetRasteraBand(i+1)
+            band   = outds.GetRasterBand(i+1)
             band.WriteArray(array[i])
             band.FlushCache()
     else:
-        band   = outds.GetRasteraBand(1)
+        band   = outds.GetRasterBand(1)
         band.WriteArray(array)
         band.FlushCache()
 
@@ -478,4 +484,19 @@ def indices_2d(array, indices):
 
     return ind
 
+def datatype(val):
+    instr = str(val)
+    return {
+        'uint8'     : 1,
+        'uint16'    : 2,
+        'int16'     : 3,
+        'uint32'    : 4,
+        'int32'     : 5,
+        'float32'   : 6,
+        'float64'   : 7,
+        'complex64' : 8,
+        'complex64' : 9,
+        'complex64' : 10,
+        'complex128': 11,
+        }.get(instr, 7)
 
