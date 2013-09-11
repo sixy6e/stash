@@ -4,7 +4,7 @@ import numpy
 from scipy import ndimage
 from IDL_functions import IDL_Histogram
 
-def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10):
+def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10, all_neighbors=True):
     """
     A function for removing pixel 'islands' from the water summary output.
     Using the default parameters, pixel groups with less than 10 members
@@ -22,6 +22,10 @@ def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10):
     :param min_pop_count:
         Default value of 10. The minimum population size a group of pixels must be in order to be retained.
 
+    :param all_neighbors:
+        Default is True. If True, the 8 surrounding neighbors of the centre pixel will be used for connectivity.
+        If False, then only the 4 immediate neighbors of the centre pixel will be used for connectivity.
+
     :return:
         A copy of array with pixels satisfying the min_value/max_value/min_pop_count parameters removed.
 
@@ -31,6 +35,7 @@ def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10):
     :history:
         *  2013/09/11: Created
     """
+
     dims = array.shape
     if (len(dims) != 2):
         print 'Array is not 2-Dimensional!!!'
@@ -39,7 +44,11 @@ def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10):
     flat_array = array.flatten()
 
     low_obs = (array >= min_value) & (array <= max_value)
-    kernel  = [[1,1,1],[1,1,1],[1,1,1]]
+
+    if all_neighbors:
+        kernel  = [[1,1,1],[1,1,1],[1,1,1]]
+    else:
+        kernel  = [[0,1,0],[1,1,1],[0,1,0]]
 
     label_array, num_labels = ndimage.label(low_obs, structure=kernel)
 
