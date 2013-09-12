@@ -57,7 +57,7 @@ def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10, all_neigh
     hist = h['histogram']
     ri   = h['ri']
 
-    wh = numpy.where(hist < max_value)
+    wh = numpy.where(hist < min_pop_count)
     for i in wh[0]:
         flat_array[ri[ri[i]:ri[i+1]]] = 0
 
