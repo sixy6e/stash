@@ -305,7 +305,7 @@ def write_img(array, name='', format='ENVI', projection=None, geotransform=None)
         A string containing the output file name.
 
     :param format:
-        A string containing a GDAL compliant image format.
+        A string containing a GDAL compliant image format. Default is 'ENVI'.
 
     :param projection:
         A variable containing the projection information of the array.
