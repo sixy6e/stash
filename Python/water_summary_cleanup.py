@@ -4,7 +4,7 @@ import numpy
 from scipy import ndimage
 from IDL_functions import IDL_Histogram
 
-def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10, all_neighbors=True):
+def summary_cleanup(array, min_value=1, max_value=4, min_population=10, all_neighbors=True):
     """
     A function for removing pixel 'islands' from the water summary output.
     Using the default parameters, pixel groups with less than 10 members
@@ -19,7 +19,7 @@ def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10, all_neigh
     :param max_value:
         Default value of 4. The maximum pixel value to be included within the analysis.
 
-    :param min_pop_count:
+    :param min_population:
         Default value of 10. The minimum population size a group of pixels must be in order to be retained.
 
     :param all_neighbors:
@@ -57,7 +57,7 @@ def summary_cleanup(array, min_value=1, max_value=4, min_pop_count=10, all_neigh
     hist = h['histogram']
     ri   = h['ri']
 
-    wh = numpy.where(hist < min_pop_count)
+    wh = numpy.where(hist < min_population)
     for i in wh[0]:
         flat_array[ri[ri[i]:ri[i+1]]] = 0
 
