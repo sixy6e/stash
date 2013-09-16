@@ -481,6 +481,15 @@ def indices_2d(array, indices):
 def datatype(val):
     """
     Provides a map to convert a numpy datatype to a GDAL datatype.
+
+    :param val:
+        A string numpy datatype identifier, eg 'uint8'.
+
+    :return:
+        An integer that corresponds to the equivalent GDAL data type.
+
+    :author:
+        Josh Sixsmith, joshua.sixsmith@ga.gov.au
     """
     instr = str(val)
     return {
