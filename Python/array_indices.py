@@ -15,7 +15,7 @@ def array_indices(array, index, dimensions=False):
         If set to True, then array should be a list or tuple containing the dimensions. Default is False. Dimensions are retrieved by array.shape.
 
     :return:
-        A tuple numpy 1D arrays containing the multi-dimensional subscripts.
+        A tuple of numpy 1D arrays containing the multi-dimensional subscripts.
 
     :author:
         Josh Sixsmith, joshua.sixsmith@ga.gov.au, josh.sixsmith@gmail.com
@@ -23,7 +23,14 @@ def array_indices(array, index, dimensions=False):
     :history:
         * 23/10/2013: Created
 
+    :notes:
+        IDL will return an (m x n) array, with each row (n, IDL is [col,row]) containing the multi-dimensional subscripts corresponding to that index. However this function will return a tuple containing n numpy arrays, where n is the number of dimensions. This allows numpy to use the returned tuple for normal array indexing.
+
     """
+ 
+    if ((type(index) != numpy.ndarray) | (numpy.isscalar(index) != True)):
+        raise Exception('Error! Index must either be a 1D numpy array or a scalar!!!')
+        return
 
     if dimensions:
         dims        = array
@@ -51,7 +58,7 @@ def array_indices(array, index, dimensions=False):
     # Negatives are legal in python, but make it harder to determine the
     # multi-dimensional index
     if ((min_ < 0) | (max_ >= nelements)):
-        print 'Error. Index out of bounds!'
+        raise Exception('Error. Index out of bounds!')
         return
 
     # 1D case; basically do nothing!
@@ -67,17 +74,17 @@ def array_indices(array, index, dimensions=False):
     elif (ndimensions == 3):
         b   = index / (cols * rows)
         r   = (index % (cols * rows)) / cols
-        c   = index % col
+        c   = index % cols
         ind = (b,r,c)
         return ind
     # Higher D order;
     else:
-        #print 'At this time unable to calculate indices for arrays higher than 3D.'
         dims_rv = dims[::-1]
         i = 1
         cumu_dims_rv = []
         for D in dims_rv:
-            cumu_dims_rv.append(i *= D)
+            i *= D
+            cumu_dims_rv.append(i)
 
         cumu_dims = cumu_dims_rv[::-1]
         idx = []
