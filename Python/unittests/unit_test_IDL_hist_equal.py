@@ -6,7 +6,7 @@ import numpy
 from scipy import stats
 
 # Need to temporarily append to the PYTHONPATH in order to import the 
-# newly built IDL_Histogram function
+# newly built hist_equal function
 sys.path.append(os.getcwd())
 from IDL_functions import hist_equal
 
