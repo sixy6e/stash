@@ -47,6 +47,6 @@ setup(name="IDL_functions", # name of the package to import later
      ## Install these to their own directory
      package_dir = {'IDL_functions':'Lib', 'IDL_functions/tests':'tests'},
      packages = ["IDL_functions", 'IDL_functions/tests'],
-     test_suite = 'IDL_functions.tests.unit_test_IDL_Hist' 
+     test_suite = ['IDL_functions.tests.unit_test_IDL_Hist', 'IDL_functions.tests.unit_test_IDL_hist_equal']
      )
 
