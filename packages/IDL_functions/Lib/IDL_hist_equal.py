@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import numpy
-from IDL_functions import IDL_Histogram
+from IDL_functions import histogram
 from IDL_functions import bytscl
 
 def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, Percent=None, Top=None, Histogram_Only=False):
@@ -158,7 +158,7 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
     # Retrieve the dimensions of the array
     dims = array.shape
 
-    h = IDL_Histogram(array.flatten(), binsize=BinSIZE, max=MaxV, min=MinV, omax='omax', omin='omin')
+    h = histogram(array.flatten(), binsize=BinSIZE, max=MaxV, min=MinV, omax='omax', omin='omin')
 
     # Need to check for omin and omax so they can be returned
     return_extra = False
