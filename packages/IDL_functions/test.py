@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
         # Find the unittest script
         test_file  = locate('unit_test_IDL_Hist.py', os.getcwd())[0]
-        test_file2 = 'unit_test_IDL_hist_equal.py'
+        test_file2 = locate('unit_test_IDL_hist_equal.py', os.getcwd())[0]
 
         # Get the directory path that contains the unittest script and change to that directory
         dname = os.path.dirname(test_file)
