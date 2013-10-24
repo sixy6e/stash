@@ -6,14 +6,14 @@ import numpy
 import unit_test_IDL_Hist
 
 # Need to temporarily append to the PYTHONPATH in order to import the 
-# newly built IDL_Histogram function
+# newly built histogram function
 sys.path.append(os.getcwd())
-from IDL_functions import IDL_Histogram
+from IDL_functions import histogram
 
 
 class IDL_Hist_Tester(unittest.TestCase):
     """
-    A unit testing procedure for the IDL Histogram function.
+    A unit testing procedure for the IDL Histogram funciton.
     """
 
     def setUp(self):
@@ -49,7 +49,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         Test that the histogram works. Default binsize is 1, so there 
         should be 256 bins.
         """
-        h = IDL_Histogram(self.array2)
+        h = histogram(self.array2)
         # Should be 256 elements, and the value 1 contained within each.
         self.assertEqual(h['histogram'].shape[0], 256)
         self.assertEqual((h['histogram'] == 1).sum(), 256)
@@ -59,7 +59,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         Test that the max keyword works.
         """
         # Using an array 0->255, check that 255 gets omitted
-        h = IDL_Histogram(self.array2, max=254)
+        h = histogram(self.array2, max=254)
         self.assertEqual(h['histogram'].shape[0], 255)
         self.assertEqual((h['histogram'] == 1).sum(), 255)
 
@@ -68,7 +68,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         Test that the min keyword works.
         """
         # Using an array 0->255, check that 0 gets omitted
-        h = IDL_Histogram(self.array2, min=1)
+        h = histogram(self.array2, min=1)
         self.assertEqual(h['histogram'].shape[0], 255)
         self.assertEqual((h['histogram'] == 1).sum(), 255)
 
@@ -77,7 +77,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         Test that the omin keyword works.
         """
         # The output should be the same. Using an array 0->255
-        h = IDL_Histogram(self.array2, omin='omin')
+        h = histogram(self.array2, omin='omin')
         self.assertEqual(h['omin'], 0)
 
     def test_omax(self):
@@ -88,7 +88,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # The returned value should be the same as the derived max, unless
         # the nbins keyword is set, in which case the max gets rescaled by
         # nbins*binsize+min in order to maintain equal bin widths.
-        h = IDL_Histogram(self.array2, omax='omax')
+        h = histogram(self.array2, omax='omax')
         self.assertEqual(h['omax'], 255)
 
     def test_nan(self):
@@ -97,7 +97,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         """
         a = self.array2.astype('float64')
         a[0] = numpy.NaN
-        h = IDL_Histogram(a, NaN=True)
+        h = histogram(a, NaN=True)
         # The histogram will fail if array contains NaN's and NaN isn't set.
         # One element is excluded (the NaN), so test the length.
         self.assertEqual(h['histogram'].shape[0], 255)
@@ -106,7 +106,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         """
         Test that the binsize keyword works.
         """
-        h = IDL_Histogram(self.array3, binsize=0.5)
+        h = histogram(self.array3, binsize=0.5)
         # should be 20 bins to contain the values 10 -> 19.5
         self.assertEqual(h['histogram'].shape[0], 20)
 
@@ -115,7 +115,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         Test that the default binsize is 1 and works accordingly.
         """
         # Using an array of values in range 0->1
-        h = IDL_Histogram(self.array4)
+        h = histogram(self.array4)
         self.assertEqual(h['histogram'].shape[0], 1)
         # All values should be in the first bin.
         self.assertEqual(self.array4.shape[0], h['histogram'][0])
@@ -124,7 +124,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         """
         Test that the nbins keyword works.
         """
-        h = IDL_Histogram(self.array4, nbins=256)
+        h = histogram(self.array4, nbins=256)
         # There should be 256 bins
         self.assertEqual(h['histogram'].shape[0], 256)
 
@@ -132,7 +132,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         """
         Test that inputing a 2D array will raise an error.
         """
-        self.assertRaises(Exception, IDL_Histogram, self.array5)
+        self.assertRaises(Exception, histogram, self.array5)
 
     def test_reverse_indices1(self):
         """
@@ -141,7 +141,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # Make a copy then shuffle the array. Elements are in a random order.
         a = self.array2.copy()
         numpy.random.shuffle(a)
-        h = IDL_Histogram(a, reverse_indices='ri')
+        h = histogram(a, reverse_indices='ri')
         # Let's see if we can access the correct element. As we are dealing with
         # int's (and the binsize is one), pick a random element and the value
         # of the element represents the bin.
@@ -160,7 +160,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # Make a copy then shuffle the array. Elements are in a random order.
         a = self.array2.copy()
         numpy.random.shuffle(a)
-        h = IDL_Histogram(a, reverse_indices='ri', binsize=5)
+        h = histogram(a, reverse_indices='ri', binsize=5)
         # Using an array in the range 0->255, find data >=100<105
         # This should be bin 21 (20th if start from the 0th bin)
         ri = h['ri']
@@ -179,7 +179,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # A random floating array in range 0-20
         a = (self.array4)*20
         # Specifying min=0 should give bin start points 0, 2.5, 5, 7.5 etc
-        h = IDL_Histogram(a, reverse_indices='ri', min=0, binsize=2.5)
+        h = histogram(a, reverse_indices='ri', min=0, binsize=2.5)
         # Find values >= 7.5 < 17.5
         control = numpy.sort(a[(a >= 7.5) & (a < 17.5)])
         ri = h['ri']
