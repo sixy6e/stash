@@ -58,7 +58,7 @@ def histogram(data, binsize=None, max=None, min=None, nbins=None, omax=None, omi
 
     Example:
 
-        >>> h = IDL_Histogram(data, min=0, max=max, omin='omin', omax='omax', reverse_indices='ri')
+        >>> h = histogram(data, min=0, max=max, omin='omin', omax='omax', reverse_indices='ri')
         >>> hist = h['histogram']
         >>> ri = h['ri']
         >>> loc = loc['ri']
