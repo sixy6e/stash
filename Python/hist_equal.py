@@ -113,7 +113,7 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
         """
     
         ch = cumulative_histogram
-        if len(ch.shape) != 2:
+        if len(ch.shape) != 1:
             raise Exception('Only 1D arrays are supported.')
 
         # Calculate upper and lower values
@@ -124,7 +124,7 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
         n = ch[-1]
     
         x1 = numpy.searchsorted(ch, n * low)
-        while cumu[x1] == ch[x1 + 1]:
+        while ch[x1] == ch[x1 + 1]:
             x1 = x1 + 1
     
         x2 = numpy.searchsorted(ch, n * high)
@@ -149,20 +149,20 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
     if (Top == None):
        Top = 255
 
-    if (BinSize == None):
+    if (BinSIZE == None):
         if (array.dtype == 'uint8'):
-            BinSize = 1
+            BinSIZE = 1
         else:
-            BinSize = (MaxV - MinV) / 5000.
+            BinSIZE = (MaxV - MinV) / 5000.
 
     # Retrieve the dimensions of the array
     dims = array.shape
 
-    h = IDL_Histogram(array.flatten(), binsize=BinSize, max=MaxV, min=MinV, omax='omax', omin='omin')
+    h = IDL_Histogram(array.flatten(), binsize=BinSIZE, max=MaxV, min=MinV, omax='omax', omin='omin')
 
     # Need to check for omin and omax so they can be returned
     return_extra = False
-    if ((type(Omin) == str) | (type(Omax) == str):
+    if ((type(Omin) == str) | (type(Omax) == str)):
         return_extra = True
         d = {}
         if (type(Omin) == str):
@@ -186,10 +186,10 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
 
     # Evaluate a linear percent stretch
     if (Percent != None):
-        if (percent <= 0) or (percent >= 100):
+        if (Percent <= 0) or (Percent >= 100):
             raise Exception('Percent must be between 0 and 100')
 
-        maxDN, MinDN = linear_percent(array=cumu_hist, percent=Percent, min_=MinV, Binsize=BinSize)
+        maxDN, MinDN = linear_percent(cumu_hist, percent=Percent, min_=MinV, Binsize=BinSIZE)
         scl = bytscl(array, Max=maxDN, Min=MinDN, Top=Top)
         if return_extra:
             return scl, d
@@ -199,7 +199,7 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
     scl_lookup = bytscl(cumu_hist, Top=Top)
 
     # apply the scl_lookup in order to retrieve the new scaled value
-    if (type(image) == 'uint8'):
+    if (type(array) == 'uint8'):
         # We know the binsize for byte data, i.e. 1
         # Clip the lower bounds
         arr = array.clip(min=MinV)
@@ -207,8 +207,9 @@ def hist_equal(array, BinSIZE=None, MaxV=None, MinV=None, Omax=None, Omin=None, 
     else:
         # We need to divide by the binsize in order to the bin position
         # Clip the lower bounds
-        arr = arr.clip(min=MinV)
-        scl = (scl_lookup[(arr.flatten() - MinV) / BinSize]).reshape(dims)
+        arr = array.clip(min=MinV)
+        arr = numpy.floor((arr - MinV) / BinSIZE).astype('int')
+        scl = (scl_lookup[arr.flatten()]).reshape(dims)
 
     if return_extra:
         return scl, d
