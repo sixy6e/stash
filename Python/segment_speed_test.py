@@ -2,7 +2,7 @@
 import numpy
 import argparse
 import datetime
-from IDL_functions import IDL_Histogram
+from IDL_functions import histogram
 
 def numpy_test():
     """
@@ -30,10 +30,10 @@ def idl_test():
     within an image.  The identifed objects are then set/flagged in an array of the
     same dimensions as the original image.  This just illustrates the finding mechanism,
     but in reality statistics can be generated per segment/object.
-    This is the method for solving such a problem using the IDL_Histogram module.
+    This is the method for solving such a problem using the histogram module.
 
     To Note:
-        This is just one simple example of using the IDL_Histogram to solve such an
+        This is just one simple example of using the histogram to solve such an
         abstract problem.  It can be used for so much more, such as chunk indexing
         and incrementing vectors. 
         See http://www.idlcoyote.com/tips/histogram_tutorial.html for more info.
@@ -44,7 +44,7 @@ def idl_test():
     b = numpy.random.randint(0,30001, (3000))
     c = numpy.unique(b)
     img2 = numpy.zeros((8000,8000), dtype='uint8').flatten()
-    h = IDL_Histogram(img.flatten(), min=0, max=numpy.max(c), reverse_indices='ri')
+    h = histogram(img.flatten(), min=0, max=numpy.max(c), reverse_indices='ri')
     hist = h['histogram']
     ri = h['ri']
     for i in numpy.arange(c.shape[0]):
@@ -56,7 +56,7 @@ def idl_test():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser = argparse.ArgumentParser(description="A small test that investigates the speed of finding specific objects/segments within an image. The identifed objects are then set/flagged in an array of the same dimensions as the original image. This just illustrates the finding mechanism, but in reality statistics can be generated per segment/object. Two methods are tested, one using NumPy, the other using the IDL_Histogram.")
+    parser = argparse.ArgumentParser(description="A small test that investigates the speed of finding specific objects/segments within an image. The identifed objects are then set/flagged in an array of the same dimensions as the original image. This just illustrates the finding mechanism, but in reality statistics can be generated per segment/object. Two methods are tested, one using NumPy, the other using the histogram.")
     parser.add_argument('--idl', action='store_true', help='Solves the problem using the IDL method.')
     parser.add_argument('--numpy', action='store_true', help='Solves the problem using the NumPy method.')
     parser.add_argument('--both', action='store_true', help='Solves the problem testing both the IDL and NumPy methods.')
