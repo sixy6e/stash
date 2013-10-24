@@ -2,7 +2,7 @@ import numpy
 import datetime
 import _idl_histogram
 
-def IDL_Histogram(data, binsize=None, max=None, min=None, nbins=None, omax=None, omin=None, reverse_indices=None, locations=None, input=None, NaN=False):
+def histogram(data, binsize=None, max=None, min=None, nbins=None, omax=None, omin=None, reverse_indices=None, locations=None, input=None, NaN=False):
     """
     Replicates the histogram function avaiable within IDL (Interactive Data Language, EXELISvis).
 
