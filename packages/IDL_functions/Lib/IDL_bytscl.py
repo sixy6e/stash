@@ -89,7 +89,7 @@ def bytscl(array, Max=None, Min=None, Top=255, NaN=False):
     flt_types = ['float', 'float16', 'float32', 'float64']
 
     if (array.dtype in int_types):
-        rscl = numpy.floor(((Top + 1.) * (scl - Min_) - 1.) / (Max - Min))
+        rscl = numpy.floor(((Top + 1.) * (scl - Min) - 1.) / (Max - Min))
     elif (array.dtype in flt_types):
         rscl = numpy.floor((Top + 0.9999) * (scl - Min) / (Max - Min))
     else:
