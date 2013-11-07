@@ -62,7 +62,7 @@ def main(L1T_list, NBAR_list, dir_name, job_test):
     
     for i in range(len(l1t_dir_list)):
         scene_id = l1t_dir_list[i].split(os.sep)[-1]
-        job_name = os.path.join(dir_name, 'nbar_%s.bash' %scene_id)
+        job_name = os.path.join(dir_name, 'tc_%s.bash' %scene_id)
         out_string = pbs_layout(l1t_dir_list[i], nbar_dir_list[i])
         out_file = open(job_name, 'w')
         out_file.write(out_string)
