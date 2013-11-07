@@ -24,28 +24,29 @@ def pbs_layout(L1T_scene, NBAR_out):
     text = """#!/bin/bash
 #PBS -P v10
 #PBS -q normal
-#PBS -l walltime=02:00:00,ncpus=2,vmem=12940MB
+#PBS -l walltime=02:00:00,ncpus=2,mem=12940MB
 #PBS -me
 #PBS -M Joshua.Sixsmith@ga.gov.au
 
-module load geotiff/1.3.0
-module load hdf4/4.2.6_2012
+module load python/2.7.3
+module load hdf4/4.2.6
+module load gdal
 module load proj
-module load python/2.7.2
-module load gdal/1.9.0
 
-module use /short/v10/mitch-sys/opt/modules --append
-module load py-dev-tools
+module use /projects/u46/opt/modules/modulefiles
+module load IDL_functions
+module load pyephem
+module load numexpr
 
-export IMAGEPROCESSOR_ROOT=$/home/547/jps547/job_submissions/nbar/ga-neo-landsat-processor/
+
+export IMAGEPROCESSOR_ROOT=$/home/547/jps547/job_submissions/nbar/head/ga-neo-landsat-processor
 export OUTPUT_ROOT=%s
 
-PYTHONPATH=$PYTHONPATH:$IMAGEPROCESSOR_ROOT:/short/v10/nbar/pyephem-3.7.5.1/lib/python2.7/site-packages
 
 mkdir -p ${OUTPUT_ROOT}/work
 mkdir -p ${OUTPUT_ROOT}/output
 
-/home/547/jps547/job_submissions/nbar/ga-neo-landsat-processor/process.py --sequential --debug --work ${OUTPUT_ROOT}/work --process_level tc --nbar-root ${OUTPUT_ROOT}/output --l1t %s
+/home/547/jps547/job_submissions/nbar/head/ga-neo-landsat-processor/process.py --sequential --debug --work ${OUTPUT_ROOT}/work --process_level tc --nbar-root ${OUTPUT_ROOT}/output --l1t %s
 """ %(NBAR_out, L1T_scene)
 
     return text
