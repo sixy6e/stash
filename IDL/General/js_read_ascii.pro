@@ -4,6 +4,7 @@ function JS_Read_Ascii, filename, skip, Help=help
 ;Will produce a column vector (1 column by n rows)
 ;The skip keyword is if you want to skip header info, just specify the number of
 ;lines that you want to skip.  If not entered it will just read every line.
+;Author: Josh Sixsmith
 
 if keyword_set(help) then begin
     print, 'function JS_READ_ASCII filename, skip, Help=help'
