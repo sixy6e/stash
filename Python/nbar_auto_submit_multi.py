@@ -21,22 +21,33 @@ def read_text_file(text_file=''):
     else:
         raise Exception('Error. No file with that name exists!')
 
-def get_process_list(input_list, jobs=150):
+def get_process_list(input_list, jobs=150, floor=False):
     """
     Groups several jobs per node.
     Returns a list containing the chunks to process on each node, and the number of jobs per chunk.
     """
-
-    list_len = len(input_list)
-    node_jobs = int(round(list_len / float(jobs)))
-    xstart = numpy.arange(0, list_len, node_jobs)
-    proc_list = []
-    for xstep in xstart:
-        if xstep + node_jobs < list_len:
-            xend = xstep + node_jobs
-        else:
-            xend = list_len
-        proc_list.append((xstep, xend))
+    if floor:
+        list_len = len(input_list)
+        node_jobs = int(numpy.floor(list_len / float(jobs)))
+        xstart = numpy.arange(0, list_len, node_jobs)
+        proc_list = []
+        for xstep in xstart:
+            if xstep + node_jobs < list_len:
+                xend = xstep + node_jobs
+            else:
+                xend = list_len
+            proc_list.append((xstep, xend))
+    else:
+        list_len = len(input_list)
+        node_jobs = int(numpy.ceil(list_len / float(jobs)))
+        xstart = numpy.arange(0, list_len, node_jobs)
+        proc_list = []
+        for xstep in xstart:
+            if xstep + node_jobs < list_len:
+                xend = xstep + node_jobs
+            else:
+                xend = list_len
+            proc_list.append((xstep, xend))
     return proc_list, node_jobs
 
 #def pbs_layout(L1T_scene, NBAR_out):
@@ -66,7 +77,7 @@ export IMAGEPROCESSOR_ROOT=$/home/547/jps547/job_submissions/nbar/head/ga-neo-la
 
     return text
 
-def main(L1T_list, NBAR_list, dir_name, job_test, jobs):
+def main(L1T_list, NBAR_list, dir_name, job_test, jobs, floor):
     if (not os.path.exists(dir_name)):
         os.makedirs(dir_name)
     
@@ -75,7 +86,7 @@ def main(L1T_list, NBAR_list, dir_name, job_test, jobs):
     l1t_dir_list  = read_text_file(text_file=L1T_list)
     nbar_dir_list = read_text_file(text_file=NBAR_list)
 
-    process_groups, node_jobs = get_process_list(input_list=l1t_dir_list, jobs=jobs)
+    process_groups, node_jobs = get_process_list(input_list=l1t_dir_list, jobs=jobs, floor=floor)
 
     # Total time; allowing for an extra job to be computed
     total_time = str(datetime.timedelta(hours=1) + datetime.timedelta(hours=node_jobs))
@@ -84,6 +95,9 @@ def main(L1T_list, NBAR_list, dir_name, job_test, jobs):
     for group in process_groups:
         xs = group[0]
         xe = group[1]
+
+        pbs_str    = pbs_layout(walltime=total_time)
+        nbar_str   = ''
 
         for i in range(xs,xe):
             BASE_OUT_ROOT = nbar_dir_list[i]
@@ -98,9 +112,9 @@ def main(L1T_list, NBAR_list, dir_name, job_test, jobs):
 
             nbar_str = '/home/547/jps547/job_submissions/nbar/head/ga-neo-landsat-processor/process.py --sequential --work %s --process_level nbar --nbar-root %s --l1t %s \n' %(WORK_ROOT, OUTPUT_ROOT, L1T_scene)
 
-            echo_str = "echo 'Prcessing Scene: %s'" %L1T_scene
+            echo_str = "echo 'Prcessing Scene: %s'\n" %L1T_scene
 
-            pbs_str = pbs_str + nbar_str
+            pbs_str = pbs_str + echo_str + nbar_str
 
         job_name = os.path.join(dir_name, 'nbar_group_%i_to_%i.bash' %(xs, xe))
         out_file = open(job_name, 'w')
@@ -145,7 +159,8 @@ if __name__ == '__main__':
     parser.add_argument('--nbar_list', required=True, help='Text file containing the list of NBAR output directories.')
     parser.add_argument('--job_dir', required=True, help='The directory from which to run/submit the jobs from.')
     parser.add_argument('--test', action='store_true', help='If set then the script will not submit any jobs. It will still create the actual job submission script file, but rather than submit, it will print the command line statement. Default = True.')
-    parser.add_argument('--jobs', default=100, type=int, help='How many jobs to run concurrently.')
+    parser.add_argument('--jobs', default=100, type=int, help='How many jobs to run concurrently. Default is 100.')
+    parser.add_argument('--floor', action='store_true', help='If set then the number of concurrent jobs will be determined by floor division. Flooring will potentially yield more concurrent jobs than specifed using the --jobs argument. Ceiling division will potentially yield less concurrent jobs (safer measure). Default is ceiling division.')
 
     parsed_args = parser.parse_args()
 
@@ -154,6 +169,7 @@ if __name__ == '__main__':
     job_dir   = parsed_args.job_dir
     test      = parsed_args.test
     jobs      = parsed_args.jobs
+    floor     = parsed_args.floor
 
     print 'Running in test mode?'
     print test
@@ -161,5 +177,5 @@ if __name__ == '__main__':
     print 'Output NBAR directories: %s' %nbar_list
     print 'Jobs will be submitted from: %s' %job_dir
     print 'Number of concurrent jobs: %i' %jobs
-    main(l1t_list, nbar_list, job_dir, test, jobs)
+    main(l1t_list, nbar_list, job_dir, test, jobs, floor)
 
