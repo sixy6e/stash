@@ -77,7 +77,7 @@ export IMAGEPROCESSOR_ROOT=$/home/547/jps547/job_submissions/nbar/head/ga-neo-la
 
     return text
 
-def main(L1T_list, NBAR_list, dir_name, job_test, jobs, floor):
+def main(L1T_list, NBAR_list, PQ_list, dir_name, job_test, jobs, floor):
     if (not os.path.exists(dir_name)):
         os.makedirs(dir_name)
     
@@ -85,11 +85,12 @@ def main(L1T_list, NBAR_list, dir_name, job_test, jobs, floor):
 
     l1t_dir_list  = read_text_file(text_file=L1T_list)
     nbar_dir_list = read_text_file(text_file=NBAR_list)
+    pq_dir_list   = read_text_file(text_file=PQ_list)
 
     process_groups, node_jobs = get_process_list(input_list=l1t_dir_list, jobs=jobs, floor=floor)
 
     # Total time; allowing for an extra job to be computed
-    total_time = str(datetime.timedelta(hours=1) + datetime.timedelta(hours=node_jobs))
+    total_time = str(datetime.timedelta(minutes=15) + datetime.timedelta(minutes=node_jobs*15))
     pbs_str    = pbs_layout(walltime=total_time)
 
     for group in process_groups:
@@ -100,23 +101,24 @@ def main(L1T_list, NBAR_list, dir_name, job_test, jobs, floor):
         nbar_str   = ''
 
         for i in range(xs,xe):
-            BASE_OUT_ROOT = nbar_dir_list[i]
+            BASE_OUT_ROOT = pq_dir_list[i]
             WORK_ROOT     = os.path.join(BASE_OUT_ROOT, 'work')
             OUTPUT_ROOT   = os.path.join(BASE_OUT_ROOT, 'output')
             L1T_scene     = l1t_dir_list[i]
+            NBAR_scene    = nbar_dir_list[i]
 
             if not (os.path.exists(WORK_ROOT)):
                 os.makedirs(WORK_ROOT)
             if not (os.path.exists(OUTPUT_ROOT)):
                 os.makedirs(OUTPUT_ROOT)
 
-            nbar_str = '/home/547/jps547/job_submissions/nbar/head/ga-neo-landsat-processor/process.py --sequential --work %s --process_level nbar --nbar-root %s --l1t %s \n' %(WORK_ROOT, OUTPUT_ROOT, L1T_scene)
+            pq_str = '/home/547/jps547/job_submissions/nbar/head/ga-neo-landsat-processor/process.py --sequential --work %s --process_level pqa --pqa-root %s --l1t %s --nbar %s \n' %(WORK_ROOT, OUTPUT_ROOT, L1T_scene, NBAR_scene)
 
-            echo_str = "echo 'Prcessing Scene: %s'\n" %L1T_scene
+            echo_str = "echo 'Prcessing L1T Scene: %s with NBAR Scene: %s'\n" %(L1T_scene, NBAR_scene)
 
-            pbs_str = pbs_str + echo_str + nbar_str
+            pbs_str = pbs_str + echo_str + pq_str
 
-        job_name = os.path.join(dir_name, 'nbar_group_%i_to_%i.bash' %(xs, xe))
+        job_name = os.path.join(dir_name, 'pq_group_%i_to_%i.bash' %(xs, xe))
         out_file = open(job_name, 'w')
         out_file.write(pbs_str)
         out_file.close()
@@ -156,7 +158,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser(description='Automatic PBS job submission for processing NBAR.')
     parser.add_argument('--l1t_list', required=True, help='Text file containing the list of input L1T directories')
-    parser.add_argument('--nbar_list', required=True, help='Text file containing the list of NBAR output directories.')
+    parser.add_argument('--nbar_list', required=True, help='Text file containing the list of input NBAR directories.')
+    parser.add_argument('--pq_list', required=True, help='Text file containing the list of PQ output directories.')
     parser.add_argument('--job_dir', required=True, help='The directory from which to run/submit the jobs from.')
     parser.add_argument('--test', action='store_true', help='If set then the script will not submit any jobs. It will still create the actual job submission script file, but rather than submit, it will print the command line statement. Default = True.')
     parser.add_argument('--jobs', default=100, type=int, help='How many jobs to run concurrently. Default is 100.')
@@ -166,6 +169,7 @@ if __name__ == '__main__':
 
     l1t_list  = parsed_args.l1t_list
     nbar_list = parsed_args.nbar_list
+    pq_list   = parsed_args.pq_list
     job_dir   = parsed_args.job_dir
     test      = parsed_args.test
     jobs      = parsed_args.jobs
@@ -174,8 +178,9 @@ if __name__ == '__main__':
     print 'Running in test mode?'
     print test
     print 'Input L1T list: %s' %l1t_list
-    print 'Output NBAR directories: %s' %nbar_list
+    print 'Input NBAR list: %s' %nbar_list
+    print 'Output PQ directories: %s' %pq_list
     print 'Jobs will be submitted from: %s' %job_dir
     print 'Number of concurrent jobs: %i' %jobs
-    main(l1t_list, nbar_list, job_dir, test, jobs, floor)
+    main(l1t_list, nbar_list, pq_list, job_dir, test, jobs, floor)
 
