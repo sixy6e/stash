@@ -29,8 +29,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser(description='Extracts the DEM covering the extent of the input file. At this stage assuming the input image is projected in metres and the DEM is in geographics. Output will be the extent and co-ordinate system of the input file.')
  
-    parser.add_argument('--DEMfile', required=True, help='The input DEM on which to create the hillshade')
-    parser.add_argument('--imgfile', required=True, help='The input image file on which to extract the relevant DEM')
+    parser.add_argument('--DEMfile', required=True, help='The input DEM on which to extract a subset.')
+    parser.add_argument('--imgfile', required=True, help='The input image file to be used as the subset boundary.')
     parser.add_argument('--outfile', required=True, help='The output filename.')
     parser.add_argument('--driver', default='ENVI', help="The file driver type for the output file. See GDAL's list of valid file types. (Defaults to ENVI).")
 
