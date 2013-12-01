@@ -66,9 +66,10 @@ def array_indices(array, index, dimensions=False):
 
     """
  
-    if ((type(index) != numpy.ndarray) | (numpy.isscalar(index) != True)):
-        raise Exception('Error! Index must either be a 1D numpy array or a scalar!!!')
-        return
+    if (type(index) != numpy.ndarray):
+        if (numpy.isscalar(index) != True):
+            raise Exception('Error! Index must either be a 1D numpy array or a scalar!!!')
+            return
 
     if dimensions:
         dims        = array
