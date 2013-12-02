@@ -26,7 +26,7 @@ if __name__ == '__main__':
         test_file3 = locate('unit_test_IDL_array_indices.py', os.getcwd())[0]
 
         # Get the directory path that contains the unittest script and change to that directory
-        dname = os.path.dirname(test_file)
+        dname = os.path.dirname(test_file1)
         os.chdir(dname)
 
         # Move up two directories from where unit_test_IDL_Hist.py was located
