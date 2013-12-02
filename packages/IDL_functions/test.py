@@ -21,8 +21,9 @@ if __name__ == '__main__':
         os.chdir('build')
 
         # Find the unittest script
-        test_file  = locate('unit_test_IDL_Hist.py', os.getcwd())[0]
+        test_file1 = locate('unit_test_IDL_histogram.py', os.getcwd())[0]
         test_file2 = locate('unit_test_IDL_hist_equal.py', os.getcwd())[0]
+        test_file3 = locate('unit_test_IDL_array_indices.py', os.getcwd())[0]
 
         # Get the directory path that contains the unittest script and change to that directory
         dname = os.path.dirname(test_file)
@@ -33,6 +34,7 @@ if __name__ == '__main__':
         os.chdir(os.pardir)
 
         # Now execute the unittest script from the command line
-        subprocess.call(['python', test_file])
+        subprocess.call(['python', test_file1])
         subprocess.call(['python', test_file2])
+        subprocess.call(['python', test_file3])
 
