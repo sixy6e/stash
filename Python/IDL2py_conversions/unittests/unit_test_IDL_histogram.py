@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 from IDL_functions import histogram
 
 
-class IDL_Hist_Tester(unittest.TestCase):
+class IDL_histogram_Tester(unittest.TestCase):
     """
     A unit testing procedure for the IDL Histogram funciton.
     """
@@ -200,7 +200,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # We are using the default binsize, for values in range [0,255]
         a = self.array2
         b = self.array6
-        h = IDL_Histogram(a, input=b)
+        h = histogram(a, input=b)
         self.assertEqual(h['histogram'].shape[0], 256)
 
     def test_input2(self):
@@ -213,8 +213,8 @@ class IDL_Hist_Tester(unittest.TestCase):
         # We are using the default binsize, for values in range [0,255]
         a = self.array2
         b = self.array6
-        h = IDL_Histogram(a, input=b)['histogram']
-        hcontrol = IDL_Histogram(a)['histogram'] + b
+        h = histogram(a, input=b)['histogram']
+        hcontrol = histogram(a)['histogram'] + b
         self.assertEqual((h - hcontrol).sum(), 0)
 
     def test_input3(self):
@@ -228,7 +228,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # should be 256.
         a = self.array1
         b = self.array6
-        h = IDL_Histogram(a, input=b)
+        h = histogram(a, input=b)
         self.assertEqual(h['histogram'].shape[0], b.shape[0])
 
     def test_input4(self):
@@ -242,7 +242,7 @@ class IDL_Hist_Tester(unittest.TestCase):
         # We are using the default binsize, for values in range [0,10)
         a = self.array1
         b = self.array6
-        h = IDL_Histogram(a, input=b)['histogram']
+        h = histogram(a, input=b)['histogram']
         # Elements h[0:9] should equal 1, and elements h[10:-1] should equal 0
         diff = h - b
         self.assertEqual(diff.sum(),10)
