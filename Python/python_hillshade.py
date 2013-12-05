@@ -32,9 +32,9 @@ def slope_aspect(array, pix_size, scale):
 
 def calc_hillshade(slope, aspect, azimuth, elevation):
 
-    az   = numpy.deg2rad(360 - azimuth + 90)
-    elev = numpy.deg2rad(90 - elevation)
-    hs   = numexpr.evaluate("cos(elev) * cos(slope) + (sin(elev) * sin(slope) * cos(az - aspect))")
+    az       = numpy.deg2rad(360 - azimuth + 90)
+    zenith   = numpy.deg2rad(90 - elevation)
+    hs       = numexpr.evaluate("cos(zenith) * cos(slope) + (sin(zenith) * sin(slope) * cos(az - aspect))")
     hs_scale = numpy.round(254 * hs +1)
     return hs_scale.astype('int')
 
