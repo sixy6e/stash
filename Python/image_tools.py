@@ -45,12 +45,12 @@ def img2map(geoTransform, pixel):
     if type(pixel[0]) == numpy.ndarray:
         mapx = []
         mapy = []
-        for i in range(len(location[0])):
+        for i in range(len(pixel[0])):
             mapx.append(pixel[1][i] * geoTransform[1] + geoTransform[0])
             mapy.append(geoTransform[3] - (pixel[0][i] * (numpy.abs(geoTransform[5]))))
 
-            mapx = numpy.array(mapx)
-            mapy = numpy.array(mapy)
+        mapx = numpy.array(mapx)
+        mapy = numpy.array(mapy)
     else:
         mapx = pixel[1] * geoTransform[1] + geoTransform[0]
         mapy = geoTransform[3] - (pixel[0] * (numpy.abs(geoTransform[5])))
