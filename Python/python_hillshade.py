@@ -120,10 +120,11 @@ def hillshade(dem, elevation=45.0, azimuth=315.0, scalearray=False, scalefactor=
     else:
         if ((scalearray == True) & (GeoTransform == None)):
             raise Exception("Can't calculate an array of scale factors without the geotransform information!")
-        if ((GeoTransform == None) | (len(GeoTransform) != 5)):
+        if ((GeoTransform == None) | (len(GeoTransform) != 6)):
             raise Exception("Invalid GeoTransform parameter!")
-        geoT = geotransform
-        prj  = projection
+        image = dem
+        geoT  = GeoTransform
+        prj   = projection
 
     dims = image.shape
     if (len(dims) != 2):
