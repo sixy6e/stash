@@ -9,6 +9,52 @@ from IDL_functions import histogram
 
 def binary_recursive_histogram(image, outfile, all_neighbours=False):
     """
+    Recursively applies a histogram to an image with multiple bands.
+    Designed for the analysing the binary results by finding counts of 1 within each band.
+
+    :param image:
+        A string containing the full file path name of a multi-band binary image.
+
+    :param outfile:
+        The output filename of the textfile that will contain the report.
+
+    :param all_neighbours:
+        If set then pixel connectivity will be 8 neighbours rather than 4. Default is 4.
+
+    :author:
+        Josh Sixsmith; josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
+
+    :history:
+        * 07/12/2013: Created
+
+    :copyright:
+        Copyright (c) 2013, Josh Sixsmith
+        All rights reserved.
+
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+
+        1. Redistributions of source code must retain the above copyright notice, this
+           list of conditions and the following disclaimer.
+        2. Redistributions in binary form must reproduce the above copyright notice,
+           this list of conditions and the following disclaimer in the documentation
+           and/or other materials provided with the distribution.
+
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+        ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+        ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+        (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+        LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+        (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+        SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+        The views and conclusions contained in the software and documentation are those
+        of the authors and should not be interpreted as representing official policies,
+        either expressed or implied, of the FreeBSD Project.
+
     """
 
     # Check that the directory for the output file exists.
