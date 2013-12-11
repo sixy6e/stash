@@ -26,6 +26,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
 
     :history:
         * 07/12/2013: Created
+        * 11/12/2013: Added more stats to the output
 
     :copyright:
         Copyright (c) 2013, Josh Sixsmith
