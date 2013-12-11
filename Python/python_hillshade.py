@@ -34,6 +34,7 @@ def calc_hillshade(slope, aspect, azimuth, elevation):
 
     az       = numpy.deg2rad(360 - azimuth + 90)
     zenith   = numpy.deg2rad(90 - elevation)
+    # Calculate the cosine of the solar incident angle normal to the surface
     hs       = numexpr.evaluate("cos(zenith) * cos(slope) + (sin(zenith) * sin(slope) * cos(az - aspect))")
     hs_scale = numpy.round(254 * hs +1)
     return hs_scale.astype('int')
