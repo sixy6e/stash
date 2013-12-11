@@ -71,7 +71,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
     nb = ds.RasterCount
 
     # Initialise the result array
-    result      =  numpy.zeros((nb,2))
+    result      =  numpy.zeros((nb,4), dtype='int') # Only dealing with integers at this point in time. This could change in future.
     result_list = []
 
     # Loop over the bands
@@ -81,7 +81,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
         band.FlushCache()
 
         # Generate the histogram
-        h = histogram(img.flatten(), min=0)
+        h    = histogram(img.flatten(), min=0)
         hist = h['histogram']
 
         # Segment the binary mask
@@ -90,21 +90,34 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
             kernel = [[1,1,1],[1,1,1],[1,1,1]]
         label_arr, nlabels = ndimage.label(img, structure=kernel)
 
+        # Get min and max areas of the segmented regions
+        h2       = histogram(label_arr.flatten(), min=1)
+        hist2    = h2['histogram']
+        mn_area  = numpy.min(hist2)
+        mx_area  = numpy.max(hist2)
+        avg_area = numpy.mean(hist2)
+
         # Populate the result array if data is found
         if (hist.shape[0] >= 2):
             result[i,0] = hist[1]
             result[i,1] = nlabels
-            result_list.append('%i, %i, %i\n' %(i+1, hist[1], nlabels))
+            result[i,2] = mn_area
+            result[i,3] = mx_area
+            result_list.append('%i, %i, %i, %i, %i, %f\n' %(i+1, hist[1], nlabels, mn_area, mx_area, avg_area))
+        else:
+            result_list.append('%i, %i, %i, %i, %i, %f\n' %(i+1, 0, 0, 0, 0, 0.0))
 
-    mx_loc     = numpy.argmax(result[:,0]) + 1 # Refer back to a 1 based band index
-    mx_seg_loc = numpy.argmax(result[:,1]) + 1 # Refer back to a 1 based band index
+    mx_loc      = numpy.argmax(result[:,0]) + 1 # Refer back to a 1 based band index
+    mx_seg_loc  = numpy.argmax(result[:,1]) + 1 # Refer back to a 1 based band index
+    mn_area_loc = numpy.argmin(result[:,2]) + 1 # Refer back to a 1 based band index
+    mx_area_loc = numpy.argmax(result[:,3]) + 1 # Refer back to a 1 based band index
 
     outfile = open(outfname, 'w')
     outfile.write('Results from %s image file\n' %image)
     outfile.write('Band with most flagged pixels: %i\n' %mx_loc)
     outfile.write('Band with most objects: %i\n' %mx_seg_loc)
     outfile.write('\n')
-    outfile.write('Band, Flagged Pixels, Number of Objects\n')
+    outfile.write('Band, Flagged Pixels, Number of Objects, Smallest Object, Largest Object, Average Object Size\n')
     
     for res in result_list:
         outfile.write(res)
@@ -114,7 +127,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser = argparse.ArgumentParser(description='A histogram and segmentation is applied to every band in an image. Only 0-1 binary images should be used. The result is output as a textfile.')
+    parser = argparse.ArgumentParser(description='A histogram and segmentation is applied to every band in an image. Only 0-1 binary images should be used. The result is output as a textfile. Stats outputs on a per band basis include num of flagged pixels, number of objects, min/max/avg object area.')
     parser.add_argument('--infile', required=True, help='The input image on which to apply the analysis.')
     parser.add_argument('--outfile', required=True, help='The output filename of the textfile that will contain the report.')
     parser.add_argument('--all_neighbours', action="store_true", help='If set, then all 8 neighbours of a pixel will be used for the segmentation process. Default is the immediate 4 neighbours.')
