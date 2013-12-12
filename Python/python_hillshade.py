@@ -38,7 +38,7 @@ def calc_hillshade(slope, aspect, azimuth, elevation):
     # Calculate the cosine of the solar incident angle normal to the surface
     hs       = numexpr.evaluate("cos(zenith) * cos(slope) + (sin(zenith) * sin(slope) * cos(az - aspect))")
     hs_scale = numpy.round(254 * hs +1)
-    return hs_scale.astype('uint8') # Changed from int
+    return hs_scale.astype('int')
 
 def img2map(geoTransform, pixel):
     mapx = pixel[1] * geoTransform[1] + geoTransform[0]
@@ -153,7 +153,7 @@ def hillshade(dem, elevation=45.0, azimuth=315.0, scalearray=False, scalefactor=
         #outband.WriteArray(hshade)
         #outds.FlushCache()
         #outds = None
-        image_tools.write_img(hshade, name=outfile, format=driver, projection=prj, geotransform=geoT))
+        image_tools.write_img(hshade, name=outfile, format=driver, projection=prj, geotransform=geoT)
 
 if __name__ == '__main__':
 
