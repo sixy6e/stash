@@ -5,6 +5,7 @@ import numpy
 from osgeo import gdal
 import numexpr
 from skimage import morphology
+import image_tools
 from python_hillshade import hillshade
 
 def imfill(image):
@@ -103,18 +104,21 @@ def input_output_main(infile, outfile, sun_azimuth, sun_elevation, scale_array, 
     proj = ds.GetProjection()
     geoT = ds.GetGeoTransform()
 
-    dims = img.shape
+    #dims = img.shape
 
     shadow_mask = get_terrin_shadow_mask(image=img, sun_azimuth=sun_azimuth, sun_elevation=sun_elevation, scale_array=scale_array, scale_factor=scale_factor, projection=proj, geotransform=geoT)
 
-    drv   = gdal.GetDriverByName(driver)
-    outds = drv.Create(outfile, dims[1], dims[0], 1, 1)
-    band  = outds.GetRasterBand(1) # We're only outputting a single band
-    band.WriteArray(shadow_mask)
-    outds.SetProjection(proj)
-    outds.SetGeoTransform(geoT)
+    #drv   = gdal.GetDriverByName(driver)
+    #outds = drv.Create(outfile, dims[1], dims[0], 1, 1)
+    #band  = outds.GetRasterBand(1) # We're only outputting a single band
+    #band.WriteArray(shadow_mask)
+    #outds.SetProjection(proj)
+    #outds.SetGeoTransform(geoT)
 
-    outds = None # Close the dataset and flush to disk.
+    #outds = None # Close the dataset and flush to disk.
+
+    # Write the file to disk
+    image_tools.write_img(shadow_mask, name=outfile, format=driver, projection=proj, geotransform=geoT)
     
 
 
