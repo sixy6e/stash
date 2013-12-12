@@ -6,6 +6,7 @@ import numexpr
 from scipy import ndimage
 from osgeo import gdal
 from scipy import interpolate
+import image_tools
 
 """
 Hillshade
@@ -37,7 +38,7 @@ def calc_hillshade(slope, aspect, azimuth, elevation):
     # Calculate the cosine of the solar incident angle normal to the surface
     hs       = numexpr.evaluate("cos(zenith) * cos(slope) + (sin(zenith) * sin(slope) * cos(az - aspect))")
     hs_scale = numpy.round(254 * hs +1)
-    return hs_scale.astype('int')
+    return hs_scale.astype('uint8') # Changed from int
 
 def img2map(geoTransform, pixel):
     mapx = pixel[1] * geoTransform[1] + geoTransform[0]
@@ -144,14 +145,15 @@ def hillshade(dem, elevation=45.0, azimuth=315.0, scalearray=False, scalefactor=
     else:
         if (type(outfile) != str):
             raise Exception("Invalid filename!")
-        drvr = gdal.GetDriverByName(driver)
-        outds  = drvr.Create(outfile, dims[1], dims[0], 1, gdal.GDT_Byte)
-        outds.SetGeoTransform(geoT)
-        outds.SetProjection(prj)
-        outband = outds.GetRasterBand(1)
-        outband.WriteArray(hshade)
-        outds.FlushCache()
-        outds = None
+        #drvr = gdal.GetDriverByName(driver)
+        #outds  = drvr.Create(outfile, dims[1], dims[0], 1, gdal.GDT_Byte)
+        #outds.SetGeoTransform(geoT)
+        #outds.SetProjection(prj)
+        #outband = outds.GetRasterBand(1)
+        #outband.WriteArray(hshade)
+        #outds.FlushCache()
+        #outds = None
+        image_tools.write_img(hshade, name=outfile, format=driver, projection=prj, geotransform=geoT))
 
 if __name__ == '__main__':
 
