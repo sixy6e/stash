@@ -4,7 +4,7 @@ import numpy
 from scipy import ndimage
 from IDL_funtions import histogram
 
-def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=False):
+def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=False, threshold=[None,None]):
     """
     Grows a single pixel or a group of pixels into a region.
 
@@ -71,6 +71,19 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
 
     """
 
+    def case_one():
+        return (upper,lower)
+
+    def case_two():
+        return (upper,lower)
+
+    def case_three():
+        return (upper,lower)
+
+    def case_four():
+        return (upper,lower)
+
+
     if len(array.shape) != 2:
         raise Exception('Input array needs to be 2D in shape')
 
@@ -82,6 +95,28 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
 
     if type(All_Neighbours) != bool:
         raise Exception('All_Neighbours keyword must be of type bool')
+
+    # this can be used only if initialised as threshold=[None,None]
+    #if (len(threshold) != 2):
+    #    raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+
+    if (stdv_multiplier == None) & (threshold == None):
+        case = '1'
+        case_one()
+    elif (stdv_multiplier == None) & (threshold != None):
+        if (len(threshold) != 2):
+            raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+        case = '2'
+        case_two()
+    elif (stdv_multiplier != None) & (threshold != None):
+        print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
+        if (len(threshold) != 2):
+            raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+        case = '2'
+        case_two()
+    else:
+        case = '3'
+        case_three()
 
     # Create the structure for the labeling procedure
     if All_Neighbours:
@@ -120,9 +155,21 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
         else:
             roi = seed
 
-        if stdv_multiplier == None:
+        # Implement the following prior to looping. Set up as a dictionary styled case switch
+        if (stdv_multiplier == None) & (threshold == None):
             upper = numpy.max(array[roi])
             lower = numpy.min(array[roi])
+        elif (stdv_multiplier == None) & (threshold != None):
+            if (len(threshold) != 2):
+                raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+            upper = threshold[1]
+            lower = threshold[0]
+        elif (stdv_multiplier != None) & (threshold != None):
+            print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
+            if (len(threshold) != 2):
+                raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+            upper = threshold[1]
+            lower = threshold[0]
         else:
             stdv  = numpy.std(array[roi], ddof=1)
             limit = stdv_multiplier * stdv
