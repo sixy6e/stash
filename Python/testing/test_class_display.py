@@ -46,7 +46,7 @@ def get_class_colours(band, alpha=False, normal=False):
 
     return class_colours
 
-def create_colour_map(colours, name='Custom_Class_Colours', n=None, register=False):
+def create_colour_map(colours, name='Custom_Class_Colours', n=None, register=False, normal=False):
     """
     Creates a colour map for use with matplotlib.
 
@@ -62,6 +62,9 @@ def create_colour_map(colours, name='Custom_Class_Colours', n=None, register=Fal
     :param register:
         If set to True then the colour table is registered with cm (colormap) and can be retrieved via the get_cmap() method. Default is False.
 
+    :param normal:
+        A boolean option as to whether to return the normalised class colours (colours / 255.0). Default is False.
+
     :return:
         A colour map object that can be used with matplotlib.
 
@@ -72,7 +75,11 @@ def create_colour_map(colours, name='Custom_Class_Colours', n=None, register=Fal
         * 18/12/2013: Created
     """
 
-    cmap = col.ListedColormap(colours, name=name, N=n)
+    if normal:
+        normalised = colours / 255.0
+        cmap = col.ListedColormap(normalised, name=name, N=n)
+    else:
+        cmap = col.ListedColormap(colours, name=name, N=n)
 
     if register:
         cm.register_cmap(cmap=cmap)
