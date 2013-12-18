@@ -39,17 +39,21 @@ def get_class_colours(band, alpha=False, normal=False):
     if alpha:
         # Do nothing
     else:
-        class_colours = class_colours[*,0:3] # Alpha channel is last column
+        class_colours = class_colours[*,0:3] # Retreive only RGB parts.
 
     if normal:
         class_colours = class_colours / 255.0
 
     return class_colours
 
-def create_colour_table(colours, name='', n=None):
+def create_colour_table(colours, name='Custom_Class_Colours', n=None, register=False):
     """
     """
 
     cmap = col.ListedColormap(colours, name=name, N=n)
-    cm.register_cmap(cmap=cmap)
+
+    if register:
+        cm.register_cmap(cmap=cmap)
+
+    return cmap
 
