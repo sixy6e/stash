@@ -71,18 +71,35 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
 
     """
 
-    def case_one():
+    def case_one(array, roi, threshold, stdv_multiplier):
+        """
+        Calculates the upper and lower thresholds based on an ROI of array.
+        """
+        upper = numpy.max(array[roi])
+        lower = numpy.min(array[roi])
+
         return (upper,lower)
 
-    def case_two():
+    def case_two(array, roi, threshold, stdv_multiplier):
+        """
+        No calculation, simply returns the upper and lower thresholds based on given threshold paramater.
+        """
+        upper = threshold[1]
+        lower = threshold[0]
+
         return (upper,lower)
 
-    def case_three():
-        return (upper,lower)
+    def case_three(array, roi, threshold, stdv_multiplier):
+        """
+        Calculates the upper and lower thresholds via the ROI of an array and a standard deviation multiplier.
+        """
+        stdv  = numpy.std(array[roi], ddof=1) # Sample standard deviation
+        limit = stdv_multiplier * stdv
+        mean  = numpy.mean(array[roi])
+        upper = mean + limit
+        lower = mean - limit
 
-    def case_four():
         return (upper,lower)
-
 
     if len(array.shape) != 2:
         raise Exception('Input array needs to be 2D in shape')
@@ -100,23 +117,25 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
     #if (len(threshold) != 2):
     #    raise Exception('Threshold must be of length 2: [Min,Max]!!!')
 
+    case_of = {
+                '1' : case_one,
+                '2' : case_two,
+                '3' : case_three,
+              }
+
     if (stdv_multiplier == None) & (threshold == None):
         case = '1'
-        case_one()
     elif (stdv_multiplier == None) & (threshold != None):
         if (len(threshold) != 2):
             raise Exception('Threshold must be of length 2: [Min,Max]!!!')
         case = '2'
-        case_two()
     elif (stdv_multiplier != None) & (threshold != None):
         print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
         if (len(threshold) != 2):
             raise Exception('Threshold must be of length 2: [Min,Max]!!!')
         case = '2'
-        case_two()
     else:
         case = '3'
-        case_three()
 
     # Create the structure for the labeling procedure
     if All_Neighbours:
@@ -133,6 +152,8 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
     else:
        loop = range(1)
 
+    # The following loop can be very time consuming if there are lots of seed points!!!
+    # An ROI is calculated for every seed point
     for i in loop:
 
         if ROI == False:
@@ -155,27 +176,29 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
         else:
             roi = seed
 
-        # Implement the following prior to looping. Set up as a dictionary styled case switch
-        if (stdv_multiplier == None) & (threshold == None):
-            upper = numpy.max(array[roi])
-            lower = numpy.min(array[roi])
-        elif (stdv_multiplier == None) & (threshold != None):
-            if (len(threshold) != 2):
-                raise Exception('Threshold must be of length 2: [Min,Max]!!!')
-            upper = threshold[1]
-            lower = threshold[0]
-        elif (stdv_multiplier != None) & (threshold != None):
-            print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
-            if (len(threshold) != 2):
-                raise Exception('Threshold must be of length 2: [Min,Max]!!!')
-            upper = threshold[1]
-            lower = threshold[0]
-        else:
-            stdv  = numpy.std(array[roi], ddof=1)
-            limit = stdv_multiplier * stdv
-            mean  = numpy.mean(array[roi])
-            upper = mean + limit
-            lower = mean - limit
+        upper, lower = case_of[case](array, roi)
+
+        # Implement the following prior to looping. Set up as a dictionary styled case switch. !!!DONE!!!
+        #if (stdv_multiplier == None) & (threshold == None):
+        #    upper = numpy.max(array[roi])
+        #    lower = numpy.min(array[roi])
+        #elif (stdv_multiplier == None) & (threshold != None):
+        #    if (len(threshold) != 2):
+        #        raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+        #    upper = threshold[1]
+        #    lower = threshold[0]
+        #elif (stdv_multiplier != None) & (threshold != None):
+        #    print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
+        #    if (len(threshold) != 2):
+        #        raise Exception('Threshold must be of length 2: [Min,Max]!!!')
+        #    upper = threshold[1]
+        #    lower = threshold[0]
+        #else:
+        #    stdv  = numpy.std(array[roi], ddof=1)
+        #    limit = stdv_multiplier * stdv
+        #    mean  = numpy.mean(array[roi])
+        #    upper = mean + limit
+        #    lower = mean - limit
 
         # Create the mask via the thresholds
         mask = (array >= lower) & (array <= upper)
