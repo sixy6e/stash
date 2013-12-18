@@ -2,6 +2,8 @@
 
 import numpy
 import matplotlib.pyplot as plt
+import matplotlib.colors as col
+import matplotlib.cm as cm
 from osgeo import gdal
 
 def get_class_colours(band, alpha=False, normal=False):
@@ -44,9 +46,10 @@ def get_class_colours(band, alpha=False, normal=False):
 
     return class_colours
 
-def create_colour_table():
+def create_colour_table(colours, name='', n=None):
     """
     """
-    return colour_table
 
+    cmap = col.ListedColormap(colours, name=name, N=n)
+    cm.register_cmap(cmap=cmap)
 
