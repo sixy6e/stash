@@ -39,7 +39,7 @@ def get_class_colours(band, alpha=False, normal=False):
     class_colours = numpy.array(class_colours, dtype='uint8') # RGB values are only 0 -> 255
 
     if ~alpha:
-        class_colours = class_colours[*,0:3] # Retreive only RGB parts.
+        class_colours = class_colours[:,0:3] # Retreive only RGB parts.
 
     if normal:
         class_colours = class_colours / 255.0
