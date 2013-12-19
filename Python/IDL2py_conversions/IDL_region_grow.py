@@ -2,9 +2,9 @@
 
 import numpy
 from scipy import ndimage
-from IDL_funtions import histogram
+from IDL_functions import histogram
 
-def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=False, threshold=[None,None]):
+def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=False, threshold=None):
     """
     Grows a single pixel or a group of pixels into a region.
 
@@ -71,33 +71,39 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
 
     """
 
-    def case_one(array, roi, threshold, stdv_multiplier):
+    def case_one(array=None, roi=None, threshold=None, stdv_multiplier=None):
         """
         Calculates the upper and lower thresholds based on an ROI of array.
         """
+        print 'case_one'
         upper = numpy.max(array[roi])
         lower = numpy.min(array[roi])
+        print (upper,lower)
 
         return (upper,lower)
 
-    def case_two(array, roi, threshold, stdv_multiplier):
+    def case_two(array=None, roi=None, threshold=None, stdv_multiplier=None):
         """
         No calculation, simply returns the upper and lower thresholds based on given threshold paramater.
         """
+        print 'case_two'
         upper = threshold[1]
         lower = threshold[0]
+        print (upper,lower)
 
         return (upper,lower)
 
-    def case_three(array, roi, threshold, stdv_multiplier):
+    def case_three(array=None, roi=None, threshold=None, stdv_multiplier=None):
         """
         Calculates the upper and lower thresholds via the ROI of an array and a standard deviation multiplier.
         """
+        print 'case_three'
         stdv  = numpy.std(array[roi], ddof=1) # Sample standard deviation
         limit = stdv_multiplier * stdv
         mean  = numpy.mean(array[roi])
         upper = mean + limit
         lower = mean - limit
+        print (upper,lower)
 
         return (upper,lower)
 
@@ -112,10 +118,6 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
 
     if type(All_Neighbours) != bool:
         raise Exception('All_Neighbours keyword must be of type bool')
-
-    # this can be used only if initialised as threshold=[None,None]
-    #if (len(threshold) != 2):
-    #    raise Exception('Threshold must be of length 2: [Min,Max]!!!')
 
     case_of = {
                 '1' : case_one,
@@ -176,29 +178,10 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
         else:
             roi = seed
 
-        upper, lower = case_of[case](array, roi)
+        print roi
+        print array[roi]
 
-        # Implement the following prior to looping. Set up as a dictionary styled case switch. !!!DONE!!!
-        #if (stdv_multiplier == None) & (threshold == None):
-        #    upper = numpy.max(array[roi])
-        #    lower = numpy.min(array[roi])
-        #elif (stdv_multiplier == None) & (threshold != None):
-        #    if (len(threshold) != 2):
-        #        raise Exception('Threshold must be of length 2: [Min,Max]!!!')
-        #    upper = threshold[1]
-        #    lower = threshold[0]
-        #elif (stdv_multiplier != None) & (threshold != None):
-        #    print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
-        #    if (len(threshold) != 2):
-        #        raise Exception('Threshold must be of length 2: [Min,Max]!!!')
-        #    upper = threshold[1]
-        #    lower = threshold[0]
-        #else:
-        #    stdv  = numpy.std(array[roi], ddof=1)
-        #    limit = stdv_multiplier * stdv
-        #    mean  = numpy.mean(array[roi])
-        #    upper = mean + limit
-        #    lower = mean - limit
+        upper, lower = case_of[case](array, roi)
 
         # Create the mask via the thresholds
         mask = (array >= lower) & (array <= upper)
@@ -208,11 +191,14 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
 
         # Find the labels associated with the roi
         labels  = label_array[roi]
+        mx_lab  = numpy.max(labels)
         ulabels = (numpy.unique(labels[labels > 0])).tolist() # Convert to list; Makes for neater indexing
+        print labels
+        print ulabels
 
         # Generate a histogram to find the label locations, excluding zero (background)
         # num_labels can be used for 'max' as the labeling function should return labels 0 through to n without skipping a value
-        h = histogram(label_array.flatten(), min=1, max=num_labels, reverse_indices='ri')
+        h = histogram(label_array.flatten(), min=0, max=mx_lab, reverse_indices='ri')
         hist = h['histogram']
         ri = h['ri']
 
@@ -221,10 +207,5 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=Fal
                 continue
             grown_regions[ri[ri[lab]:ri[lab+1]]] = True
 
-        #for i in numpy.arange(ulabels.shape[0]):
-        #    if hist[ulabels[i]] == 0:
-        #        continue
-        #    grown_regions[ri[ri[ulabels[i]]:ri[ulabels[i]+1]]] = True
-            
     return grown_regions.reshape(dims)
 
