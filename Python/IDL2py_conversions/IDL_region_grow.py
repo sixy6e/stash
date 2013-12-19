@@ -4,7 +4,7 @@ import numpy
 from scipy import ndimage
 from IDL_functions import histogram
 
-def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbours=False, threshold=None):
+def region_grow(array, seed, stdv_multiplier=None, ROI=False, All_Neighbors=False, threshold=None):
     """
     Grows a single pixel or a group of pixels into a region.
 
