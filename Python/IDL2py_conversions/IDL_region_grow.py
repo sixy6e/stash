@@ -3,8 +3,9 @@
 import numpy
 from scipy import ndimage
 from IDL_functions import histogram
+from IDL_functions import array_indices
 
-def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False, threshold=None):
+def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=False, threshold=None):
     """
     Grows a single pixel or a group of pixels into a region.
 
@@ -18,13 +19,10 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
     :param roi:
         A tuple containing a the location of a single pixel, or multiple pixel locations.
 
-    :param stdv_multiplier:
+    :param stddev_multiplier:
         A value containing the standard deviation multiplier that defines the upper and lower threshold limits. Defaulted to None, in which case the min and max will be used as defining threshold limits.
 
-    :param ROI:
-        If set to True, then the roi is assumed to be a region of neighbouring pixels, and gather stats from the ROI to perform the threholding. Defaults to False; eg pixels are not neighbouring and will iterate through all pixels contained in the roi.
-
-    :param All_Neighbours:
+    :param All_Neighbors:
         If set to True, then all 8 neighbours will be used to search for connectivity. Defaults to False (only the 4 immediate neighbours are used for connectivity).
  
     :return:
@@ -71,7 +69,7 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
 
     """
 
-    def case_one(array=None, roi=None, threshold=None, stdv_multiplier=None):
+    def case_one(array=None, roi=None, threshold=None, stddev_multiplier=None):
         """
         Calculates the upper and lower thresholds based on an ROI of array.
         """
@@ -82,7 +80,7 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
 
         return (upper,lower)
 
-    def case_two(array=None, roi=None, threshold=None, stdv_multiplier=None):
+    def case_two(array=None, roi=None, threshold=None, stddev_multiplier=None):
         """
         No calculation, simply returns the upper and lower thresholds based on given threshold paramater.
         """
@@ -93,7 +91,7 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
 
         return (upper,lower)
 
-    def case_three(array=None, roi=None, threshold=None, stdv_multiplier=None):
+    def case_three(array=None, roi=None, threshold=None, stddev_multiplier=None):
         """
         Calculates the upper and lower thresholds via the ROI of an array and a standard deviation multiplier.
         """
@@ -106,7 +104,7 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
             stdv = 0.0
         else:
             stdv  = numpy.std(array[roi], ddof=1) # Sample standard deviation
-            limit = stdv_multiplier * stdv
+            limit = stddev_multiplier * stdv
             mean  = numpy.mean(array[roi])
 
         upper = mean + limit
@@ -118,7 +116,7 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
     if (len(array.shape) != 2):
         raise Exception('Input array needs to be 2D in shape!')
 
-    if ((type(roi) != list) | (type(roi) != tuple)):
+    if not ((type(roi) != list) | (type(roi) != tuple)):
         raise Exception('ROI must be of type tuple or type list containing (ndarray,ndarray) or [ndarray,ndarray]!')
 
     if (type(roi[0]) != numpy.ndarray):
@@ -127,7 +125,7 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
     if (len(roi) != 2):
         raise Exception('ROI must be of length 2!')
 
-    if (type(All_Neighbours) != bool):
+    if (type(All_Neighbors) != bool):
         raise Exception('All_Neighbours keyword must be of type bool!')
 
     case_of = {
@@ -136,14 +134,14 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
                 '3' : case_three,
               }
 
-    if (stdv_multiplier == None) & (threshold == None):
+    if (stddev_multiplier == None) & (threshold == None):
         case = '1'
-    elif (stdv_multiplier == None) & (threshold != None):
+    elif (stddev_multiplier == None) & (threshold != None):
         if (len(threshold) != 2):
             raise Exception('Threshold must be of length 2: [Min,Max]!!!')
         case = '2'
-    elif (stdv_multiplier != None) & (threshold != None):
-        print 'Warning!!! Both stdv_multiplier and threshold parameters are set. Using threshold.'
+    elif (stddev_multiplier != None) & (threshold != None):
+        print 'Warning!!! Both stddev_multiplier and threshold parameters are set. Using threshold.'
         if (len(threshold) != 2):
             raise Exception('Threshold must be of length 2: [Min,Max]!!!')
         case = '2'
@@ -151,48 +149,19 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
         case = '3'
 
     # Create the structure for the labeling procedure
-    if All_Neighbours:
+    if All_Neighbors:
         s = [[1,1,1],[1,1,1],[1,1,1]]
     else:
         s = [[0,1,0],[1,1,1],[0,1,0]]
 
     dims = array.shape
-    # Create the array that will hold the grown region
-    grown_regions = numpy.zeros(dims, dtype='bool').flatten()
-
-    #if (type(roi[0]) == numpy.ndarray) & ROI == False:
-    #   loop = range(len(roi[0]))
-    #else:
-    #   loop = range(1)
-
-    # The following loop can be very time consuming if there are lots of roi points!!!
-    # An ROI is calculated for every roi point
-    #for i in loop:
-
-    #    if ROI == False:
-    #        # Find the roi's neighbours
-    #        x   = numpy.arange(9) % 3 + (roi[1][i] - 1)
-    #        y   = numpy.arange(9) / 3 + (roi[0][i] - 1)
-    #        roi = (y,x)
-
-    #        # Check if any parts of the roi are outside the image
-    #        bxmin = numpy.where(roi[1] < 0)
-    #        bymin = numpy.where(roi[0] < 0)
-    #        bxmax = numpy.where(roi[1] >= dims[1])
-    #        bymax = numpy.where(roi[0] >= dims[0])
-
-    #        # Change if roi co-ordinates exist outside the image domain.
-    #        roi[1][bxmin] = 0
-    #        roi[0][bymin] = 0
-    #        roi[1][bxmax] = dims[1]-1
-    #        roi[0][bymax] = dims[0]-1
-    #    else:
-    #        roi = roi
+    # Create the index list
+    idx = []
 
     print roi
     print array[roi]
 
-    upper, lower = case_of[case](array, roi)
+    upper, lower = case_of[case](array, roi, threshold=threshold, stddev_multiplier=stddev_multiplier)
 
     # Create the mask via the thresholds
     mask = (array >= lower) & (array <= upper)
@@ -203,12 +172,12 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
     # Find the labels associated with the roi
     labels  = label_array[roi]
     mx_lab  = numpy.max(labels)
+    # Find unique labels, excluding zero (background)
     ulabels = (numpy.unique(labels[labels > 0])).tolist() # Convert to list; Makes for neater indexing
     print labels
     print ulabels
 
-    # Generate a histogram to find the label locations, excluding zero (background)
-    # num_labels can be used for 'max' as the labeling function should return labels 0 through to n without skipping a value
+    # Generate a histogram to find the label locations
     h = histogram(label_array.flatten(), min=0, max=mx_lab, reverse_indices='ri')
     hist = h['histogram']
     ri = h['ri']
@@ -216,7 +185,10 @@ def region_grow(array, roi, stdv_multiplier=None, ROI=False, All_Neighbors=False
     for lab in ulabels:
         if hist[lab] == 0:
             continue
-        grown_regions[ri[ri[lab]:ri[lab+1]]] = True
+        idx.extend(ri[ri[lab]:ri[lab+1]])
 
-    return grown_regions.reshape(dims)
+    idx = numpy.array(idx)
+    idx = array_indices(array.shape, idx, dimensions=True)
+
+    return idx
 
