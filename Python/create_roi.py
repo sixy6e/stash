@@ -2,14 +2,26 @@
 
 import numpy
 
-def square_roi(array, seed):
+def create_roi(array, loc, kx=3, ky=3):
     """
-    Expands a single pixel to include the 8 surrounding neighbours.
+    Expands a single pixel to an ROI defined by a kernel size.
     """
 
+    dims = array.shape
+    if (len(dims) != 2):
+        raise Exception("Array Must Be 2 Dimensional!")
+
+    # Kernel size squared
+    kx2 = kx**2
+    ky2 = ky**2
+
+    # Kernel offsets
+    xoff = kx / 2
+    yoff = ky / 2
+
     # Find the seed's neighbours
-    x   = numpy.arange(9) % 3 + (seed[1][i] - 1)
-    y   = numpy.arange(9) / 3 + (seed[0][i] - 1)
+    x   = numpy.arange(kx2) % kx + (seed[1] - xoff)
+    y   = numpy.arange(ky2) / ky + (seed[0] - yoff)
     roi = (y,x)
 
     # Check if any parts of the roi are outside the image
