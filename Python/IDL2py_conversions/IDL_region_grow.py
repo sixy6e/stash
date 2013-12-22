@@ -73,10 +73,8 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
         """
         Calculates the upper and lower thresholds based on an ROI of array.
         """
-        print 'case_one'
         upper = numpy.max(array[roi])
         lower = numpy.min(array[roi])
-        print (upper,lower)
 
         return (upper,lower)
 
@@ -84,10 +82,8 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
         """
         No calculation, simply returns the upper and lower thresholds based on given threshold paramater.
         """
-        print 'case_two'
         upper = threshold[1]
         lower = threshold[0]
-        print (upper,lower)
 
         return (upper,lower)
 
@@ -95,7 +91,6 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
         """
         Calculates the upper and lower thresholds via the ROI of an array and a standard deviation multiplier.
         """
-        print 'case_three'
 
         # For the case of a single pixel ROI, the standard deviation would be undefined
         # So set the mean to equal the pixel value and stdv to 0.0
@@ -109,7 +104,6 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
 
         upper = mean + limit
         lower = mean - limit
-        print (upper,lower)
 
         return (upper,lower)
 
@@ -158,9 +152,6 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
     # Create the index list
     idx = []
 
-    print roi
-    print array[roi]
-
     upper, lower = case_of[case](array, roi, threshold=threshold, stddev_multiplier=stddev_multiplier)
 
     # Create the mask via the thresholds
@@ -174,8 +165,6 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
     mx_lab  = numpy.max(labels)
     # Find unique labels, excluding zero (background)
     ulabels = (numpy.unique(labels[labels > 0])).tolist() # Convert to list; Makes for neater indexing
-    print labels
-    print ulabels
 
     # Generate a histogram to find the label locations
     h = histogram(label_array.flatten(), min=0, max=mx_lab, reverse_indices='ri')
@@ -188,7 +177,7 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
         idx.extend(ri[ri[lab]:ri[lab+1]])
 
     idx = numpy.array(idx)
-    idx = array_indices(array.shape, idx, dimensions=True)
+    idx = array_indices(dims, idx, dimensions=True)
 
     return idx
 
