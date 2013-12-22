@@ -589,4 +589,67 @@ def create_colour_map(colours, name='Custom_Class_Colours', n=None, register=Fal
 
     return cmap
 
+def create_roi(array, loc, kx=3, ky=3, edge_wrap=False):
+    """
+    Expands a single pixel to an ROI defined by a kernel size.
+
+    :param array:
+        A 2D NumPy array.
+
+    :param loc:
+        A tuple or list of length 2 containing a pixel co-ordinate (row,col). Eg (2316,1616).
+
+    :param kx:
+        The kernel size in the x dimension. Default is 3.
+
+    :param ky:
+        The kernel size in the y dimension. Default is 3.
+
+    :param edge_wrap:
+        If set to True then pixel co-ordinates outside the array will wrap around to the other side of the array. Deafult is False in which case any co-oridnates outside the array are constrained to the edges.
+
+    :return:
+        A tuple of length 2 containing NumPy arrays representing the ROI as image co-ordinates.
+
+    :author:
+        Josh Sixsmith; josh.sixsmith@gmail.com
+
+    :history:
+        * 22/12/2013: Created
+    """
+
+    dims = array.shape
+    if (len(dims) != 2):
+        raise Exception("Array Must Be 2 Dimensional!")
+
+    # Kernel size squared
+    kx2 = kx**2
+    ky2 = ky**2
+
+    # Kernel offsets
+    xoff = kx / 2
+    yoff = ky / 2
+
+    # Find the seed's neighbours
+    x   = numpy.arange(kx2) % kx + (seed[1] - xoff)
+    y   = numpy.arange(ky2) / ky + (seed[0] - yoff)
+    roi = (y,x)
+
+    # If the ROI is outside the array bounds it will be set to the min/max array bounds
+    # otherwise it will be wrap around the edges of the array if edge_wrap is set to True
+    if not edge_wrap:
+        # Check if any parts of the roi are outside the image
+        bxmin = numpy.where(roi[1] < 0)
+        bymin = numpy.where(roi[0] < 0)
+        bxmax = numpy.where(roi[1] >= dims[1])
+        bymax = numpy.where(roi[0] >= dims[0])
+
+        # Change if roi co-ordinates exist outside the image domain.
+        roi[1][bxmin] = 0
+        roi[0][bymin] = 0
+        roi[1][bxmax] = dims[1]-1
+        roi[0][bymax] = dims[0]-1
+
+    return roi
+
 

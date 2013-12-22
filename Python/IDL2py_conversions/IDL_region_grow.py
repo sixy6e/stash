@@ -5,13 +5,12 @@ from scipy import ndimage
 from IDL_functions import histogram
 from IDL_functions import array_indices
 
-def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=False, threshold=None):
+def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, threshold=None):
     """
-    Grows a single pixel or a group of pixels into a region.
+    Grows an ROI (Region of Interest) for a given array.
 
-    Similar to IDL's REGION_GROW function. (Interactive Data Language, EXELISvis).
-    For the single pixel case, the roi and its neighbours are used to generate statistical thresholds by which to grow connected pixels. 
-    If the keyword 'ROI' is set to True, then the roi will be assumed to be a region of neighbouring pixels. Otherwise the region grow function will iterate through the roi points and grow them individually.
+    Replicates IDL's REGION_GROW function (Interactive Data Language, EXELISvis).
+    The ROI is used to generate statistical thresholds by which to grow connected pixels. 
 
     :param array:
         A single 2D numpy array.
@@ -26,7 +25,7 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
         If set to True, then all 8 neighbours will be used to search for connectivity. Defaults to False (only the 4 immediate neighbours are used for connectivity).
  
     :return:
-        A mask of type Bool containing the grown locations.
+        A tuple of (y,x) 1D numpy arrays containing image co-ordinates of the grown regions..
 
     :author:
         Josh Sixsmith; joshua.sixsmith@ga.gov.au, josh.sixsmith@gmail.com
@@ -34,6 +33,7 @@ def region_grow(array, roi, stddev_multiplier=None, ROI=False, All_Neighbors=Fal
     :history:
        * 20/04/2012: Created.
        * 12/12/2013: Re-written and adapted for the IDL_functions suite.
+       * 21/12/2012: Functionality changed (removed ROI creation and assumed the base input is already an ROI) to bring more into line with EXELISvis's version of REGION_GROW.
 
     :notes:
         The keyword ROI is an addition to IDL's version of REGION_GROW, in that a series of roi points can be provided for growing, not just a single ROI.
