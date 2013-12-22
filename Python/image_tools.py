@@ -592,6 +592,30 @@ def create_colour_map(colours, name='Custom_Class_Colours', n=None, register=Fal
 def create_roi(array, loc, kx=3, ky=3, edge_wrap=False):
     """
     Expands a single pixel to an ROI defined by a kernel size.
+
+    :param array:
+        A 2D NumPy array.
+
+    :param loc:
+        A tuple or list of length 2 containing a pixel co-ordinate (row,col). Eg (2316,1616).
+
+    :param kx:
+        The kernel size in the x dimension. Default is 3.
+
+    :param ky:
+        The kernel size in the y dimension. Default is 3.
+
+    :param edge_wrap:
+        If set to True then pixel co-ordinates outside the array will wrap around to the other side of the array. Deafult is False in which case any co-oridnates outside the array are constrained to the edges.
+
+    :return:
+        A tuple of length 2 containing NumPy arrays representing the ROI as image co-ordinates.
+
+    :author:
+        Josh Sixsmith; josh.sixsmith@gmail.com
+
+    :history:
+        * 22/12/2013: Created
     """
 
     dims = array.shape
