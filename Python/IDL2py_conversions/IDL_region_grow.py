@@ -5,7 +5,7 @@ from scipy import ndimage
 from IDL_functions import histogram
 from IDL_functions import array_indices
 
-def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, threshold=None):
+def region_grow(array, ROIPixels, stddev_multiplier=None, All_Neighbors=False, threshold=None):
     """
     Grows an ROI (Region of Interest) for a given array.
 
@@ -15,7 +15,7 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
     :param array:
         A single 2D numpy array.
 
-    :param roi:
+    :param ROIPixels:
         A tuple containing a the location of a single pixel, or multiple pixel locations.
 
     :param stddev_multiplier:
@@ -33,11 +33,8 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
     :history:
        * 20/04/2012: Created.
        * 12/12/2013: Re-written and adapted for the IDL_functions suite.
-       * 21/12/2012: Functionality changed (removed ROI creation and assumed the base input is already an ROI) to bring more into line with EXELISvis's version of REGION_GROW.
-
-    :notes:
-        The keyword ROI is an addition to IDL's version of REGION_GROW, in that a series of roi points can be provided for growing, not just a single ROI.
-        IDL will return a vector of pixel indices representing the grown regions. Numpy can use a boolean array to index, as such a boolean array will be returned. This also makes it easier to return multiple grown regions within a single boolean array.
+       * 21/12/2013: Functionality changed (removed ROI creation and assumed the base input is already an ROI) to bring more into line with EXELISvis's version of REGION_GROW.
+       * 27/12/2013: Changed roi keyword to ROIPixels to bring into line with IDL keyword.
 
     :copyright:
         Copyright (c) 2013, Josh Sixsmith
@@ -69,16 +66,16 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
 
     """
 
-    def case_one(array=None, roi=None, threshold=None, stddev_multiplier=None):
+    def case_one(array=None, ROI=None, threshold=None, stddev_multiplier=None):
         """
         Calculates the upper and lower thresholds based on an ROI of array.
         """
-        upper = numpy.max(array[roi])
-        lower = numpy.min(array[roi])
+        upper = numpy.max(array[ROI])
+        lower = numpy.min(array[ROI])
 
         return (upper,lower)
 
-    def case_two(array=None, roi=None, threshold=None, stddev_multiplier=None):
+    def case_two(array=None, ROI=None, threshold=None, stddev_multiplier=None):
         """
         No calculation, simply returns the upper and lower thresholds based on given threshold paramater.
         """
@@ -87,20 +84,20 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
 
         return (upper,lower)
 
-    def case_three(array=None, roi=None, threshold=None, stddev_multiplier=None):
+    def case_three(array=None, ROI=None, threshold=None, stddev_multiplier=None):
         """
         Calculates the upper and lower thresholds via the ROI of an array and a standard deviation multiplier.
         """
 
         # For the case of a single pixel ROI, the standard deviation would be undefined
         # So set the mean to equal the pixel value and stdv to 0.0
-        if (roi[0].shape == 1):
-            mean = array[roi]
+        if (ROI[0].shape == 1):
+            mean = array[ROI]
             stdv = 0.0
         else:
-            stdv  = numpy.std(array[roi], ddof=1) # Sample standard deviation
+            stdv  = numpy.std(array[ROI], ddof=1) # Sample standard deviation
             limit = stddev_multiplier * stdv
-            mean  = numpy.mean(array[roi])
+            mean  = numpy.mean(array[ROI])
 
         upper = mean + limit
         lower = mean - limit
@@ -110,14 +107,14 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
     if (len(array.shape) != 2):
         raise Exception('Input array needs to be 2D in shape!')
 
-    if not ((type(roi) != list) | (type(roi) != tuple)):
-        raise Exception('ROI must be of type tuple or type list containing (ndarray,ndarray) or [ndarray,ndarray]!')
+    if not ((type(ROIPixels) != list) | (type(ROIPixels) != tuple)):
+        raise Exception('ROIPixels must be of type tuple or type list containing (ndarray,ndarray) or [ndarray,ndarray]!')
 
-    if (type(roi[0]) != numpy.ndarray):
-        raise Exception('ROI must be of type ndarray for tuple (ndarray,ndarray) or list [ndarray,ndarray] style of index!')
+    if (type(ROIPixels[0]) != numpy.ndarray):
+        raise Exception('ROIPixels must be of type ndarray for tuple (ndarray,ndarray) or list [ndarray,ndarray] style of index!')
 
-    if (len(roi) != 2):
-        raise Exception('ROI must be of length 2!')
+    if (len(ROIPixels) != 2):
+        raise Exception('ROIPixels must be of length 2!')
 
     if (type(All_Neighbors) != bool):
         raise Exception('All_Neighbours keyword must be of type bool!')
@@ -152,7 +149,7 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
     # Create the index list
     idx = []
 
-    upper, lower = case_of[case](array, roi, threshold=threshold, stddev_multiplier=stddev_multiplier)
+    upper, lower = case_of[case](array, ROIPixels, threshold=threshold, stddev_multiplier=stddev_multiplier)
 
     # Create the mask via the thresholds
     mask = (array >= lower) & (array <= upper)
@@ -160,8 +157,8 @@ def region_grow(array, roi, stddev_multiplier=None, All_Neighbors=False, thresho
     # The label function segments the image into contiguous blobs
     label_array, num_labels = ndimage.label(mask, structure=s)
 
-    # Find the labels associated with the roi
-    labels  = label_array[roi]
+    # Find the labels associated with the ROI
+    labels  = label_array[ROIPixels]
     mx_lab  = numpy.max(labels)
     # Find unique labels, excluding zero (background)
     ulabels = (numpy.unique(labels[labels > 0])).tolist() # Convert to list; Makes for neater indexing
