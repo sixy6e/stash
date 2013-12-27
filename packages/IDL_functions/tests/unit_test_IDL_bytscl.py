@@ -12,7 +12,7 @@ from IDL_functions import bytscl
 
 class IDL_bytscl_Tester(unittest.TestCase):
     """
-    A unit testing procedure for the IDL Region_Grow funciton.
+    A unit testing procedure for the IDL BYTSCL function.
     """
 
     def setUp(self):
