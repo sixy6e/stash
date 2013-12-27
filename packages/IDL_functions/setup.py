@@ -28,7 +28,7 @@ extra_compile_args=['--fcompiler=gnu95']
     
 ## setup the python module
 setup(name="IDL_functions", # name of the package to import later
-      version='1.0',
+      version='2.0',
       author='Josh Sixsmith',
       author_email='joshua.sixsmith@ga.gov.au, josh.sixsmith@gmail.com',
       # Build fortran wrappers, uses f2py
@@ -47,6 +47,6 @@ setup(name="IDL_functions", # name of the package to import later
      ## Install these to their own directory
      package_dir = {'IDL_functions':'Lib', 'IDL_functions/tests':'tests'},
      packages = ["IDL_functions", 'IDL_functions/tests'],
-     test_suite = ['IDL_functions.tests.unit_test_IDL_histogram', 'IDL_functions.tests.unit_test_IDL_hist_equal', 'IDL_functions.tests.unit_test_IDL_array_indices']
+     test_suite = ['IDL_functions.tests.unit_test_IDL_histogram', 'IDL_functions.tests.unit_test_IDL_hist_equal', 'IDL_functions.tests.unit_test_IDL_array_indices', 'IDL_functions.tests.unit_test_IDL_bytscl', 'IDL_functions.tests.unit_test_IDL_region_grow']
      )
 
