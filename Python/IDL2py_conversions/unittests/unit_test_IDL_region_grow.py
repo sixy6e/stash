@@ -12,7 +12,7 @@ from IDL_functions import region_grow
 
 class IDL_region_grow_Tester(unittest.TestCase):
     """
-    A unit testing procedure for the IDL Region_Grow funciton.
+    A unit testing procedure for the IDL Region_Grow function.
     """
 
     def setUp(self):
