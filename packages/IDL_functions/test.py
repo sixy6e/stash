@@ -24,6 +24,8 @@ if __name__ == '__main__':
         test_file1 = locate('unit_test_IDL_histogram.py', os.getcwd())[0]
         test_file2 = locate('unit_test_IDL_hist_equal.py', os.getcwd())[0]
         test_file3 = locate('unit_test_IDL_array_indices.py', os.getcwd())[0]
+        test_file4 = locate('unit_test_IDL_bytscl.py', os.getcwd())[0]
+        test_file5 = locate('unit_test_IDL_region_grow.py', os.getcwd())[0]
 
         # Get the directory path that contains the unittest script and change to that directory
         dname = os.path.dirname(test_file1)
@@ -37,4 +39,6 @@ if __name__ == '__main__':
         subprocess.call(['python', test_file1])
         subprocess.call(['python', test_file2])
         subprocess.call(['python', test_file3])
+        subprocess.call(['python', test_file4])
+        subprocess.call(['python', test_file5])
 
