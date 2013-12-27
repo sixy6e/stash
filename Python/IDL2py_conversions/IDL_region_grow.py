@@ -25,7 +25,16 @@ def region_grow(array, ROIPixels, stddev_multiplier=None, All_Neighbors=False, t
         If set to True, then all 8 neighbours will be used to search for connectivity. Defaults to False (only the 4 immediate neighbours are used for connectivity).
  
     :return:
-        A tuple of (y,x) 1D numpy arrays containing image co-ordinates of the grown regions..
+        A tuple of (y,x) 1D numpy arrays containing image co-ordinates of the grown regions.
+
+    Example:
+
+        >>> array = numpy.random.randint(0,256, (100,100))
+        >>> pix = [50,50]
+        >>> x = numpy.arange(9) % 3 + (pix[1] - 1)
+        >>> y = numpy.arange(9) % 3 + (pix[0] - 1)
+        >>> roi = (y,x)
+        >>> grown_region = region_grow(array, roi, stddev_multiplier=2.5, All_Neighbors=True)
 
     :author:
         Josh Sixsmith; joshua.sixsmith@ga.gov.au, josh.sixsmith@gmail.com
@@ -34,7 +43,7 @@ def region_grow(array, ROIPixels, stddev_multiplier=None, All_Neighbors=False, t
        * 20/04/2012: Created.
        * 12/12/2013: Re-written and adapted for the IDL_functions suite.
        * 21/12/2013: Functionality changed (removed ROI creation and assumed the base input is already an ROI) to bring more into line with EXELISvis's version of REGION_GROW.
-       * 27/12/2013: Changed roi keyword to ROIPixels to bring into line with IDL keyword.
+       * 27/12/2013: Changed roi keyword to ROIPixels to bring into line with the keyword used by IDL.
 
     :copyright:
         Copyright (c) 2013, Josh Sixsmith
@@ -145,10 +154,13 @@ def region_grow(array, ROIPixels, stddev_multiplier=None, All_Neighbors=False, t
     else:
         s = [[0,1,0],[1,1,1],[0,1,0]]
 
+    # Get the array dimensions
     dims = array.shape
+
     # Create the index list
     idx = []
 
+    # Get the upper and lower limits to generate the mask
     upper, lower = case_of[case](array, ROIPixels, threshold=threshold, stddev_multiplier=stddev_multiplier)
 
     # Create the mask via the thresholds
