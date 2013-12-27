@@ -95,6 +95,9 @@ def bytscl(array, Max=None, Min=None, Top=255, NaN=False):
     else:
         raise Exception('Error! Unknown datatype. Supported datatypes are int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64.')
 
+    # Check and account for any overflow that might occur during datatype conversion
+    rscl[rscl >= Top] = Top
+    rscl[rscl < 0] = 0
     scl = rscl.astype('uint8')
     return scl
 
