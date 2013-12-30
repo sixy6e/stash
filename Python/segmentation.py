@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
 import numpy
+from scipy import ndimage
 from IDL_functions import histogram, array_indices
+
+#TODO
+# Add a parameter for the histogram object and dictionary keyword for the reverse indices
+# That way we can simply pass around the locations rather than have to recompute them
 
 def obj_area(array):
     """
@@ -49,13 +54,10 @@ def obj_mean(array):
 
     return mean_obj
 
-def perimeter(array, labeled=False, all_neighbors=False):
+def perimeter(array, labelled=False, all_neighbors=False):
     """
-    Calculates the perimeter per objectt.
+    Calculates the perimeter per object.
     """
-
-    if labelled:
-        arr = array > 0
 
     # Construct the kernel to be used for the erosion process
     if all_neighbors:
@@ -63,39 +65,58 @@ def perimeter(array, labeled=False, all_neighbors=False):
     else:
         k = [[0,1,0],[1,1,1],[0,1,0]]
 
-    arr = array
+    if labelled:
+        # Calculate the histogram of the labelled array and retrive the indices
+        h    = histogram(array.flatten(), min=1, reverse_indices='ri')
+        hist = h['histogram']
+        ri   = h['ri']
+        arr  = array > 0
+    else:
+        # Label the array to assign id's to segments/regions
+        lab, num = ndimage.label(array, k)
 
+        # Calculate the histogram of the labelled array and retrive the indices
+        h    = histogram(lab.flatten(), min=1, reverse_indices='ri')
+        hist = h['histogram']
+        ri   = h['ri']
+        arr = array
+
+    # Erode the image
     erode = ndimage.binary_erosion(arr, k)
 
+    # Get the borders of each object/region/segment
     obj_borders = arr - erode
 
     # There is potential here for the kernel to miss object borders containing diagonal features
     # Force the kernel to include all neighbouring pixels
-    k = [[1,1,1],[1,1,1],[1,1,1]]
-    label_arr, n_labels = ndimage.label(obj_borders, k)
+    #k = [[1,1,1],[1,1,1],[1,1,1]]
+    #label_arr, n_labels = ndimage.label(obj_borders, k)
     #TODO
     # An alternative would be to use the reverse_indices of the original objects.
     # It shouldn't matter if they point to zero in the convolve array as the second histogram will exclude them.
 
-    h    = histogram(label_arr.flatten(), min=1, reverse_indices='ri')
-    hist = h['histogram']
-    ri   = h['ri']
+    #h    = histogram(label_arr.flatten(), min=1, reverse_indices='ri')
+    #hist = h['histogram']
+    #ri   = h['ri']
 
     # Construct the perimeter kernel
     k2 = [[10,2,10],[2,1,2],[10,2,10]]
-    convolved = ndimage.convolve(diff, k2, mode='constant', cval=0.0) # pixels on array border only use values within the array extents
+    convolved = ndimage.convolve(obj_borders, k2, mode='constant', cval=0.0) # pixels on array border only use values within the array extents
 
+    # Initialise the perimeter list
     perim   = []
+
+    # Calculate the weights to be used for each edge pixel's contribution
     sqrt2   = numpy.sqrt(2.)
     weights = numpy.zeros(50)
-    weights[[5,7,15,17,25,27]] = 1
-    weights[[21,33]] = sqrt2
-    weights[[13,23]] = (1. + sqrt2) / 2.
+    weights[[5,7,15,17,25,27]] = 1 # case (a)
+    weights[[21,33]] = sqrt2 # case (b)
+    weights[[13,23]] = (1. + sqrt2) / 2. # case (c)
 
     for i in numpy.arange(hist.shape[0]):
         #if hist[i] # Probable don't need this check, as ndimage.label() should provide consecutive labels
         h_i    = histogram(convolved[ri[ri[i]:ri[i+1]]], min=1, max=50)
         hist_i = h_i['histogram']
-        perim.append(numpy.dot(hist_i, weights)
+        perim.append(numpy.dot(hist_i, weights))
 
     return perim
