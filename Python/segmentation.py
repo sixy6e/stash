@@ -119,4 +119,19 @@ def perimeter(array, labelled=False, all_neighbors=False):
         hist_i = h_i['histogram']
         perim.append(numpy.dot(hist_i, weights))
 
+    perim = numpy.array(perim)
+
     return perim
+
+def obj_compactness(array):
+    """
+    Calculates centroids per object.
+    """
+
+    pi          = numpy.pi
+    area        = obj_area(array)
+    perim       = perimeter(array, labelled=True)
+    compactness = (perim**2)/(4*pi*area)
+
+    return compactness
+
