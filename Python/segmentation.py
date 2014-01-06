@@ -37,11 +37,11 @@ def obj_centroid(array):
 
     return cent
 
-def obj_mean(array):
+def obj_mean(array, base_array):
     """
     Calculates mean value per object.
     """
-    arr_flat = array.flatten()
+    arr_flat = base_array.flatten()
     h        = histogram(array.flatten(), min=1, reverse_indices='ri')
     hist     = h['histogram']
     ri       = h['ri']
@@ -134,4 +134,26 @@ def obj_compactness(array):
     compactness = (perim**2)/(4*pi*area)
 
     return compactness
+
+def obj_rectangularity(array):
+    """
+    Calculates rectangularity per object.
+    """
+
+    dims = array.shape
+    h    = histogram(array.flatten(), min=1, reverse_indices='ri')
+    hist = h['histogram']
+    ri   = h['ri']
+    rect = []
+    for i in numpy.arange(hist.shape[0]):
+        if (hist[i] == 0):
+            continue
+        idx = numpy.array(array_indices(dims, ri[ri[i]:ri[i+1]], dimensions=True))
+        min_yx = numpy.min(idx, axis=1)
+        max_yx = numpy.max(idx, axis=1)
+        diff = max_yx - min_yx + 1 # Add one to account for zero based index
+        bbox_area = numpy.prod(diff)
+        rect.append(hist[i] / bbox_area)
+
+    return rect
 
