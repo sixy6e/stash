@@ -157,3 +157,12 @@ def obj_rectangularity(array):
 
     return rect
 
+def obj_roundness(array):
+    """
+    Calculates roundness per object.
+    """
+
+    roundness = 1. / obj_compactness(array)
+
+    return roundness
+
