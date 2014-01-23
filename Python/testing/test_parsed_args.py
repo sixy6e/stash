@@ -13,6 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('--ysize', help='The tile size for dimension y.', type=int)
     parser.add_argument('--no_data', help='The data value to be ignored.', type=int, default=-999)
     parser.add_argument('--as_bip', action='store_true', help='If set, the array will be transposed to be [Lines,Samples,Bands], and processed in this fashion. The default is to process the array as [Bands,Lines,Samples].')
+    parser.add_argument('--as_bip_old', default=False, type=bool, help='If set to True, the array will be transposed to be [Lines,Samples,Bands], and processed in this fashion. The default is to process the array as [Bands,Lines,Samples]. Tests another way of setting a True/False switch.')
 
     parsed_args = parser.parse_args()
 
@@ -25,6 +26,7 @@ if __name__ == '__main__':
     ytile  = parsed_args.ysize
     no_data = parsed_args.no_data
     as_bip = parsed_args.as_bip
+    as_bip_old = parsed_args.as_bip_old
 
 
     print 'path: ', path
@@ -38,3 +40,4 @@ if __name__ == '__main__':
     print 'type(no_data): ', type(no_data)
     print 'no_data: ', no_data
     print 'as_bip: ', as_bip
+    print 'as_bip_old: ', as_bip_old
