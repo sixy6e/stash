@@ -44,6 +44,7 @@ def idl_test():
     b = numpy.random.randint(0,30001, (3000))
     c = numpy.unique(b)
     img2 = numpy.zeros((8000,8000), dtype='uint8').flatten()
+    # Set min=0 then we can simply index directly using the array of values we wish to find
     h = histogram(img.flatten(), min=0, max=numpy.max(c), reverse_indices='ri')
     hist = h['histogram']
     ri = h['ri']
