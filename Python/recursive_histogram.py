@@ -98,7 +98,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
         mx_area  = numpy.max(hist2)
         avg_area = numpy.mean(hist2)
 
-        # Populate the result array if data is found
+        # Populate the result array if data is found. If hist.shape[0] == 1 then only the value of zero was found.
         if (hist.shape[0] >= 2):
             result[i,0] = hist[1]
             result[i,1] = nlabels
