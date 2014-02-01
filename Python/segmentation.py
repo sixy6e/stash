@@ -166,3 +166,25 @@ def obj_roundness(array):
 
     return roundness
 
+def pdf(hist_array, scale=False, double=False):
+    """
+    Calculates the probability density function from a histogram.
+    """
+
+    # Calculate in double precision?
+    if double:
+        dtype = 'float'
+    else:
+        dtype = 'float32'
+
+    # Calculate the cumulative distribution
+    cdf = numpy.cumsum(hist_array, dtype=dtype)
+
+    # Calculate the probability density function
+    pdf = cdf / cdf[-1]
+
+    # Scale 0-100 percent?
+    if scale:
+        pdf = pdf * 100
+
+    return pdf
