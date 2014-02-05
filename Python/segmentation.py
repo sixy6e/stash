@@ -188,3 +188,100 @@ def pdf(hist_array, scale=False, double=False):
         pdf = pdf * 100
 
     return pdf
+
+def obj_get_boundary_method1():
+    """
+    Get the pixels that mark the object boundary.
+    Method 1.
+    """
+    pix_directions = numpy.array([[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]])
+    
+    # Lots to figure out here
+
+    return
+
+def obj_get_boundary_method2():
+    """
+    Get the pixels that mark the object boundary.
+    Method 2.
+    """
+
+    lab = labeled_array
+    labels_touched = [] # Maintain a list of recently investigated labels
+    coord_chain = {} # Initialise the co-ordinate chain dictionary
+    boundary_coords = []
+    
+    """
+    8 neighbourhood chain code
+
+         5 6 7
+         4 . 0
+         3 2 1
+
+    4 neighbourhood chain code
+
+         . 3 .
+         2 . 0
+         . 1 .
+    """
+
+    pix_neighbours      = [[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]]
+    adjacent_neighbours = [[0,1],[1,0],[0,-1],[-1,0]]
+
+    extra_chains = {}
+
+    # Loop over the image investigating every pixel (probably not suitable for Python)
+    # Just a play around to see if this method works
+    # May try an F2Py approach if this succeeds
+
+    cols = labeled_array.shape[1]
+    rows = labeled_array.shape[0]
+
+    for y in range(rows):
+        for x in range(cols):
+            label = labeled_array[y,x]
+            if (lab[y,x] == 0):
+                continue
+
+            # Get co-ordinates of all neighbours
+            all_neighb_points = [[y + val[0], x + val[1]] for val in pix_neighbours] # All 8 neighbours
+            # Need to do checks for out of bounds
+            in_bounds_all = [[val[0], val[1]] for val in all_neighb_points if ((val[0] >= 0) & (val[0] < rows) & (val[1] >= 0) & (val[1] < cols))]
+            # Get labels of in-bounds all neighbours
+            all_neighb = [lab[val[0], val[1]] for val in in_bounds_all] # All 8 neighbours
+            # Get co-ordinates of adjacent neighbours
+            adj_neighb_points = [[y + val[0], x + val[1] for val in adjacent_neighbours] # Immediate 4 neighbours
+            # Need to do checks for out of bounds
+            in_bounds_adj = [[val[0], val[1]] for val in adj_neighb_points if ((val[0] >= 0) & (val[0] < rows) & (val[1] >= 0) & (val[1] < cols))]
+            # Get labels of in-bounds adjacent neighbours
+            adj_neighb = [lab[val[0], val[1]] for val in in_bounds_adj]
+
+            # Border tests
+            island = all(val != label for val in all_neighb)
+            body   = all(val == label for val in all_neighb)
+
+            if body: # Label surrounded by the same label
+                continue
+            if lab not in coord_chain.keys():
+                coord_chain[lab] = [[]]
+                extra_chains[lab] = 0
+            if island: # Label surronded by zeros or other labels
+                coord_chain[lab][0] = [y,x]
+            if len(coord_chain[lab][0][-1]) != 0:
+                check_y, check_x = coord_chain[lab][0][-1]
+                check_adj = any((check_y == val[0]) & (check_x == val[1]) for val in adj_neighb)
+                if check_adj:
+                    coord_chain[lab][0].append([y,x])
+                else:
+                    # Need to loop over each chain segment. Maybe include this above and only loop the whole chain rather than the extra chain
+                    if len(extra_chains[lab]) != 0:
+                        for extra in extra_chains[lab]:
+                            check_y, check_x = extra[-1]
+                            check_adj = any((check_y == val[0]) & (check_x == val[1]) for val in adj_neighb)
+                            if check_adj:
+                                extra[lab].append([y,x])
+                                continue
+                        else:
+                            extra_chains[lab] += 1
+                            coord_chain[lab][1] = [y,x]
+                
