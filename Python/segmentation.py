@@ -200,10 +200,17 @@ def obj_get_boundary_method1():
 
     return
 
-def obj_get_boundary_method2():
+def obj_get_boundary_method2(labeled_array):
     """
     Get the pixels that mark the object boundary.
-    Method 2.
+    Method 2
+
+    The idea works and outputs the boundary. It doesn't quite work in all cases though.
+    Mabye have to use the co-ordinate chain codes to aid in the decision as to which chain link
+    a pixel should be appended to. Currently the method will search the end of each chain link
+    and appends to the first match.
+    Or implement a mehtod that will order the clockwise closest to the starting border pixel (basically the fisrt labeled pixel).
+    Border pixels are found, just not always in the correct order. Bugger :( 
     """
 
     lab = labeled_array
@@ -228,7 +235,7 @@ def obj_get_boundary_method2():
     pix_neighbours      = [[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]]
     adjacent_neighbours = [[0,1],[1,0],[0,-1],[-1,0]]
 
-    extra_chains = {}
+    chains = {}
 
     # Loop over the image investigating every pixel (probably not suitable for Python)
     # Just a play around to see if this method works
@@ -240,7 +247,7 @@ def obj_get_boundary_method2():
     for y in range(rows):
         for x in range(cols):
             label = labeled_array[y,x]
-            if (lab[y,x] == 0):
+            if (label == 0):
                 continue
 
             # Get co-ordinates of all neighbours
@@ -250,7 +257,7 @@ def obj_get_boundary_method2():
             # Get labels of in-bounds all neighbours
             all_neighb = [lab[val[0], val[1]] for val in in_bounds_all] # All 8 neighbours
             # Get co-ordinates of adjacent neighbours
-            adj_neighb_points = [[y + val[0], x + val[1] for val in adjacent_neighbours] # Immediate 4 neighbours
+            adj_neighb_points = [[y + val[0], x + val[1]] for val in adjacent_neighbours] # Immediate 4 neighbours
             # Need to do checks for out of bounds
             in_bounds_adj = [[val[0], val[1]] for val in adj_neighb_points if ((val[0] >= 0) & (val[0] < rows) & (val[1] >= 0) & (val[1] < cols))]
             # Get labels of in-bounds adjacent neighbours
@@ -262,26 +269,71 @@ def obj_get_boundary_method2():
 
             if body: # Label surrounded by the same label
                 continue
-            if lab not in coord_chain.keys():
-                coord_chain[lab] = [[]]
-                extra_chains[lab] = 0
+            if label not in coord_chain.keys():
+                coord_chain[label] = [[]]
+                chains[label] = 1
             if island: # Label surronded by zeros or other labels
-                coord_chain[lab][0] = [y,x]
-            if len(coord_chain[lab][0][-1]) != 0:
-                check_y, check_x = coord_chain[lab][0][-1]
-                check_adj = any((check_y == val[0]) & (check_x == val[1]) for val in adj_neighb)
-                if check_adj:
-                    coord_chain[lab][0].append([y,x])
-                else:
-                    # Need to loop over each chain segment. Maybe include this above and only loop the whole chain rather than the extra chain
-                    if len(extra_chains[lab]) != 0:
-                        for extra in extra_chains[lab]:
-                            check_y, check_x = extra[-1]
-                            check_adj = any((check_y == val[0]) & (check_x == val[1]) for val in adj_neighb)
-                            if check_adj:
-                                extra[lab].append([y,x])
-                                continue
-                        else:
-                            extra_chains[lab] += 1
-                            coord_chain[lab][1] = [y,x]
-                
+                coord_chain[label][0] = [y,x]
+            #if len(coord_chain[label][0][-1]) != 0:
+            #    check_yx = coord_chain[label][0][-1]
+            #    check_adj = check_yx in adj_neighb
+            #    if check_adj:
+            #        coord_chain[label][0].append([y,x])
+            #    else:
+            #        # Need to loop over each chain segment. Maybe include this above and only loop the whole chain rather than the extra chain
+            #        if len(extra_chains[label]) != 0:
+            #            for extra in extra_chains[lab]:
+            #                check_yx = extra[-1]
+            #                check_adj = check_yx in adj_neighb
+            #                if check_adj:
+            #                    extra[label].append([y,x])
+            #                    continue
+            #            else:
+            #                chains[label] += 1
+            #                coord_chain[lab][1] = [y,x]
+            if len(coord_chain[label][0]) == 0: # Create the first chain
+                coord_chain[label][0].append([y,x])
+                continue
+            check_chains = []
+            # This has became too messy
+            for i in range(chains[label]):
+                #if len(coord_chain[label][i][-1]) != 0:
+                #if len(coord_chain[label][i]) != 0:
+                check_yx = coord_chain[label][i][-1]
+                check_adj = check_yx in in_bounds_adj
+                check_chains.append(check_adj)
+                if (y == 2) & (x == 8):
+                    print 'y,x ', y,x
+                    print 'check_yx ', check_yx
+                    print 'check_adj', check_adj
+                    print 'in_bounds_adj', in_bounds_adj
+                    #if check_adj:
+                    #    coord_chain[lab][i].append([y,x])
+                    #    break
+                    #chain = any(val == True for val in check_chains)
+                    #if check_adj:
+                    #if chain:
+                    #    idx = [i for i, val in enumerate(check_chains) if val][0] # Get the first True value
+                    #    coord_chain[label][idx].append([y,x])
+                    #    break
+                    #else:
+                    #    chains[label] += 1
+                    #    idx = chains[label] - 1
+                        #coord_chain[label][chains[label]].append([y,x]) # Number of chains as opposed to the index
+                    #    coord_chain[label].append([[y,x]]) # Number of chains as opposed to the index
+                    #    break
+                #else: # Create a new chain
+                #    coord_chain[label][i].append([y,x])
+                #    break
+            #else:
+            #    continue
+            chain = any(val == True for val in check_chains)
+            if chain:
+                idx = [i for i, val in enumerate(check_chains) if val][0] # Get the first True value
+                coord_chain[label][idx].append([y,x]) # Append to an existing link in the chain
+            else:
+                chains[label] += 1
+                #idx = chains[label] - 1
+                coord_chain[label].append([[y,x]]) # Create a new link in chain
+
+    return coord_chain
