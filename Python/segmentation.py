@@ -189,14 +189,55 @@ def pdf(hist_array, scale=False, double=False):
 
     return pdf
 
-def obj_get_boundary_method1():
+def obj_get_boundary_method1(labeled_array):
     """
-    Get the pixels that mark the object boundary.
+    Get the pixels that mark the object boundary/perimeter.
     Method 1.
-    """
-    pix_directions = numpy.array([[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]])
     
-    # Lots to figure out here
+    8 neighbourhood chain code
+
+         5 6 7
+         4 . 0
+         3 2 1
+
+    4 neighbourhood chain code
+
+         . 3 .
+         2 . 0
+         . 1 .
+
+    """
+
+    dims = labeled_array.shape
+    rows = dims[0]
+    cols = dims[1]
+
+    # We'll try for the perimeter co-ordinates to be ordered in a clockwise fashion
+    pix_directions = numpy.array([[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]])
+
+    # Determine the co-ordinates (indices) of each segement
+    # The first index of each segment will be used to define the start and end of a boundary/perimeter
+    h = histogram(labeled_array.flatten(), min=1, reverse_indices='ri')
+    hist = h['histogram']
+    ri = h['ri']
+    nlabels = hist.shape[0]
+    seg_start_idxs = numpy.zeros(nlabels, dtype='int')
+
+    # Boundary or perimeter ?? Will go with perimeter, akin to a method implement earlier which uses a
+    # convolution operator to determine perimeter length.
+
+    # Obtain the start indices of each segment/object
+    for i in numpy.arange(nlabels):
+        #if (hist[i] == 0): # The labeled array should be consecutive
+        #    continue
+        seg_start_idxs[i] = ri[ri[i]:ri[i+1]][0] # Return the first index
+
+    # Convert the 1D indices to 2D indeces used by NumPy
+    seg_start_idxs = array_indices(dims, seg_start_idxs, dimensions=True)
+
+    # Lots to figure out here. Dealing with 'from' and 'too' directions can make things confusing
+    # Keep track of the direction we last travelled, that way we can start at the next clockwise direction
+    # For single pixel objects or 'islands' use the histogram value to skip the follow boundary/search routine
 
     return
 
