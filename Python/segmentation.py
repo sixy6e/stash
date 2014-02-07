@@ -189,6 +189,67 @@ def pdf(hist_array, scale=False, double=False):
 
     return pdf
 
+def track_obj_perimeter(array, start_index=None, label_id=None):
+    """
+    Function to track the perimeter of a given object specified by label_id.
+    """
+
+    dims = array.shape
+    rows = dims[0]
+    cols = dims[1]
+
+    # We'll opt for the perimeter co-ordinates to be ordered in a clockwise fashion. GIS convention???
+    pix_directions = [[ 0, 1],
+                      [ 1, 1],
+                      [ 1, 0],
+                      [ 1,-1],
+                      [ 0,-1],
+                      [-1,-1],
+                      [-1, 0],
+                      [-1, 1]]
+
+    # Set up the distances as we traverse across a pixel
+    diag           = numpy.sqrt(2.0) # NumPy will return a float64, but just in case future versions change....
+    pix_distances  = {0 : 1.0,
+                      1 : diag,
+                      2 : 1.0,
+                      3 : diag,
+                      4 : 1.0,
+                      5 : diag,
+                      6 : 1.0,
+                      7, diag
+                     }
+
+    co_ords = []
+    co_ords.append(start_index)
+
+    # Initialise the to/from directions
+    to_   = 0
+    from_ = 4
+
+    perimeter_point  = (-1,-1)
+    perimeter_length = 0.0
+
+    while (perimeter_point != start_index):
+        for i in range(len(pix_directions)):
+            to_         = (from_ + 4) % 8 # Track the direction we have been and the direction we are going
+            current_idx = co_ords[-1]
+            new_idx     = (current_idx[0] + pix_directions[to_][0], current_idx[1] + pix_directions[to_][1])
+            if not (((new_idx[0] >= 0) & (new_idx[0] < rows)) & ((new_idx[1] >= 0) & (new_idx[1] < cols))):
+                continue
+            if array[new_idx] == label_id:
+                break
+        else:
+            perimeter_point = new_idx
+            co_ords.append(new_idx)
+            # Next direction search will be one more than the from_ direction
+            # Just in case we need to double back and return from whence we came. ie a line object
+            from_ = (to_ + 4) % 8
+            perimeter_length += pix_distances[to_]
+            continue # Kick off the direction search again
+
+    return {'Vertices' : co_ords, 'Perimeter_Length' : perimeter_length}
+
 def obj_get_boundary_method1(labeled_array):
     """
     Get the pixels that mark the object boundary/perimeter.
@@ -212,8 +273,27 @@ def obj_get_boundary_method1(labeled_array):
     rows = dims[0]
     cols = dims[1]
 
-    # We'll try for the perimeter co-ordinates to be ordered in a clockwise fashion
-    pix_directions = numpy.array([[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1],[-1,0],[-1,1]])
+    # We'll opt for the perimeter co-ordinates to be ordered in a clockwise fashion. GIS convention???
+    pix_directions = numpy.array([[ 0, 1],
+                                  [ 1, 1],
+                                  [ 1, 0],
+                                  [ 1,-1],
+                                  [ 0,-1],
+                                  [-1,-1],
+                                  [-1, 0],
+                                  [-1, 1]])
+
+    # Set up the distances as we traverse across a pixel
+    diag           = numpy.sqrt(2.0) # NumPy will return a float64, but just in case future versions change....
+    pix_distances  = {0 : 1.0,
+                      1 : diag,
+                      2 : 1.0,
+                      3 : diag,
+                      4 : 1.0,
+                      5 : diag,
+                      6 : 1.0,
+                      7, diag
+                     }
 
     # Determine the co-ordinates (indices) of each segement
     # The first index of each segment will be used to define the start and end of a boundary/perimeter
@@ -232,12 +312,52 @@ def obj_get_boundary_method1(labeled_array):
         #    continue
         seg_start_idxs[i] = ri[ri[i]:ri[i+1]][0] # Return the first index
 
-    # Convert the 1D indices to 2D indeces used by NumPy
+    # Convert the 1D indices to 2D indices used by NumPy
     seg_start_idxs = array_indices(dims, seg_start_idxs, dimensions=True)
 
     # Lots to figure out here. Dealing with 'from' and 'too' directions can make things confusing
     # Keep track of the direction we last travelled, that way we can start at the next clockwise direction
     # For single pixel objects or 'islands' use the histogram value to skip the follow boundary/search routine
+
+    """
+    The memory of the order of the array should be 'C-Style': column, column, column, then next row.
+
+    eg a 2x5 array
+
+        0, 1, 2, 3, 4
+        5, 6, 7, 8, 9
+
+    Therefore the first index will only have labels to the right and below (below left, below right).
+
+    eg an object with a label ID of 6
+
+       0, 0, 6, 6, 6
+       6, 6, 6, 6, 6
+
+    As such, the first direction travelled will be to the right '0' in the freeman chain, and the first index will be the
+    first boundary co-ordinate and will be the final co-ordinate to close the boundary thereby creating a polygon.
+    As for linear features...
+    """
+
+    # Probably deal with these inside the boundary tracking routine
+    # Let the tracking routine handle to/from and just return the final result
+    to_   = 0
+    from_ = 4
+
+    perimeter_info = {}
+
+    for i in range(hist.shape[0]):
+        if hist[i] == 0:
+            continue
+        if hist[i] == 1:
+            #perimeter_co_ords[i] = seg_start_idxs[i[0],i[1]] # Still need to design the function and how to return the result
+        idx   = (seg_start_idxs[0][i], seg_start_idxs[1][i])
+        label = i + 1
+        perimeter_info[i] = track_object_boundary(labeled_array, start_index=idx, label_id=label)
+
+    # Might need to format the perimeter_info dictionary before returning, ie turn the co-ords into numpy arrays.
+    # Or even into a polygon object using the shapely library???
+    # Using shapely might be easier to report geometrical attributes
 
     return
 
