@@ -360,11 +360,20 @@ def obj_get_boundary_method1(labeled_array):
     # Using shapely might be easier to report geometrical attributes
 
     # Still need to deal with holes within an object as ENVI does. They will increase an objects perimeter length.
-    # SciPy have a binary_fill_holes function, label the filled array, then get the indices, and then retrive only those indices
+    # SciPy have a binary_fill_holes function. label the filled array, then get the indices, and then retrive only those indices
     # for each object that are 0 in the original array.
     # That might be one way to do it, which means re-writing the above function....ughhh :)
 
     return
+
+def obj_fill_holes(array):
+    """
+    Fills holes within objects.
+    """
+    fill = ndimage.binary_fill_holes(array)
+    #holes = fill - array
+
+    return fill
 
 def obj_get_boundary_method2(labeled_array):
     """
