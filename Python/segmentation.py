@@ -2,6 +2,7 @@
 
 import numpy
 from scipy import ndimage
+import numexpr
 from IDL_functions import histogram, array_indices
 
 #TODO
@@ -250,7 +251,7 @@ def track_obj_perimeter(array, start_index=None, label_id=None):
 
     return {'Vertices' : co_ords, 'Perimeter_Length' : perimeter_length}
 
-def obj_get_boundary_method1(labeled_array):
+def obj_get_boundary_method1(labelled_array, fill_holes=True):
     """
     Get the pixels that mark the object boundary/perimeter.
     Method 1.
@@ -269,9 +270,15 @@ def obj_get_boundary_method1(labeled_array):
 
     """
 
-    dims = labeled_array.shape
+    dims = labelled_array.shape
     rows = dims[0]
     cols = dims[1]
+
+    if fill_holes:
+        orig_binary = (labelled_array > 0).astype('uint8')
+        fill = obj_fill_holes(labelled_array)
+        s = [[1,1,1],[1,1,1],[1,1,1]]
+        labelled_array, nlabels = ndimage.label(fill, structure=s)
 
     # We'll opt for the perimeter co-ordinates to be ordered in a clockwise fashion. GIS convention???
     pix_directions = numpy.array([[ 0, 1],
@@ -297,7 +304,7 @@ def obj_get_boundary_method1(labeled_array):
 
     # Determine the co-ordinates (indices) of each segement
     # The first index of each segment will be used to define the start and end of a boundary/perimeter
-    h = histogram(labeled_array.flatten(), min=1, reverse_indices='ri')
+    h = histogram(labelled_array.flatten(), min=1, reverse_indices='ri')
     hist = h['histogram']
     ri = h['ri']
     nlabels = hist.shape[0]
@@ -350,10 +357,12 @@ def obj_get_boundary_method1(labeled_array):
         if hist[i] == 0:
             continue
         if hist[i] == 1:
+            # What is the perimeter of a single pixel, 0.0, 4.0???
             #perimeter_co_ords[i] = seg_start_idxs[i[0],i[1]] # Still need to design the function and how to return the result
+            continue
         idx   = (seg_start_idxs[0][i], seg_start_idxs[1][i])
         label = i + 1
-        perimeter_info[i] = track_object_boundary(labeled_array, start_index=idx, label_id=label)
+        perimeter_info[i] = track_object_boundary(labelled_array, start_index=idx, label_id=label)
 
     # Might need to format the perimeter_info dictionary before returning, ie turn the co-ords into numpy arrays.
     # Or even into a polygon object using the shapely library???
@@ -364,14 +373,58 @@ def obj_get_boundary_method1(labeled_array):
     # for each object that are 0 in the original array.
     # That might be one way to do it, which means re-writing the above function....ughhh :)
 
-    return
+    #!!!!This isn't the correct place for the handling of object holes, but just get the rough structure out!!!
+    if fill_holes:
+        for i in range(hist.shape[0]):
+            if hist[i] == 0:
+                continue
+            if hist[i] == 1:
+                # What is the perimeter of a single pixel, 0.0, 4.0???
+                continue
+            idx   = (seg_start_idxs[0][i], seg_start_idxs[1][i])
+            label = i + 1
+            perimeter_info[i] = track_object_boundary(labelled_array, start_index=idx, label_id=label)
+            # Can we trust that the labelling of the filled and unfilled arrays will give the same object index??
+            # If we can we could use the area differences to determine if there are holes and only go through the 
+            # hole perimeter tracking if needed.
+            single_object = numpy.zeros((rows*cols), dtype='uint8')
+            single_object[ri[ri[i]:ri[i+1]]] = 1
+            holes = numexpr.evaluate("(single_object - orig_binary) == 1")
+            labs, nlabs = ndimage.label(holes, s)
+            h_holes = histogram(labs, min=1, reverse_indices='ri')
+            hist_holes = h_holes['histogram']
+            ri_h = h_holes['ri']
+            seg_holes_start_idxs = numpy.zeros(nlabs, dtype='int')
+            for j in numpy.arange(nlabels):
+                #if (hist[i] == 0): # The labeled array should be consecutive
+                #    continue
+                seg_holes_start_idxs[j] = ri_h[ri_h[j]:ri_h[j+1]][0] # Return the first index
 
-def obj_fill_holes(array):
+            # Convert the 1D indices to 2D indices used by NumPy
+            seg_holes_start_idxs = array_indices(dims, seg_holes_start_idxs, dimensions=True)
+            for k in range(hist_holes.shape):
+                if hist_holes[k] == 0:
+                    continue
+                if hist[i] == 1:
+                    # What is the perimeter of a single pixel, 0.0, 4.0???
+                    continue
+                idx = (seg_holes_start_idxs[0][k], seg_holes_start_idxs[1][k])
+                holes_label = k + 1
+                holes_result = track_object_boundary(labs, start_index=idx, label_id=holes_label)
+                perimeter_info[i]['Holes'] = holes_result['Vertices']
+                perimeter_info[i]['Perimeter_Length'] += perimeter_info['Perimeter_Length']
+
+    return perimeter_info
+
+def obj_fill_holes(array, labelled=True):
     """
     Fills holes within objects.
     """
-    fill = ndimage.binary_fill_holes(array)
-    #holes = fill - array
+    if labelled:
+        fill = ndimage.binary_fill_holes(array > 0)
+        #holes = fill - array
+    else:
+        fill = ndimage.binary_fill_holes(array)
 
     return fill
 
