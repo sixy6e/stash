@@ -8,7 +8,7 @@ from osgeo import gdal
 from datetime import datetime
 import numexpr
 
-import get_tiles
+from image_tools import get_tiles
 
 #Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
 """
