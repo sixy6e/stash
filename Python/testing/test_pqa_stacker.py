@@ -23,7 +23,7 @@ if not logger.level:
     logger.setLevel(logging.DEBUG) # Default logging level for all modules
     logger.addHandler(console_handler)
 
-def extractPQFlags(array, flags=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], invert=False):
+def extractPQFlags(array, flags=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], invert=False, check_zero=False):
     """
     """
 
@@ -63,9 +63,16 @@ def extractPQFlags(array, flags=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], invert=False)
     n_flags  = len(flags)
     pq_flags = numpy.zeros((n_flags,rows,cols), dtype='bool')
 
-    for i in range(n_flags):
-        flag = flags[i]
-        pq_flags[i] = (array & flag) >> bit_shift[flag]
+    if check_zero:
+        zero = array == 0
+        for i in range(n_flags):
+            flag = flags[i]
+            pq_flags[i] = (array & flag) >> bit_shift[flag]
+            pq_flags[i][zero] = True
+    else:
+        for i in range(n_flags):
+            flag = flags[i]
+            pq_flags[i] = (array & flag) >> bit_shift[flag]
 
     if invert:
         return ~pq_flags
@@ -123,9 +130,9 @@ def pqSaturation(file_path):
 
         # Get the saturation flags
         if sensor == 'TM': # Landsat 5
-            pq_flags = extractPQFlags(PQdata, flags=[1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0], invert=True)
+            pq_flags = extractPQFlags(PQdata, flags=[1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0], invert=True, check_zero=True)
         else: # Landsat 7
-            pq_flags = extractPQFlags(PQdata, flags=[1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0], invert=True)
+            pq_flags = extractPQFlags(PQdata, flags=[1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0], invert=True, check_zero=True)
 
         #if i == 1:
         #    write_img(pq_flags.astype('uint8'), name='test_pq_bits')
@@ -223,6 +230,7 @@ def datatype(val):
         'complex64' : 9,
         'complex64' : 10,
         'complex128': 11,
+        'bool'      : 1
         }.get(instr, 7)
 
 def cleanup(filelist):
