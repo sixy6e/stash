@@ -507,6 +507,7 @@ def datatype(val):
         'complex64' : 9,
         'complex64' : 10,
         'complex128': 11,
+        'bool'      : 1
         }.get(instr, 7)
 
 def get_class_colours(band, alpha=False, normal=False):
