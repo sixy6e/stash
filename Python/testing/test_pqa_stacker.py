@@ -131,8 +131,16 @@ def pqSaturation(file_path):
         # Get the saturation flags
         if sensor == 'TM': # Landsat 5
             pq_flags = extractPQFlags(PQdata, flags=[1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0], invert=True, check_zero=True)
+            cloud    = extractPQFlags(PQdata, flags=[0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0], invert=True, check_zero=True)
+            cloud    = cloud[0] | cloud[1]
         else: # Landsat 7
             pq_flags = extractPQFlags(PQdata, flags=[1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0], invert=True, check_zero=True)
+            cloud    = extractPQFlags(PQdata, flags=[0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0], invert=True, check_zero=True)
+            cloud    = cloud[0] | cloud[1]
+
+        # Exclude cloud from the saturation count
+        for i in range(pq_flags.shape[0]):
+            pq_flags[i][cloud] = False
 
         #if i == 1:
         #    write_img(pq_flags.astype('uint8'), name='test_pq_bits')
