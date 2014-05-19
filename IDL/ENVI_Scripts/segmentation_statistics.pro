@@ -225,7 +225,9 @@ PRO segmentation_statistics, event
         bdata = (dbl EQ 0) ? FLOAT(ENVI_GET_TILE(btile_id, i, ys=ys, ye=ye)) : $
                 DOUBLE(ENVI_GET_TILE(btile_id, i, ys=ys, ye=ye))
         sdata = ENVI_GET_TILE(stile_id, i, ys=ys, ye=ye)
-        h = HISTOGRAM(sdata, min=1, reverse_indices=ri)
+        ; Need to specify the whole range of the histogram to avoid instances of where it is completely
+        ; background data, i.e. values of zero.
+        h = HISTOGRAM(sdata, min=1, max=sdata_mx, reverse_indices=ri)
         num_bins = N_ELEMENTS(h)
         print, class_stats[2:3,1]
         FOR c=0L, num_bins-1 DO BEGIN
