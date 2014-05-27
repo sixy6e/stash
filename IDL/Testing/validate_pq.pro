@@ -171,9 +171,9 @@ PRO validate_pq, event
     ENVI_REPORT_INIT, base=rbase, /FINISH
 
     ; Now to calculate some stats on the histgoram
-    array_sz = nl * ns
+    array_sz = ULONG64(nl) * ns
     cumu_h   = TOTAL(h, /CUMULATIVE, /DOUBLE)
-    pdf      = cumu_h / array_sz
+    pdf      = (cumu_h / array_sz) * 100
 
     ; Initialise the output string
     out_str1 = 'Reference Dataset'
@@ -188,14 +188,14 @@ PRO validate_pq, event
     out_str = [out_str, diff_str, '']
 
     ; Check that the difference is < 3% (This could be a user variable)
-    IF (diff GT (tolerance)) THEN BEGIN
+    IF (diff GT (100 - tolerance)) THEN BEGIN
         str1 = 'Difference Threshold is Acceptable'
-        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (tolerance))
+        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - tolerance))
 
         out_str = [out_str, str1, str2]
     ENDIF ELSE BEGIN
         str1 = 'Difference Threshold Failed!'
-        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (tolerance))
+        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - tolerance))
         str3 = 'Requires Further Investigation.'
 
         out_str = [out_str, str1, str2, str3, '']
