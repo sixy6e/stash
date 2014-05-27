@@ -188,14 +188,14 @@ PRO validate_pq, event
     out_str = [out_str, diff_str, '']
 
     ; Check that the difference is < 3% (This could be a user variable)
-    IF (diff GT (100 - tolerance)) THEN BEGIN
+    IF (diff GT (tolerance)) THEN BEGIN
         str1 = 'Difference Threshold is Acceptable'
-        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - tolerance))
+        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (tolerance))
 
         out_str = [out_str, str1, str2]
     ENDIF ELSE BEGIN
         str1 = 'Difference Threshold Failed!'
-        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - tolerance))
+        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (tolerance))
         str3 = 'Requires Further Investigation.'
 
         out_str = [out_str, str1, str2, str3, '']
