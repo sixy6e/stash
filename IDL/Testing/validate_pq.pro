@@ -32,7 +32,7 @@ PRO validate_pq, event
 
     CATCH, error
     IF (error NE 0) THEN BEGIN
-	msg = [!error_state.msg, 'Click Ok to retry or Cancel to exit.']
+        msg = [!error_state.msg, 'Click Ok to retry or Cancel to exit.']
         ok = DIALOG_MESSAGE(msg, /CANCEL)
         IF (STRUPCASE(ok) EQ 'CANCEL') THEN RETURN
     ENDIF
@@ -46,7 +46,7 @@ PRO validate_pq, event
 
     ; The tolerance threshold
     p1 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Tolerance Threshold', $
-	    uvalue='tolerance', xsize=10, default=3)
+             uvalue='tolerance', xsize=10, default=3)
 
     ; Do we keep the intermediate files
     k_list = ['Keep Intermediate Files?']
@@ -77,24 +77,24 @@ PRO validate_pq, event
 
     ; Open the original (reference) PQ file
     ENVI_SELECT, title='Select Reference PQ file', fid=fid_ref, pos=pos_ref, $
-                 /BAND_ONLY, /NO_DIMS, /NO_SPEC
+        /BAND_ONLY, /NO_DIMS, /NO_SPEC
     IF (fid_ref EQ -1) THEN RETURN
 
     ; Get image info
     ENVI_FILE_QUERY, fid_ref, dims=dims_ref, ns=ns_ref, nl=nl_ref, $
-                     interleave=interleave_ref, fname=fname_ref
+        interleave=interleave_ref, fname=fname_ref
 
     ; Get image projection info
     map_info_ref = ENVI_GET_MAP_INFO(fid=fid_ref)
 
     ; Open the new (test) PQ file
     ENVI_SELECT, title='Select Test PQ file', fid=fid_test, pos=pos_test, $
-	         /BAND_ONLY, /NO_DIMS, /NO_SPEC
+        /BAND_ONLY, /NO_DIMS, /NO_SPEC
     IF (fid_test EQ -1) THEN RETURN
 
     ; Get image info
     ENVI_FILE_QUERY, fid_test, dims=dims_test, ns=ns_test, nl=nl_test, $
-                     interleave=interleave_test, fname=fname_test
+        interleave=interleave_test, fname=fname_test
 
     ; Get image projection info
     map_info_test = ENVI_GET_MAP_INFO(fid=fid_test)
@@ -109,18 +109,18 @@ PRO validate_pq, event
     map_str_test = map_info_test.proj.pe_coord_sys_str
     IF (map_str_ref NE map_str_test) THEN BEGIN
         str1 = 'The reference PQ and the test PQ have different co-ordinate reference systems.'
-	str2 = 'Reference Dataset'
-	str3 = 'Test Dataset'
-	str4 = 'Co-ordinate Reference System Test Failed!'
-	str5 = 'PQ Validation Test Failed!'
-	str6 = 'Check for correct input PQ reference and test datasets.'
+        str2 = 'Reference Dataset'
+        str3 = 'Test Dataset'
+        str4 = 'Co-ordinate Reference System Test Failed!'
+        str5 = 'PQ Validation Test Failed!'
+        str6 = 'Check for correct input PQ reference and test datasets.'
 
-	err_str  = [str1, '', str2, fname_ref, map_str_ref, '', $
-		    str3, fname_test, map_str_test, '', str4, $
-		    str5, str6]
+        err_str  = [str1, '', str2, fname_ref, map_str_ref, '', $
+        str3, fname_test, map_str_test, '', str4, $
+        str5, str6]
 
         ENVI_INFO_WID, err_str, title='PQ Validation Report'
-	RETURN
+        RETURN
     ENDIF
 
     ; First step is band math
@@ -131,14 +131,14 @@ PRO validate_pq, event
     bmath_fname = out_dir + 'bmath_result_PQ_diff'
 
     ENVI_DOIT, 'math_doit', fid=fid, pos=pos, dims=dims_ref, exp=str_exp, $
-               out_name=bmath_fname, r_fid=diff_fid
+        out_name=bmath_fname, r_fid=diff_fid
 
     ENVI_FILE_QUERY, diff_fid, dims=dims, ns=ns, nl=nl, interleave=interleave, $
-	       data_type=dtype
+        data_type=dtype
 
     ; Now to calculate the min and max. We need this for the histogram
     ENVI_DOIT, 'envi_stats_doit', fid=diff_fid, pos=pos, $ 
-               dims=dims, comp_flag=1, dmin=dmin, dmax=dmax
+        dims=dims, comp_flag=1, dmin=dmin, dmax=dmax
     
     data_mx = MAX(dmax)
     data_mn = MIN(dmin)
@@ -163,8 +163,8 @@ PRO validate_pq, event
     ; Now loop over the remaining tiles
     FOR i=1L, num_tiles-1 DO BEGIN
         ENVI_REPORT_STAT, rbase, i, num_tiles
-	data = ENVI_GET_TILE(tile_id, i)
-	h = HISTOGRAM(data, input=h, min=mn, max=mx)
+        data = ENVI_GET_TILE(tile_id, i)
+        h = HISTOGRAM(data, input=h, min=mn, max=mx)
     ENDFOR
 
     ; Close the Percent Complete Window
@@ -190,15 +190,15 @@ PRO validate_pq, event
     ; Check that the difference is < 3% (This could be a user variable)
     IF (diff GT (100 - tolerance)) THEN BEGIN
         str1 = 'Difference Threshold is Acceptable'
-	str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - tolerance))
+        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - tolerance))
 
-	out_str = [out_str, str1, str2]
+        out_str = [out_str, str1, str2]
     ENDIF ELSE BEGIN
-	str1 = 'Difference Threshold Failed!'
-	str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - tolerance))
-	str3 = 'Requires Further Investigation.'
+        str1 = 'Difference Threshold Failed!'
+        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - tolerance))
+        str3 = 'Requires Further Investigation.'
 
-	out_str = [out_str, str1, str2, str3, '']
+        out_str = [out_str, str1, str2, str3, '']
     ENDELSE
 
     ; Now to compare the reference and test datasets for every PQ test
@@ -245,14 +245,14 @@ PRO validate_pq, event
     FOR i=0, out_nb-1 DO BEGIN
         ENVI_REPORT_INIT, rstr, title="Processing Bit Extraction", base=base
 
-	tile_id = ENVI_INIT_TILE(fid_ref, pos_ref, num_tiles=num_tiles, interleave=0)
+        tile_id = ENVI_INIT_TILE(fid_ref, pos_ref, num_tiles=num_tiles, interleave=0)
 
-	FOR t=0L, num_tiles-1 DO BEGIN
-	    ENVI_REPORT_STAT, base, t, num_tiles
+        FOR t=0L, num_tiles-1 DO BEGIN
+            ENVI_REPORT_STAT, base, t, num_tiles
             data = ENVI_GET_TILE(tile_id, t)
-	    ext  = (data AND bits[i]) EQ bits[i]
-	    WRITEU, lun1, ext
-	ENDFOR
+            ext  = (data AND bits[i]) EQ bits[i]
+            WRITEU, lun1, ext
+        ENDFOR
 
         ;Close the tiling procedure and the Percent Complete window
         ENVI_TILE_DONE, tile_id
@@ -266,14 +266,14 @@ PRO validate_pq, event
     FOR i=0, out_nb-1 DO BEGIN
         ENVI_REPORT_INIT, rstr, title="Processing Bit Extraction", base=base
 
-	tile_id = ENVI_INIT_TILE(fid_test, pos_test, num_tiles=num_tiles, interleave=0)
+        tile_id = ENVI_INIT_TILE(fid_test, pos_test, num_tiles=num_tiles, interleave=0)
 
-	FOR t=0L, num_tiles-1 DO BEGIN
-	    ENVI_REPORT_STAT, base, t, num_tiles
+        FOR t=0L, num_tiles-1 DO BEGIN
+            ENVI_REPORT_STAT, base, t, num_tiles
             data = ENVI_GET_TILE(tile_id, t)
-	    ext  = (data AND bits[i]) EQ bits[i]
-	    WRITEU, lun2, ext
-	ENDFOR
+            ext  = (data AND bits[i]) EQ bits[i]
+            WRITEU, lun2, ext
+        ENDFOR
 
         ;Close the tiling procedure and the Percent Complete window
         ENVI_TILE_DONE, tile_id
@@ -286,14 +286,14 @@ PRO validate_pq, event
 
     ; Create the header files for the extracted reference and test datasets
     ENVI_SETUP_HEAD, fname=ref_PQextract_fname, ns=ns_ref, nl=nl_ref, $
-            nb=out_nb, data_type=1, offset=0, interleave=0, $
-	    map_info=map_info_ref, descrip=description, $
-	    r_fid=extract_ref_fid, /WRITE, /OPEN
+        nb=out_nb, data_type=1, offset=0, interleave=0, $
+        map_info=map_info_ref, descrip=description, $
+        r_fid=extract_ref_fid, /WRITE, /OPEN
 
     ENVI_SETUP_HEAD, fname=test_PQextract_fname, ns=ns_test, nl=nl_test, $
-            nb=out_nb, data_type=1, offset=0, interleave=0, $
-	    map_info=map_info_test, descrip=description, $
-	    r_fid=extract_test_fid, /WRITE, /OPEN
+        nb=out_nb, data_type=1, offset=0, interleave=0, $
+        map_info=map_info_test, descrip=description, $
+        r_fid=extract_test_fid, /WRITE, /OPEN
 
     ; The extracted PQ datasets are written now for bandwise comparison
     ; Multiple calls to MATH_DOIT would be simple enough...
@@ -311,9 +311,9 @@ PRO validate_pq, event
 
     ; Initialise the tiling sequence
     ref_tile_id  = ENVI_INIT_TILE(extract_ref_fid, pos, interleave=2, $
-	           num_tiles=num_tiles)
+        num_tiles=num_tiles)
     test_tile_id = ENVI_INIT_TILE(extract_test_fid, pos, interleave=2, $
-	           match_id=ref_tile_id)
+        match_id=ref_tile_id)
 
     ; Initialise the Percent Complete Window
     rstr = ['Reference PQ Dataset: ' + ref_PQextract_fname]
@@ -322,12 +322,12 @@ PRO validate_pq, event
 
     ; Loop through the tiles
     FOR t=0L, num_tiles-1 DO BEGIN
-	ENVI_REPORT_STAT, base, t, num_tiles
+        ENVI_REPORT_STAT, base, t, num_tiles
         ref_data  = FIX(ENVI_GET_TILE(ref_tile_id, t))
-	test_data = ENVI_GET_TILE(test_tile_id, t)
+        test_data = ENVI_GET_TILE(test_tile_id, t)
 
-	result = ref_data - test_data
-	WRITEU, lun, result
+        result = ref_data - test_data
+        WRITEU, lun, result
     ENDFOR
 
     ;Close the tiling procedure and the Percent Complete window
@@ -343,9 +343,9 @@ PRO validate_pq, event
 
     ; Create the header files for the reference and test datasets
     ENVI_SETUP_HEAD, fname=out_fname, ns=ns_ref, nl=nl_ref, $
-            nb=out_nb, data_type=2, offset=0, interleave=2, $
-	    map_info=map_info_ref, descrip=description, $
-	    r_fid=diff_per_test_fid, /WRITE, /OPEN
+        nb=out_nb, data_type=2, offset=0, interleave=2, $
+        map_info=map_info_ref, descrip=description, $
+        r_fid=diff_per_test_fid, /WRITE, /OPEN
 
     ; Query the image to get the correct info
     ENVI_FILE_QUERY, diff_per_test_fid, dims=dims, nl=nl, nb=nb, ns=ns
@@ -353,8 +353,8 @@ PRO validate_pq, event
     ; Now to generate some stats on the differences
     ; It might be simple enough to use the envi_stats_doit routine
     ENVI_DOIT, 'envi_stats_doit', fid=diff_per_test_fid, pos=pos, $
-               dims=dims, comp_flag=3, dmin=dmin, dmax=dmax, $
-	       hist=hist, report_flag=3, /TO_SCREEN
+        dims=dims, comp_flag=3, dmin=dmin, dmax=dmax, $
+        hist=hist, report_flag=3, /TO_SCREEN
 
     ; Purge intermediate files?
     IF (keep EQ 0) THEN BEGIN
