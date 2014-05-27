@@ -89,7 +89,7 @@ PRO validate_pq, event
 
     ; Open the new (test) PQ file
     ENVI_SELECT, title='Select Test PQ file', fid=fid_test, pos=pos_test, $
-	         /NO_DIMS, /NO_SPEC
+	         /BAND_ONLY, /NO_DIMS, /NO_SPEC
     IF (fid_test EQ -1) THEN RETURN
 
     ; Get image info
