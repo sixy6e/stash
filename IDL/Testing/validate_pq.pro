@@ -134,7 +134,10 @@ PRO validate_pq, event
         out_name=bmath_fname, r_fid=diff_fid
 
     ENVI_FILE_QUERY, diff_fid, dims=dims, ns=ns, nl=nl, interleave=interleave, $
-        data_type=dtype
+        data_type=dtype, nb=nb
+
+    ; Reset pos
+    pos = LINDGEN(nb)
 
     ; Now to calculate the min and max. We need this for the histogram
     ENVI_DOIT, 'envi_stats_doit', fid=diff_fid, pos=pos, $ 
