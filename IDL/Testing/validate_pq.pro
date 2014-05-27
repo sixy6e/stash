@@ -201,9 +201,6 @@ PRO validate_pq, event
         out_str = [out_str, str1, str2, str3, '']
     ENDELSE
 
-    ; Now to compare the reference and test datasets for every PQ test
-    out_nb = N_ELEMENTS(bits)
-
     ; Define the description fiels for the PQ extraction
     description = 'ULA pixel quality bit mask extraction'
 
@@ -229,6 +226,9 @@ PRO validate_pq, event
               'ACCA Cloud Shadow', $
               'Fmask Cloud Shadow' $
              ]
+
+    ; Now to compare the reference and test datasets for every PQ test
+    out_nb = N_ELEMENTS(bits)
 
     ; Define the output filenames
     ref_PQextract_fname  = out_dir + 'ref_PQextract'
