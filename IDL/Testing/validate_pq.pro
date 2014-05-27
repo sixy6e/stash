@@ -360,7 +360,7 @@ PRO validate_pq, event
     IF (keep EQ 0) THEN BEGIN
         ENVI_FILE_MNG, id=diff_fid, /REMOVE, /DELETE
         ENVI_FILE_MNG, id=extract_ref_fid, /REMOVE, /DELETE
-        ENVI_FILE_MNG, id=ectract_test_fid, /REMOVE, /DELETE
+        ENVI_FILE_MNG, id=extract_test_fid, /REMOVE, /DELETE
         ENVI_FILE_MNG, id=diff_per_test_fid, /REMOVE, /DELETE
     ENDIF
 
