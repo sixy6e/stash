@@ -32,9 +32,44 @@ PRO validate_pq, event
 
     CATCH, error
     IF (error NE 0) THEN BEGIN
-        ok = DIALOG_MESSAGE(!error_state.msg, /CANCEL)
+	msg = [!error_state.msg, 'Click Ok to retry or Cancel to exit.']
+        ok = DIALOG_MESSAGE(msg, /CANCEL)
         IF (STRUPCASE(ok) EQ 'CANCEL') THEN RETURN
     ENDIF
+
+    ; Retrieve the temporary directory. Used for file output
+    tmp_dir = GETENV('IDL_TMPDIR')
+
+    ; Create the base menu
+    base_menu = WIDGET_AUTO_BASE(title='PQ Validation Parameters')
+    row_base1 = WIDGET_BASE(base_menu, /ROW)
+
+    ; The tolerance threshold
+    p1 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Tolerance Threshold', $
+	    uvalue='tolerance', xsize=10, default=3)
+
+    ; Do we keep the intermediate files
+    k_list = ['Keep Intermediate Files?']
+    wm     = WIDGET_MENU(base_menu, list=k_list, uvalue='keep', rows=1, auto_manage=0)
+
+    ; Specify the output directory
+    wo = WIDGET_OUTF(base_menu, uvalue='outd', prompt='Working Directory', $
+             auto_manage=0, /DIRECTORY, default=tmp_dir)
+
+    ; Reference to the html help file
+    wb = WIDGET_BUTTON(base_menu, value='Help', event_pro='valPQ_button_help', $
+             /ALIGN_CENTER, /HELP)
+
+    ; Gather the user parameters
+    result = AUTO_WID_MNG(base_menu)
+
+    ; Exit if chosen
+    IF (result.accept EQ 0) THEN RETURN
+
+    ; Get the parameters
+    tolerance = result.tolerance
+    keep      = result.keep
+    out_dir   = result.outd + PATH_SEP()
 
     ; Open the original (reference) PQ file
     ENVI_SELECT, title='Select Reference PQ file', fid=fid_ref, pos=pos_ref, /BAND_ONLY, $
@@ -62,7 +97,7 @@ PRO validate_pq, event
 
     ; Check that both images have the same dimensions
     IF (TOTAL(dims_ref NE dims_test) NE 0) THEN BEGIN
-        MESSAGE, 'Both Images Must Have The Same Dimensions!'
+        MESSAGE, 'Both Images Must Have The Same X & Y Dimensions!'
     ENDIF
 
     ; Check that both images have the same co-ordinate reference system
@@ -84,15 +119,12 @@ PRO validate_pq, event
 	RETURN
     ENDIF
 
-    ; Retrieve the temporary directory. Used for file output
-    tmp_dir = GETENV('IDL_TMPDIR')
-
     ; First step is band math
     str_exp = 'abs(long(b1) – b2)'
     fid     = [fid_ref, fid_test]
     pos     = [pos_ref, pos_test]
 
-    bmath_fname = tmp_dir + 'bmath_result_PQ_diff'
+    bmath_fname = out_dir + 'bmath_result_PQ_diff'
 
     ENVI_DOIT, 'math_doit', fid=fid, pos=pos, dims=dims_ref, exp=str_exp, $
                out_name=bmath_fname, r_fid=r_fid
@@ -195,8 +227,8 @@ PRO validate_pq, event
              ]
 
     ; Define the output filenames
-    ref_PQextract_fname  = tmp_dir + 'ref_PQextract'
-    test_PQextract_fname = tmp_dir + 'test_PQextract'
+    ref_PQextract_fname  = out_dir + 'ref_PQextract'
+    test_PQextract_fname = out_dir + 'test_PQextract'
 
     ; Open the files for writing to disk
     OPENW, lun1, ref_PQextract_fname, /GET_LUN
@@ -268,7 +300,7 @@ PRO validate_pq, event
     pos = LINDGEN(out_nb)
 
     ; Define the output filename
-    out_fname = tmp_dir + 'Diff_per_PQ_test'
+    out_fname = out_dir + 'Diff_per_PQ_test'
 
     ; Open the file for writing to disk
     OPENW, lun, out_fname, /GET_LUN
