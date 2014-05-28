@@ -44,9 +44,13 @@ PRO validate_pq, event
     base_menu = WIDGET_AUTO_BASE(title='PQ Validation Parameters')
     row_base1 = WIDGET_BASE(base_menu, /ROW)
 
-    ; The tolerance threshold
-    p1 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Tolerance Threshold', $
-             uvalue='tolerance', xsize=10, default=3)
+    ; The global tolerance threshold
+    p1 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Global Tolerance Threshold', $
+             uvalue='g_tolerance', xsize=10, default=3)
+
+    ; The global tolerance threshold
+    p2 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Per Test Tolerance Threshold', $
+             uvalue='pt_tolerance', xsize=10, default=2)
 
     ; Do we keep the intermediate files
     k_list = ['Keep Intermediate Files?']
@@ -67,12 +71,17 @@ PRO validate_pq, event
     IF (result.accept EQ 0) THEN RETURN
 
     ; Get the parameters
-    tolerance = result.tolerance
-    keep      = result.keep
-    out_dir   = result.outd + PATH_SEP()
+    g_tol   = result.g_tolerance
+    pt_tol  = resilt.pt_tolerance
+    keep    = result.keep
+    out_dir = result.outd + PATH_SEP()
 
-    ; Check for suitable tolerance
-    IF (tolerance LT 0) OR (tolerance GT 100) THEN $
+    ; Check for suitable global tolerance
+    IF (g_tol LT 0) OR (g_tol GT 100) THEN $
+        MESSAGE, 'Tolerance must be in range [0,100]!'
+
+    ; Check for suitable per test tolerance
+    IF (pt_tol LT 0) OR (pt_tol GT 100) THEN $
         MESSAGE, 'Tolerance must be in range [0,100]!'
 
     ; Open the original (reference) PQ file
@@ -191,14 +200,14 @@ PRO validate_pq, event
     out_str = [out_str, diff_str, '']
 
     ; Check that the difference is < 3% (This could be a user variable)
-    IF (diff GT (100 - tolerance)) THEN BEGIN
+    IF (diff GT (100 - g_tol)) THEN BEGIN
         str1 = 'Difference Threshold is Acceptable'
-        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - tolerance))
+        str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - g_tol))
 
         out_str = [out_str, str1, str2, '']
     ENDIF ELSE BEGIN
         str1 = 'Difference Threshold Failed!'
-        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - tolerance))
+        str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - g_tol))
         str3 = 'Requires Further Investigation.'
 
         out_str = [out_str, str1, str2, str3, '']
@@ -368,18 +377,18 @@ PRO validate_pq, event
         CASE dmin[i] OF
             -1 : BEGIN
                      idxs[i] = 1
-                     IF (hist[1,i] GT (100 - tolerance)) THEN BEGIN
+                     IF (hist[1,i] GT (100 - pt_tol)) THEN BEGIN
                          str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
                          str2 = 'Difference Threshold is Acceptable'
                          str3 = STRING(format = '(F10.2, "    >=", F10.2)', $
-                                hist[1,i], (100 - tolerance))
+                                hist[1,i], (100 - pt_tol))
 
                          out_str = [out_str, str1, str2, str3, '']
                      ENDIF ELSE BEGIN
                          str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
                          str2 = 'Difference Threshold Failed!'
                          str3 = STRING(format = '(F10.2, "    <", F10.2)', $
-                                hist[1,i], (100 - tolerance))
+                                hist[1,i], (100 - pt_tol))
                          str4 = 'Requires Further Investigation.'
 
                          out_str = [out_str, str1, str2, str3, str4, '']
@@ -387,18 +396,18 @@ PRO validate_pq, event
                  END
              0 : BEGIN
                      idxs[i] = 0
-                     IF (hist[0,i] GT (100 - tolerance)) THEN BEGIN
+                     IF (hist[0,i] GT (100 - pt_tol)) THEN BEGIN
                          str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
                          str2 = 'Difference Threshold is Acceptable'
                          str3 = STRING(format = '(F10.2, "    >=", F10.2)', $
-                                hist[0,i], (100 - tolerance))
+                                hist[0,i], (100 - pt_tol))
 
                          out_str = [out_str, str1, str2, str3, '']
                      ENDIF ELSE BEGIN
                          str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
                          str2 = 'Difference Threshold Failed!'
                          str3 = STRING(format = '(F10.2, "    <", F10.2)', $
-                                hist[0,i], (100 - tolerance))
+                                hist[0,i], (100 - pt_tol))
                          str4 = 'Requires Further Investigation.'
 
                          out_str = [out_str, str1, str2, str3, str4, '']
