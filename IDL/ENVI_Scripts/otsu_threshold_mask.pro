@@ -220,7 +220,7 @@ PRO otsu_threshold_mask, event
     wm4 = WIDGET_MENU(base, list=s_list, uvalue='segment', rows=1, auto_manage=0)
     wo1 = WIDGET_OUTFM(base, uvalue='outfm', prompt='Mask Output', /AUTO)
     wo2 = WIDGET_OUTF(base, uvalue='outf', prompt='Mask Segmentation Output', auto_manage=0)
-    wb  = WIDGET_BUTTON(base, value='Help', event_pro='tri_button_help', /ALIGN_CENTER, /HELP)
+    wb  = WIDGET_BUTTON(base, value='Help', event_pro='otsu_button_help', /ALIGN_CENTER, /HELP)
     
     result = AUTO_WID_MNG(base)
 
