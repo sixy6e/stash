@@ -122,12 +122,14 @@ PRO segmentation_statistics, event
     ENDIF
 
     ; Select the base image to be used for calculating statistics.
-    ENVI_SELECT, title='Select Base Image', fid=bfid, pos=bpos, /BAND_ONLY, dims=bdims
+    ENVI_SELECT, title='Select Base Image', fid=bfid, pos=bpos, /BAND_ONLY, dims=bdims, $
+        /NO_DIMS, /NO_SPEC
     IF (bfid EQ -1) THEN RETURN
         
     ; Select the segmented image to be used for finding regions on which to
     ; base the statistics on.
-    ENVI_SELECT, title='Select Mask/Segmented Image ', fid=sfid, pos=spos, /BAND_ONLY, dims=sdims
+    ENVI_SELECT, title='Select Mask/Segmented Image ', fid=sfid, pos=spos, /BAND_ONLY, $
+        dims=sdims, /NO_DIMS, /NO_SPEC
     IF (sfid EQ -1) THEN RETURN
     
     ; Query both images
@@ -140,7 +142,7 @@ PRO segmentation_statistics, event
     ; Check that the datatype of the segmented image is an integer, signed/unsigned 
     ; (8-bit, 16-bit, 32-bit, 64-bit)
     accept_dtypes = [1,2,3,12,13,14,15]
-    wh = WHERE(sdtype EQ accept_dtypes, count)
+    wh = WHERE(accept_dtypes EQ sdtype, count)
     IF (count EQ 0) THEN BEGIN
         MESSAGE, 'Only Integer Based Images are Supported!'
     ENDIF
@@ -152,7 +154,7 @@ PRO segmentation_statistics, event
 
     ; Calculate Float or Double
     dbl_types = [5,9,14,15]
-    wh = WHERE(bdtype EQ dbl_types, count)
+    wh  = WHERE(dbl_types EQ bdtype, count)
     dbl = (count EQ 0) ? 0 : 1
     NaN = (dbl EQ 0) ? !VALUES.F_NAN : !VALUES.D_NAN
 
