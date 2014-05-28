@@ -368,7 +368,7 @@ PRO validate_pq, event
         CASE dmin[i] OF
             -1 : BEGIN
                      idxs[i] = 1
-                     IF (hist[1,i] GT (100 - tolerance)): THEN BEGIN
+                     IF (hist[1,i] GT (100 - tolerance)) THEN BEGIN
                          str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
                          str2 = 'Difference Threshold is Acceptable'
                          str3 = STRING(format = '(F10.2, "    >=", F10.2)', $
@@ -387,7 +387,7 @@ PRO validate_pq, event
                  END
              0 : BEGIN
                      idxs[i] = 0
-                     IF (hist[0,i] GT (100 - tolerance)): THEN BEGIN
+                     IF (hist[0,i] GT (100 - tolerance)) THEN BEGIN
                          str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
                          str2 = 'Difference Threshold is Acceptable'
                          str3 = STRING(format = '(F10.2, "    >=", F10.2)', $
