@@ -195,7 +195,7 @@ PRO validate_pq, event
         str1 = 'Difference Threshold is Acceptable'
         str2 = STRING(format = '(F10.2, "    >=", F10.2)', diff, (100 - tolerance))
 
-        out_str = [out_str, str1, str2]
+        out_str = [out_str, str1, str2, '']
     ENDIF ELSE BEGIN
         str1 = 'Difference Threshold Failed!'
         str2 = STRING(format = '(F10.2, "    <", F10.2)', diff, (100 - tolerance))
