@@ -43,13 +43,14 @@ PRO validate_pq, event
     ; Create the base menu
     base_menu = WIDGET_AUTO_BASE(title='PQ Validation Parameters')
     row_base1 = WIDGET_BASE(base_menu, /ROW)
+    row_base2 = WIDGET_BASE(base_menu, /ROW)
 
     ; The global tolerance threshold
     p1 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Global Tolerance Threshold', $
              uvalue='g_tolerance', xsize=10, default=3)
 
     ; The global tolerance threshold
-    p2 = WIDGET_PARAM(row_base1, auto_manage=0, dt=4, prompt='Per Test Tolerance Threshold', $
+    p2 = WIDGET_PARAM(row_base2, auto_manage=0, dt=4, prompt='Per Test Tolerance Threshold', $
              uvalue='pt_tolerance', xsize=10, default=2)
 
     ; Do we keep the intermediate files
