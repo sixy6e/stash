@@ -1,3 +1,105 @@
+;+
+; Name:
+; -----
+;     VALIDATE_PQ
+;-
+;
+;+
+; Description:
+; ------------
+;     Performs a validation for a Geoscience Australia National Earth and 
+;     Marine Observation pixel quality (PQ) product.
+;     The basis is to compare a new PQ product with a previous version to
+;     ensure that the result is behaving as expected.
+;     Uses a reference image and the image under investigation (test image.
+;-
+;
+;+
+; Output options:
+; ---------------
+;     None. The procedure will output files automatically which are then
+;     removed at the end (unless the user opts to keep the intermediate
+;     files.  Two reports are generated at the end which can be saved to
+;     ascii text files.
+;-
+;
+;+
+; Requires:
+; ---------
+;     This function is written for use only with an interactive ENVI session.
+;-
+; Parameters:
+; -----------
+;
+;     Global Tolerance Threshold : input, default=3::
+;
+;         The global tolerance threshold is used for determining acceptable levels
+;         of difference and is applied to the raw datasets.
+;         Eg, a value of 3 (default) indicates that if more than 3% of the image
+;         differs, then flag it as a potential issue.
+;
+;     Per Test Tolerance Threshold : input::
+;
+;         The per test tolerance threshold is used for determining acceptable levels
+;         of difference and is applied for each PQ test, ACCA, Fmask, Saturation etc.
+;         Eg, a value of 2 (default) indicates that if more than 2% of the image
+;         differs, then flag it as a potential issue.
+;
+;     Keep Intermediate Files : input, default=Unchecked::
+;
+;         If unchecked (default), then all intermediate files will be deleted
+;         at the end of the workflow.
+;
+;     Working Directory : input, default=IDL environment variable IDL_TMPDIR::
+;
+;         Specify the working directory for intermediate files to be written
+;         to disk.  The default is to use IDL's environment variable IDL_TMPDIR.
+;
+;-
+;
+;+
+; :Author:
+;     Josh Sixsmith; joshua.sixsmith@ga.gov.au
+;-
+;
+;+
+; :History:
+;
+;     2014/05/26: Created
+;-
+;
+;
+; :Copyright:
+;
+;     Copyright (c) 2014, Josh Sixsmith
+;     All rights reserved.
+;
+;     Redistribution and use in source and binary forms, with or without
+;     modification, are permitted provided that the following conditions are met:
+;
+;     1. Redistributions of source code must retain the above copyright notice, this
+;        list of conditions and the following disclaimer.
+;     2. Redistributions in binary form must reproduce the above copyright notice,
+;        this list of conditions and the following disclaimer in the documentation
+;        and/or other materials provided with the distribution.
+;
+;     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+;     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+;     WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+;     DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+;     ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+;     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+;     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+;     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+;     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+;     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;     The views and conclusions contained in the software and documentation are those
+;     of the authors and should not be interpreted as representing official policies,
+;     either expressed or implied, of the FreeBSD Project.
+;
+;
+
 PRO validate_pq_define_buttons, buttonInfo
 ;+
 ; :Hidden:
