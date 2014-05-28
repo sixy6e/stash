@@ -359,6 +359,69 @@ PRO validate_pq, event
         dims=dims, comp_flag=3, dmin=dmin, dmax=dmax, $
         hist=hist, report_flag=3, /TO_SCREEN
 
+    ; Normalise the histogram and convert to percent
+    hist = (hist * 100.0D) / array_sz
+
+    ; Report the percent no differences on a per test level
+    idxs = LONARR(out_nb)
+    FOR i=0, out_nb-1 DO BEGIN
+        CASE dmin[i] OF
+            -1 : BEGIN
+                     idxs[i] = 1
+                     IF (hist[1,i] GT (100 - tolerance)): THEN BEGIN
+                         str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
+                         str2 = 'Difference Threshold is Acceptable'
+                         str3 = STRING(format = '(F10.2, "    >=", F10.2)', $
+                                hist[1,i], (100 - tolerance))
+
+                         out_str = [out_str, str1, str2, str3, '']
+                     ENDIF ELSE BEGIN
+                         str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
+                         str2 = 'Difference Threshold Failed!'
+                         str3 = STRING(format = '(F10.2, "    <", F10.2)', $
+                                hist[1,i], (100 - tolerance))
+                         str4 = 'Requires Further Investigation.'
+
+                         out_str = [out_str, str1, str2, str3, str4, '']
+                     ENDELSE
+                 END
+             0 : BEGIN
+                     idxs[i] = 0
+                     IF (hist[0,i] GT (100 - tolerance)): THEN BEGIN
+                         str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
+                         str2 = 'Difference Threshold is Acceptable'
+                         str3 = STRING(format = '(F10.2, "    >=", F10.2)', $
+                                hist[0,i], (100 - tolerance))
+
+                         out_str = [out_str, str1, str2, str3, '']
+                     ENDIF ELSE BEGIN
+                         str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
+                         str2 = 'Difference Threshold Failed!'
+                         str3 = STRING(format = '(F10.2, "    <", F10.2)', $
+                                hist[0,i], (100 - tolerance))
+                         str4 = 'Requires Further Investigation.'
+
+                         out_str = [out_str, str1, str2, str3, str4, '']
+                     ENDELSE
+                 END
+             1 : BEGIN
+                     str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
+                     str2 = STRING(format = '(%"%s Test Has Not Identified Any Pixels As Compared To The Reference Dataset!")', bnames[i])
+                     str3 = 'Requires Further Investigation.'
+
+                     out_str = [out_str, str1, str2, str3, '']
+                 END
+             ELSE : BEGIN
+                        str1 = STRING(format = '(%"PQ Test: %s")', bnames[i])
+                        str2 = STRING(format = '(%"Unexpected Minimum Value %f")', dmin[i])
+                        str3 = 'Expected Values in range [-1,1]'
+                        str4 = 'Requires Further Investigation.'
+
+                        out_str = [out_str, str1, str2, str3, str4, '']
+                    END
+        ENDCASE
+    ENDFOR
+
     ; Purge intermediate files?
     IF (keep EQ 0) THEN BEGIN
         ENVI_FILE_MNG, id=diff_fid, /REMOVE, /DELETE
