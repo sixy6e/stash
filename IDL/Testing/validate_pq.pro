@@ -73,7 +73,7 @@ PRO validate_pq, event
 
     ; Get the parameters
     g_tol   = result.g_tolerance
-    pt_tol  = resilt.pt_tolerance
+    pt_tol  = result.pt_tolerance
     keep    = result.keep
     out_dir = result.outd + PATH_SEP()
 
