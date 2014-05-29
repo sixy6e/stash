@@ -174,7 +174,7 @@ PRO sun_angles, event
         azimuth = STRTRIM(angles[1], 1)  
         str = ['Sun Elevation= ' + elevation, 'Sun Azimuth= ' + azimuth]         
         ENVI_INFO_WID, str, Title = 'Sun Angles'
-        sun_angles,
+        sun_angles
     ENDIF
 
 END
