@@ -231,7 +231,7 @@ if __name__ == '__main__':
     logging.info("Creating output summary file")
 
     outcsv = open(os.path.join(outputDir.getPath(), outfname), 'w')
-    headings = "Feature Name, AUSHYDRO_ID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
+    headings = "Time Slice, Feature Name, AUSHYDRO_ID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
     outcsv.write(headings)
 
     # Loop over each WaterExtent file
