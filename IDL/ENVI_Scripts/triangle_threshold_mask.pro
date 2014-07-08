@@ -362,7 +362,7 @@ PRO triangle_threshold_mask, event
                 FOR i=0L, num_tiles-1 DO BEGIN 
                     ENVI_REPORT_STAT, rbase, i, num_tiles
                     data = ENVI_GET_TILE(tile_id, i, ys=ys, ye=ye)
-                    mask = (data LT thresh_convert) AND (data GE mn_)
+                    mask = (data GE thresh_convert) AND (data LE mx_)
                     WRITEU, lun, mask
                 ENDFOR
                END
