@@ -165,8 +165,10 @@ if __name__ == '__main__':
 
     # Get the feature names
     feature_names = []
+    hydro_id      = []
     for feature in layer:
         feature_names.append(feature.GetField("NAME"))
+        hydro_id.append(feature.GetField("AUSHYDRO_I"))
     layer.ResetReading()
 
     # Replace any occurences of None with UNKNOWN
@@ -228,8 +230,8 @@ if __name__ == '__main__':
 
     logging.info("Creating output summary file")
 
-    outcsv = open(os.path.join(baseOutputPath, outfname), 'w')
-    headings = "Feature Name, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
+    outcsv = open(os.path.join(outputDir.getPath(), outfname), 'w')
+    headings = "Time Slice, Feature Name, AUSHYDRO_ID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
     outcsv.write(headings)
 
     # Loop over each WaterExtent file
@@ -283,10 +285,10 @@ if __name__ == '__main__':
             WATER_PRESENT         = hist2[128]
 
             # Now to output counts per feature
-            s = "%s, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n" %(waterExtent.filename,feature_names[i],total_area,
-                                                                     WATER_NOT_PRESENT,NO_DATA,MASKED_NO_CONTIGUITY,
-                                                                     MASKED_SEA_WATER,MASKED_TERRAIN_SHADOW,MASKED_HIGH_SLOPE,
-                                                                     MASKED_CLOUD_SHADOW,MASKED_CLOUD,WATER_PRESENT)
+            s = "%s, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n" %(waterExtent.filename,feature_names[i],hydro_id[i],total_area,
+                                                                         WATER_NOT_PRESENT,NO_DATA,MASKED_NO_CONTIGUITY,
+                                                                         MASKED_SEA_WATER,MASKED_TERRAIN_SHADOW,MASKED_HIGH_SLOPE,
+                                                                         MASKED_CLOUD_SHADOW,MASKED_CLOUD,WATER_PRESENT)
             outcsv.write(s)
 
     outcsv.close()

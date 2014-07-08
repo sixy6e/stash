@@ -104,9 +104,9 @@ PRO validate_pq_define_buttons, buttonInfo
 ;+
 ; :Hidden:
 ;-
-ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE = 'PQ', $
+ENVI_DEFINE_MENU_BUTTON, buttonInfo, VALUE = 'Compare PQ Versions', $
    EVENT_PRO = 'validate_pq', $
-   REF_VALUE = 'Validation', POSITION = 'last', UVALUE = ''
+   REF_VALUE = 'General Tools', POSITION = 'last', UVALUE = ''
 
 END
 

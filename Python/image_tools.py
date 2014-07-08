@@ -3,12 +3,23 @@
 import numpy
 import scipy
 from scipy import ndimage
-import matplotlib.pyplot as plt
-import matplotlib.colors as col
-import matplotlib.cm as cm
 from osgeo import gdal
 
-#Author: Josh Sixsmith; joshua.sixsmith@ga.gov.au
+# Handle exceptions for cases of matplotlib not being installed
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print 'matplotlib Not installed. Functions get_class_colours() and create_colour_map() not available!'
+try:
+    import matplotlib.colors as col
+except ImportError:
+    print 'matplotlib Not installed. Functions get_class_colours() and create_colour_map() not available!'
+try:
+    import matplotlib.cm as cm
+except ImportError:
+    print 'matplotlib Not installed. Functions get_class_colours() and create_colour_map() not available!'
+
+#Author: Josh Sixsmith; josh,sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
 
 def img2map(geoTransform, pixel):
     """
@@ -36,7 +47,7 @@ def img2map(geoTransform, pixel):
         A tuple containing the (x,y) location co-ordinate.
 
     :author: 
-        Josh Sixsmith; joshua.sixsmith@ga.gov.au
+        Josh Sixsmith; josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
     """
 
     if len(geoTransform) != 6:
@@ -86,7 +97,7 @@ def map2img(geoTransform, location):
         A tuple containing the (row,column) pixel co-ordinate.
 
     :author:
-        Josh Sixsmith; joshua.sixsmith@ga.gov.au
+        Josh Sixsmith; josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
     """
 
     if len(geoTransform) != 6:
@@ -146,7 +157,7 @@ def region_grow(array, seed, stdv_multiplier=None, ROI=None, All_Neighbours=True
         A mask containing the grown locations.
 
     :author:
-        Josh Sixsmith; joshua.sixsmith@ga.gov.au
+        Josh Sixsmith; josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
     """
 
     if len(array.shape) != 2:
@@ -246,7 +257,7 @@ def linear_percent(array, percent=2):
         A 2D array of the same dimensions as the input array, with values scaled by the specified percentage.
 
     :author:
-        Josh Sixsmith; joshua.sixsmith@ga.gov.au
+        Josh Sixsmith; josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
     """
 
     if len(array.shape) != 2:
@@ -317,7 +328,7 @@ def write_img(array, name='', format='ENVI', projection=None, geotransform=None)
         A variable containing the geotransform information for the array.
 
     :author:
-        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+        Josh Sixsmith, josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
 
     :history:
         * 04/09/2013--Created
@@ -401,7 +412,7 @@ def get_tiles(samples, lines, xtile=100,ytile=100):
         >>>     subset = array[:,ystart:yend,xstart:xend] # 3D
 
     :author:
-        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+        Josh Sixsmith, josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
 
     :history:
         * 01/08/2012: Created
@@ -440,7 +451,7 @@ def indices_2d(array, indices):
         A tuple containing the 2D indices.
 
     :author:
-        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+        Josh Sixsmith, josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
 
     :history:
         * 03/03/2013: Created
@@ -492,7 +503,7 @@ def datatype(val):
         An integer that corresponds to the equivalent GDAL data type.
 
     :author:
-        Josh Sixsmith, joshua.sixsmith@ga.gov.au
+        Josh Sixsmith, josh.sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
     """
     instr = str(val)
     return {
