@@ -397,6 +397,8 @@ PRO triangle_threshold_mask, event
                 
         ; An undocumented routine, sp_import
         ;http://www.exelisvis.com/Learn/VideoDetail/TabId/323/ArtMID/1318/ArticleID/3974/3974.aspx
+        ; Updated page??? The above link no longer works. New link below
+        ;http://www.exelisvis.com/Support/HelpArticlesDetail/TabId/219/ArtMID/900/ArticleID/4161/4161.aspx
         sp_import, plot_base, [thresh,thresh], !Y.CRange, plot_color=[0,255,0]
     ENDIF 
 
