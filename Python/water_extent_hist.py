@@ -168,7 +168,8 @@ if __name__ == '__main__':
     hydro_id      = []
     for feature in layer:
         feature_names.append(feature.GetField("NAME"))
-        hydro_id.append(feature.GetField("AUSHYDRO_I"))
+        #hydro_id.append(feature.GetField("AUSHYDRO_I"))
+        hydro_id.append(feature.GetField("PID"))
     layer.ResetReading()
 
     # Replace any occurences of None with UNKNOWN
@@ -186,7 +187,8 @@ if __name__ == '__main__':
 
     logging.info("Creating in-memory GDAL object")
     drv = gdal.GetDriverByName("MEM")
-    outds = drv.Create('memory', samples, lines, 1, gdal.GDT_Byte) # If more than 255 features....
+    #outds = drv.Create('memory', samples, lines, 1, gdal.GDT_Byte) # If more than 255 features....
+    outds = drv.Create('memory', samples, lines, 1, gdal.GDT_UInt32)
     outds.SetGeoTransform(geoT)
     outds.SetProjection(prj)
 
@@ -231,7 +233,8 @@ if __name__ == '__main__':
     logging.info("Creating output summary file")
 
     outcsv = open(os.path.join(outputDir.getPath(), outfname), 'w')
-    headings = "Time Slice, Feature Name, AUSHYDRO_ID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
+    #headings = "Time Slice, Feature Name, AUSHYDRO_ID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
+    headings = "Time Slice, Feature Name, PID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
     outcsv.write(headings)
 
     # Loop over each WaterExtent file
