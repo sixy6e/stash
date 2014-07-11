@@ -4,6 +4,7 @@ import numpy
 import scipy
 from scipy import ndimage
 from osgeo import gdal
+from skimage import morphology
 
 # Handle exceptions for cases of matplotlib not being installed
 try:
@@ -664,4 +665,29 @@ def create_roi(array, loc, kx=3, ky=3, edge_wrap=False):
 
     return roi
 
+def imfill(image):
+    """
+    Replicates the imfill function available within MATLAB.
+    Based on the example provided in http://scikit-image.org/docs/dev/auto_examples/plot_holes_and_peaks.html#example-plot-holes-and-peaks-py.
+
+    :param image):
+        A 2D numpy array containing "holes". Darker pixels surrounded by brighter pixels.
+
+    :return:
+        A 2D numpy array of type Float with the "holes" from image filled.
+
+    """
+
+    seed = image.copy()
+
+    # Define seed points and the start points for the erosion process.
+    seed[1:-1, 1:-1] = image.max()
+
+    # Define the mask; Probably unneeded.
+    mask = image
+
+    # Fill the holes
+    filled = morphology.reconstruction(seed, mask, method='erosion')
+
+    return filled
 
