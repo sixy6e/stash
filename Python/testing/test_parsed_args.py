@@ -14,6 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_data', help='The data value to be ignored.', type=int, default=-999)
     parser.add_argument('--as_bip', action='store_true', help='If set, the array will be transposed to be [Lines,Samples,Bands], and processed in this fashion. The default is to process the array as [Bands,Lines,Samples].')
     parser.add_argument('--as_bip_old', default=False, type=bool, help='If set to True, the array will be transposed to be [Lines,Samples,Bands], and processed in this fashion. The default is to process the array as [Bands,Lines,Samples]. Tests another way of setting a True/False switch.')
+    parser.add_argument('--min', default=None, help='The minimum value to be used')
 
     parsed_args = parser.parse_args()
 
@@ -27,6 +28,7 @@ if __name__ == '__main__':
     no_data = parsed_args.no_data
     as_bip = parsed_args.as_bip
     as_bip_old = parsed_args.as_bip_old
+    mn_ = parsed_args.min
 
 
     print 'path: ', path
@@ -41,3 +43,4 @@ if __name__ == '__main__':
     print 'no_data: ', no_data
     print 'as_bip: ', as_bip
     print 'as_bip_old: ', as_bip_old
+    print mn_
