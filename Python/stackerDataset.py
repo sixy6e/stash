@@ -69,6 +69,7 @@ class stackerDataset:
         """
 
         metadata = self.bandMetadata[band_index]
+
         return metadata
 
     def getBandDatetime(self, band_index=1):
@@ -83,6 +84,7 @@ class stackerDataset:
         """
 
         dt = self.BandDatetimes[band_index]
+
         return dt
 
     def getMetadataItem(self, band_index=1, item='tile_pathname'):
@@ -100,6 +102,7 @@ class stackerDataset:
         """
 
         metadata_item = self.bandMetadata[band_index][item]
+
         return metadata_item
 
     def setTiling(self, xsize=100, ysize=100):
@@ -135,6 +138,7 @@ class stackerDataset:
         """
 
         tile = self.tiles[index]
+
         return tile
 
     def readTile(self, tile, band_index=1, all_bands=True):
@@ -199,4 +203,21 @@ class stackerDataset:
         """
 
         return self.yearlyIterator
+
+    def readBand(self, band_index=1):
+        """
+        Read the entire 2D block for a given band index.
+
+        :param band_index:
+            The band index of interest. Default is the first band.
+
+        :return:
+            A NumPy 2D array of the same dimensions and datatype of the band of interest.
+        """
+
+        band  = self.ds.GetRasterBand(band_index)
+        array = band.ReadAsArray()
+        band.FlushCache()
+
+        return array
 
