@@ -3,29 +3,35 @@
 import os
 import datetime
 import numpy
-from osgeo import numpy
+from osgeo import gdal
 from image_tools import get_tiles
 from temporal_stats_numexpr_module import temporal_stats
 
 
 class stackerDataset:
     """
-    A class designed for dealing with datasets returned by stacker.py
+    A class designed for dealing with datasets returned by stacker.py.
+    The reason for only handling data returned by stacker.py are due to 
+    specific metadata references such as start_datetime and tile_pathname.
     """
 
     def __init__(self, file):
         """
-        
+        Initialise the class structure.
+
+        :param file:
+            A string containing the full filepath of a GDAL compliant dataset created by stacker.py.
         """
 
         self.ds      = gdal.Open(file)
-        self.bands   = self.ds.GetRasterCount
+        self.bands   = self.ds.RasterCount
         self.samples = self.ds.RasterXSize
         self.lines   = self.ds.RasterYSize
 
         self.setAllBandMetadata()
         self.setBandDatetime()
-        self.setTiling()
+        self.setTiling(xsize=self.samples)
+        self.setYearlyIterator()
 
     def setAllBandMetadata(self):
         """
@@ -96,17 +102,17 @@ class stackerDataset:
         metadata_item = self.bandMetadata[band_index][item]
         return metadata_item
 
-    def setTiling(self, xsize=self.samples, ysize=10):
+    def setTiling(self, xsize=100, ysize=100):
         """
         Sets the tile indices for a 2D array.
 
         :param xsize:
             Define the number of samples/columns to be included in a single tile.
-            Default is 10
+            Default is 100
 
         :param ysize:
             Define the number of lines/rows to be included in a single tile.
-            Default is all samples.
+            Default is 100.
 
         :return:
             A list containing a series of tuples defining the individual 2D tiles/chunks to be indexed.
@@ -164,4 +170,33 @@ class stackerDataset:
             band.FlushCache()
 
         return subset
+
+    def setYearlyIterator(self):
+        """
+        Creates an interative dictionary containing all the band indices available for each year.
+        """
+
+        self.yearlyIterator = {}
+
+        band_list = [1] # Initialise to the first band
+        yearOne   = self.getBandDatetime().year
+
+        self.yearlyIterator[yearOne] = band_list
+
+        for i in range(2, self.bands + 1):
+            year = self.getBandDatetime(band_index=i).year
+            if year == yearOne:
+                band_list.append(i)
+                self.yearlyIterator[yearOne] = band_list
+            else:
+                self.yearlyIterator[yearOne] = band_list
+                yearOne = year
+                band_list = [i]
+
+    def getYearlyIterator(self):
+        """
+        Returns the yearly iterator dictionary created by setYearlyIterator.
+        """
+
+        return self.yearlyIterator
 
