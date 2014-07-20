@@ -8,16 +8,39 @@ from osgeo import osr
 from IDL_functions import histogram
 from IDL_functions import array_indices
 
-def createMemoryDataset(name='MemoryDataset', samples, lines, Projection=None, GeoTransform=None):
+def createMemoryDataset(name='MemoryDataset', samples, lines, Projection=None, GeoTransform=None, dtype=gdal.GDT_UInt32):
     """
-    
+    Creates a GDAL dataset contained entirely in memory (format type = "MEM").
+
+    :param name:
+        A string containing the name of the "in-memory" dataset.
+
+    :param samples:
+        An integer defining the number of samples for the dataset.
+
+    :param lines:
+        An integer defining the number of lines for the dataset.
+
+    :param Projection:
+        A WKT string containing the projection used by the dataset.
+
+    :param GeoTransform:
+        A tuple containing the GeoTransform used by the dataset.  The tuple is
+        if the form ().
+
+    :param dtype:
+        An integer representing the GDAL datatype. Default datatype is UInt32
+        given as gdal.GDT_UInt32 which is represented by the integer 4.
+
+    :return:
+        A GDAL dataset of the format type "Memory".
     """
 
     # Define the Memory driver
     drv = gdal.GetDriverByName("MEM")
 
     # Create the dataset
-    outds = drv.Create(name, samples, lines, 1, gdal.GDT_UInt32)
+    outds = drv.Create(name, samples, lines, 1, dtype)
 
     # Set the projection and geotransfrom
     if Projection:
