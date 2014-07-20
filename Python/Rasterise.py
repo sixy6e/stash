@@ -52,25 +52,55 @@ def createMemoryDataset(name='MemoryDataset', samples, lines, Projection=None, G
 
 def projectVector(vectorLayer, from_srs, to_srs):
     """
-    
+    Projects a layer from one co-ordinate system to another. The transformation
+    of each features' geometry occurs in-place.
+
+    :param vectorLayer:
+        An OGR layer object.
+
+    :param from_srs:
+        An OSR spatial reference object containing the source projection.
+
+    :param to_srs:
+        An OSR spatial reference object containing the projection in which to
+        transform to.
+
+    :return:
+        None. The projection transformation is done in place.
     """
 
     # Define the transformation
     tform = osr.CoordinateTransformation(from_srs, to_srs)
 
     # Extract the geometry of every feature and transform it
-    # Transformation is done in place!!!
+    # Note: Transformation is done in place!!!
     for feat in vectorLayer:
         geom = feat.GetGeometryRef()
         geom.Transform(tform)
 
 def rasteriseVector(imageDataset, vectorLayer):
     """
-    
+    Converts a vector to a raster via a process known as rasterisation.
+
+    The process will rasterise each feature separately via a features FID.
+    The stored value in the array corresponds to a features FID + 1, eg an FID
+    of 10 will be stored in the raster as 11.
+
+    :param imageDataset:
+        A GDAL image dataset.
+
+    :param vectorLayer:
+        An OGR layer object.
+
+    :return:
+        A GDAL image dataset containing the rasterised features
     """
 
+    # Get the number of features contained in the layer
+    nfeatures = layer.GetFeatureCount()
+
     # Rasterise every feature based on it's FID value +1
-    for i in range(layer.GetFeatureCount()):
+    for i in range(nfeatures):
         layer.SetAttributeFilter("FID = %d"%i)
         burn = i + 1
         gdal.RasterizeLayer(imageDataset, [1], vectorLayer, burn_values=[burn])
