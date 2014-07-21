@@ -8,7 +8,7 @@ from osgeo import osr
 from IDL_functions import histogram
 from IDL_functions import array_indices
 
-def createMemoryDataset(name='MemoryDataset', samples, lines, Projection=None, GeoTransform=None, dtype=gdal.GDT_UInt32):
+def createMemoryDataset(name='MemoryDataset', samples, lines, bands=1, Projection=None, GeoTransform=None, dtype=gdal.GDT_UInt32):
     """
     Creates a GDAL dataset contained entirely in memory (format type = "MEM").
 
@@ -20,6 +20,9 @@ def createMemoryDataset(name='MemoryDataset', samples, lines, Projection=None, G
 
     :param lines:
         An integer defining the number of lines for the dataset.
+
+    :param bands:
+        An integer defining the number of bands for the dataset.
 
     :param Projection:
         A WKT string containing the projection used by the dataset.
@@ -40,7 +43,7 @@ def createMemoryDataset(name='MemoryDataset', samples, lines, Projection=None, G
     drv = gdal.GetDriverByName("MEM")
 
     # Create the dataset
-    outds = drv.Create(name, samples, lines, 1, dtype)
+    outds = drv.Create(name, samples, lines, bands, dtype)
 
     # Set the projection and geotransfrom
     if Projection:
@@ -247,6 +250,8 @@ class SegmentVisitor:
         
         """
 
+        assert array.ndim == 2, "Dimensions of array must be 2D!\n Supplied array is %i"%array.ndim
+
         self.array   = array
         self.array1D = array.ravel()
 
@@ -260,12 +265,15 @@ class SegmentVisitor:
         
         """
 
-        h = histogram(self.array1D, min=1, reverse_indices='ri')
+        h = histogram(self.array1D, min=0, reverse_indices='ri')
 
         self.histogram = h['histogram']
         self.ri        = h['ri']
 
-    def getSegementData(self, array, segmentID=0):
+        self.min_segID = numpy.min(self.array > 0)
+        self.max_segID = numpy.max(self.array)
+
+    def getSegementData(self, array, segmentID=1):
         """
         Retrieve the data from an array corresponding to a segmentID.
         """
@@ -281,7 +289,7 @@ class SegmentVisitor:
 
         return data
 
-    def getSegmentLocations(self, segmentID=0):
+    def getSegmentLocations(self, segmentID=1):
         """
         Retrieve the pixel locations corresponding to a segmentID.
         """
@@ -291,25 +299,42 @@ class SegmentVisitor:
 
         if ri[i+1] > ri[i]:
             idx = ri[ri[i]:ri[i+1]]
+            idx = array_indices(self.dims, idx, dimensions=True)
         else:
-            idx = numpy.array([])
+            idx = (numpy.array([]), numpy.array([]))
 
-        idx = array_indices(self.dims, idx, dimensions=True)
 
         return idx
 
-    def segmentMean(self, array):
+    def segmentMean(self, array, segmentIDs=None):
         """
-        Calculates the mean value per segment given an array containing data.
+        Calculates the mean value per segment given a 2D array containing data.
         """
 
         arr_flat = array.ravel()
         hist     = self.histogram
         ri       = self.ri
 
+        if segmentIDs:
+            assert type(segmentIDs) == list, "segmentIDs must be of type list!"
+
+            # Get a unique listing of the segmentIDs
+            s = numpy.unique(numpy.array(segmentIDs))
+
+            # Evaluate the min and max to determine if we are outside the valid segment range
+            min_id = numpy.min(s)
+            max_id = numpy.max(s)
+            assert min_id >= self.min_segID, "The minimum segment ID in the dataset is %i"%self.min_segID
+            assert max_id <= self.max_segID, "The maximum segment ID in the dataset is %i"%self.max_segID
+        else:
+            # Create an index to loop over every segment
+            s = numpy.arange(1, hist.shape[0])
+
+        # Initialise a dictionary to hold the mean value per segment
         mean_seg = {}
 
-        for i in numpy.arange(hist.shape[0]):
+        # Calculate the mean value per segment
+        for i in s:
             if (hist[i] == 0):
                 continue
             xbar        = numpy.mean(arr_flat[ri[ri[i]:ri[i+1]]])
@@ -317,7 +342,7 @@ class SegmentVisitor:
 
         return mean_seg
 
-     def segmentMax(self, array):
+     def segmentMax(self, array, segmentIDs=None):
         """
         Calculates the max value per segment given an array containing data.
         """
@@ -326,9 +351,27 @@ class SegmentVisitor:
         hist     = self.histogram
         ri       = self.ri
 
+        if segmentIDs:
+            assert type(segmentIDs) == list, "segmentIDs must be of type list!"
+
+            # Get a unique listing of the segmentIDs
+            s = numpy.unique(numpy.array(segmentIDs))
+
+
+            # Evaluate the min and max to determine if we are outside the valid segment range
+            min_id = numpy.min(s)
+            max_id = numpy.max(s)
+            assert min_id >= self.min_segID, "The minimum segment ID in the dataset is %i"%self.min_segID
+            assert max_id <= self.max_segID, "The maximum segment ID in the dataset is %i"%self.max_segID
+        else:
+            # Create an index to loop over every segment
+            s = numpy.arange(1, hist.shape[0])
+
+        # Initialise a dictionary to hold the max value per segment
         max_seg = {}
 
-        for i in numpy.arange(hist.shape[0]):
+        # Calculate the max value per segment
+        for i in s:
             if (hist[i] == 0):
                 continue
             mx_        = numpy.max(arr_flat[ri[ri[i]:ri[i+1]]])
@@ -345,12 +388,29 @@ class SegmentVisitor:
         hist     = self.histogram
         ri       = self.ri
 
+        if segmentIDs:
+            assert type(segmentIDs) == list, "segmentIDs must be of type list!"
+
+            # Get a unique listing of the segmentIDs
+            s = numpy.unique(numpy.array(segmentIDs))
+
+            # Evaluate the min and max to determine if we are outside the valid segment range
+            min_id = numpy.min(s)
+            max_id = numpy.max(s)
+            assert min_id >= self.min_segID, "The minimum segment ID in the dataset is %i"%self.min_segID
+            assert max_id <= self.max_segID, "The maximum segment ID in the dataset is %i"%self.max_segID
+        else:
+            # Create an index to loop over every segment
+            s = numpy.arange(1, hist.shape[0])
+
+        # Initialise a dictionary to hold the max value per segment
         min_seg = {}
 
-        for i in numpy.arange(hist.shape[0]):
+        # Calculate the min value per segment
+        for i in s:
             if (hist[i] == 0):
                 continue
-            mn_        = numpy.max(arr_flat[ri[ri[i]:ri[i+1]]])
+            mn_        = numpy.min(arr_flat[ri[ri[i]:ri[i+1]]])
             min_seg[i] = mn_
 
         return min_seg
