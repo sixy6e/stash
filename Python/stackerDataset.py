@@ -8,11 +8,15 @@ from image_tools import get_tiles
 from temporal_stats_numexpr_module import temporal_stats
 
 
-class stackerDataset:
+class StackerDataset:
     """
     A class designed for dealing with datasets returned by stacker.py.
     The reason for only handling data returned by stacker.py are due to 
     specific metadata references such as start_datetime and tile_pathname.
+
+    File access to the image dataset is acquired upon request, for example
+    when reading the image data.  Once the request has been made the file
+    is closed.
     """
 
     def __init__(self, file):
@@ -23,89 +27,90 @@ class stackerDataset:
             A string containing the full filepath of a GDAL compliant dataset created by stacker.py.
         """
 
-        self.ds      = gdal.Open(file)
-        self.bands   = self.ds.RasterCount
-        self.samples = self.ds.RasterXSize
-        self.lines   = self.ds.RasterYSize
+        self.fname = file
 
-        self.setAllBandMetadata()
-        self.setBandDatetime()
-        self.setTiling(xsize=self.samples)
-        self.setYearlyIterator()
+        # Open the dataset
+        ds = gdal.Open(f)
 
-    def setAllBandMetadata(self):
-        """
-        Stores the metadata for every single band into a dictionary.
-        Each key in the dictionary is referenced by the band index (starting at 1).
-        """
+        self.bands   = ds.RasterCount
+        self.samples = ds.RasterXSize
+        self.lines   = ds.RasterYSize
 
-        self.bandMetadata = {}
+        # Close the dataset
+        ds = None
 
-        for i in range(1, self.bands + 1): # GDAL starts at index 1
-            band = self.ds.GetRasterBand(i)
-            self.bandMetadata[i] = band.GetMetadata()
-
-    def setBandDatetime(self):
-        """
-        Stores the datetime object for a given band.
-        """
-
-        self.BandDatetimes = {}
-
-        for i in range(1, self.bands + 1): # GDAL starts at index 1
-            item     = self.getMetadataItem(band_index=i, item='start_datetime')
-            start_dt = datetime.datetime.strptime(item, "%Y-%m-%d %H:%M:%S.%f")
-            self.BandDatetimes[i] = start_dt
-
-    def getBandMetadata(self, band_index=1):
+    def getRasterBandMetadata(self, raster_band=1):
         """
         Retrives the metadata for a given band_index. (Default is the first band).
 
-        :param band_index:
+        :param raster_band:
             The band index of interest. Default is the first band.
 
         :return:
             A dictionary containing band level metadata.
         """
 
-        metadata = self.bandMetadata[band_index]
+        # Open the dataset
+        ds = gdal.Open(self.fname)
+
+        # Retrieve the band of interest
+        band = ds.GetRasterBand(raster_band)
+
+        # Retrieve the metadata
+        metadata = band.GetMetadata()
+
+        # Close the dataset
+        ds = None
 
         return metadata
 
-    def getBandDatetime(self, band_index=1):
+    def getBandDatetime(self, raster_band=1):
         """
         Retrieves the datetime for a given band index.
 
-        :param band_index:
-            The band index of interest. Default is the first band.
+        :param raster_band:
+            The raster band interest. Default is the first raster band.
 
         :return:
             A Python datetime object.
         """
 
-        dt = self.BandDatetimes[band_index]
+        metadata = self.getBandMetadata(raster_band]
+        dt_item  = metadata['start_datetime']
+        start_dt = datetime.datetime.strptime(item, "%Y-%m-%d %H:%M:%S.%f")
 
-        return dt
+        return start_dt
 
-    def getMetadataItem(self, band_index=1, item='tile_pathname'):
+    def initYearlyIterator(self):
         """
-        Retrieves a specific metadata item from a given band index.
-
-        :param band_index:
-            The band index of interest. Default is the first band.
-
-        :param item:
-            A valid key identifier. Default is 'tile_pathname'.
-
-        :return:
-            The value corresponding to the metadata item.
+        Creates an interative dictionary containing all the band indices available for each year.
         """
 
-        metadata_item = self.bandMetadata[band_index][item]
+        self.yearlyIterator = {}
 
-        return metadata_item
+        band_list = [1] # Initialise to the first band
+        yearOne   = self.getBandDatetime().year
 
-    def setTiling(self, xsize=100, ysize=100):
+        self.yearlyIterator[yearOne] = band_list
+
+        for i in range(2, self.bands + 1):
+            year = self.getBandDatetime(raster_band=i).year
+            if year == yearOne:
+                band_list.append(i)
+                self.yearlyIterator[yearOne] = band_list
+            else:
+                self.yearlyIterator[yearOne] = band_list
+                yearOne = year
+                band_list = [i]
+
+    def getYearlyIterator(self):
+        """
+        Returns the yearly iterator dictionary created by setYearlyIterator.
+        """
+
+        return self.yearlyIterator
+
+    def initTiling(self, xsize=100, ysize=100):
         """
         Sets the tile indices for a 2D array.
 
@@ -141,21 +146,17 @@ class stackerDataset:
 
         return tile
 
-    def readTile(self, tile, band_index=1, all_bands=True):
+    def readTile(self, tile, raster_band=1):
         """
-        Read an x & y block specified by tile using GDAL. The default is read all bands.
-        To only read a single band set all_bands=False and provide a band_index.
+        Read an x & y block specified by tile for a given raster band using GDAL.
 
         :param tile:
-            A tuple containing the start and end array indices, of the form (ystart,yend,xstart,xend).
+            A tuple containing the start and end array indices, of the form
+            (ystart,yend,xstart,xend).
 
-        :param band_index:
-            If reading from a single band, provide which band index to read from.
-            Default is band 1.
-
-        :param all_bands:
-            A boolean argument regarding whether or not to read all bands.
-            Default is True.
+        :param raster_band:
+            If reading from a single band, provide which raster band to read from.
+            Default is raster band 1.
         """
 
         ystart = int(tile[0])
@@ -165,59 +166,74 @@ class stackerDataset:
         xsize  = int(xend - xstart)
         ysize  = int(yend - ystart)
 
-        if all_bands:
-            subset = self.ds.ReadAsArray(xstart, ystart, xsize, ysize)
-            self.ds.FlushCache()
+        # Open the dataset.
+        ds = gdal.Open(self.fname)
+
+        if band_index == 0:
+            subset = ds.ReadAsArray(xstart, ystart, xsize, ysize)
+            ds.FlushCache()
         else:
-            band   = self.ds.GetRasterBand(band_index)
+            band   = ds.GetRasterBand(raster_band)
             subset = band.ReadAsArray(xstart, ystart, xsize, ysize)
             band.FlushCache()
 
+        # Close the dataset
+        ds = None
+
         return subset
 
-    def setYearlyIterator(self):
+    def readTileAllRasters(self, tile):
         """
-        Creates an interative dictionary containing all the band indices available for each year.
-        """
+        Read an x & y block specified by tile from all raster bands
+        using GDAL.
 
-        self.yearlyIterator = {}
-
-        band_list = [1] # Initialise to the first band
-        yearOne   = self.getBandDatetime().year
-
-        self.yearlyIterator[yearOne] = band_list
-
-        for i in range(2, self.bands + 1):
-            year = self.getBandDatetime(band_index=i).year
-            if year == yearOne:
-                band_list.append(i)
-                self.yearlyIterator[yearOne] = band_list
-            else:
-                self.yearlyIterator[yearOne] = band_list
-                yearOne = year
-                band_list = [i]
-
-    def getYearlyIterator(self):
-        """
-        Returns the yearly iterator dictionary created by setYearlyIterator.
+        :param tile:
+            A tuple containing the start and end array indices, of the form
+            (ystart,yend,xstart,xend).
         """
 
-        return self.yearlyIterator
+        ystart = int(tile[0])
+        yend   = int(tile[1])
+        xstart = int(tile[2])
+        xend   = int(tile[3])
+        xsize  = int(xend - xstart)
+        ysize  = int(yend - ystart)
 
-    def readBand(self, band_index=1):
+        # Open the dataset.
+        ds = gdal.Open(self.fname)
+
+        # Read the array and flush the cache (potentianl GDAL memory leak)
+        subset = ds.ReadAsArray(xstart, ystart, xsize, ysize)
+        ds.FlushCache()
+
+        # Close the dataset
+        ds = None
+
+        return subset
+
+    def readRasterBand(self, raster_band=1):
         """
-        Read the entire 2D block for a given band index.
+        Read the entire 2D block for a given raster band.
+        By default the first raster band is read into memory.
 
-        :param band_index:
+        :param raster_band:
             The band index of interest. Default is the first band.
 
         :return:
             A NumPy 2D array of the same dimensions and datatype of the band of interest.
         """
 
-        band  = self.ds.GetRasterBand(band_index)
+        # Open the dataset.
+        ds = gdal.Open(self.fname)
+
+        band  = ds.GetRasterBand(raster_band)
         array = band.ReadAsArray()
+
+        # Flush the cache to prevent leakage
         band.FlushCache()
+
+        # Close the dataset
+        ds = None
 
         return array
 
