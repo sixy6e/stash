@@ -30,7 +30,7 @@ class StackerDataset:
         self.fname = file
 
         # Open the dataset
-        ds = gdal.Open(f)
+        ds = gdal.Open(fname)
 
         self.bands   = ds.RasterCount
         self.samples = ds.RasterXSize
