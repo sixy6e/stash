@@ -75,7 +75,7 @@ class StackerDataset:
             A Python datetime object.
         """
 
-        metadata = self.getBandMetadata(raster_band]
+        metadata = self.getBandMetadata(raster_band)
         dt_item  = metadata['start_datetime']
         start_dt = datetime.datetime.strptime(item, "%Y-%m-%d %H:%M:%S.%f")
 
