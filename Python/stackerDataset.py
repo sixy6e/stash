@@ -17,9 +17,65 @@ class StackerDataset:
     File access to the image dataset is acquired upon request, for example
     when reading the image data.  Once the request has been made the file
     is closed.
+
+    Example:
+
+        >>> fname = 'FC_144_-035_BS.vrt'
+        >>> ds = StackerDataset(fname)
+        >>> # Get the number of bands associated with the dataset
+        >>> ds.bands
+        22
+        >>> # Get the number of samples associated with the dataset
+        >>> ds.samples
+        4000
+        >>> # Get the number of lines associated with the dataset
+        >>> ds.lines
+        4000
+        >>> # Initialise the yearly iterator
+        >>> ds.initYearlyIterator()
+        >>> # Get the yearly iterator dictionary
+        >>> ds.getYearlyIterator()
+        {1995: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            1996: [16, 17, 18, 19, 20, 21, 22]}
+        >>> # Get the datetime of the first raster band
+        >>> ds.getRasterBandDatetime()
+        datetime.datetime(1995, 7, 2, 23, 19, 48, 452050)
+        >>> # Get the metadata of the first raster band
+        >>> ds.getRasterBandMetadata()
+        {'start_datetime': '1995-07-02 23:19:48.452050', 'sensor_name': 'TM',
+         'start_row': '83', 'end_row': '83', 'band_name': 'Bare Soil',
+         'satellite_tag': 'LS5', 'cloud_cover': 'None', 'tile_layer': '3',
+         'end_datetime': '1995-07-02 23:20:12.452050',
+         'tile_pathname':
+         '/g/data1/rs0/tiles/EPSG4326_1deg_0.00025pixel/LS5_TM/144_-035/1995/
+          LS5_TM_FC_144_-035_1995-07-02T23-19-48.452050.tif',
+         'gcp_count': '52', 'band_tag': 'BS', 'path': '94', 'level_name': 'FC',
+         'y_index': '-35', 'x_index': '144', 'nodata_value': '-999'}
+        >>> # Initialise the x & y block tiling sequence, using a block size
+        >>> # of 400x by 400y
+        >>> ds.initTiling(400,400)
+        >>> # Number of tiles
+        >>> ds.nTiles
+        100
+        >>> # Get the 11th tile (zero based index)
+        >>> ds.getTile(10)
+        (400, 800, 0, 400)
+        >>> # Read a single raster band. The 10th raster band (one based index)
+        >>> img = ds.readRasterBand(10)
+        >>> img.shape
+        (4000, 4000)
+        >>> # Read only a tile of a single raster band
+        >>> # First tile, 10th raster band
+        >>> img = ds.readTile(ds.getTile(0), 10)
+        >>> img.shape
+        (400, 400)
+        >>> # Read all raster bands for the 24th tile
+        >>> img = ds.readTileAllRasters(ds.getTile(23))
+        >>> img.shape
+        (22, 400, 400)
     """
 
-    def __init__(self, file):
+    def __init__(self, filename):
         """
         Initialise the class structure.
 
@@ -27,14 +83,18 @@ class StackerDataset:
             A string containing the full filepath of a GDAL compliant dataset created by stacker.py.
         """
 
-        self.fname = file
+        self.fname = filename
 
         # Open the dataset
-        ds = gdal.Open(fname)
+        ds = gdal.Open(filename)
 
         self.bands   = ds.RasterCount
         self.samples = ds.RasterXSize
         self.lines   = ds.RasterYSize
+
+        # Initialise the tile variables
+        self.tiles  = [None]
+        self.nTiles = 0
 
         # Close the dataset
         ds = None
@@ -64,9 +124,9 @@ class StackerDataset:
 
         return metadata
 
-    def getBandDatetime(self, raster_band=1):
+    def getRasterBandDatetime(self, raster_band=1):
         """
-        Retrieves the datetime for a given band index.
+        Retrieves the datetime for a given raster band index.
 
         :param raster_band:
             The raster band interest. Default is the first raster band.
@@ -75,9 +135,9 @@ class StackerDataset:
             A Python datetime object.
         """
 
-        metadata = self.getBandMetadata(raster_band)
+        metadata = self.getRasterBandMetadata(raster_band)
         dt_item  = metadata['start_datetime']
-        start_dt = datetime.datetime.strptime(item, "%Y-%m-%d %H:%M:%S.%f")
+        start_dt = datetime.datetime.strptime(dt_item, "%Y-%m-%d %H:%M:%S.%f")
 
         return start_dt
 
@@ -89,12 +149,12 @@ class StackerDataset:
         self.yearlyIterator = {}
 
         band_list = [1] # Initialise to the first band
-        yearOne   = self.getBandDatetime().year
+        yearOne   = self.getRasterBandDatetime().year
 
         self.yearlyIterator[yearOne] = band_list
 
         for i in range(2, self.bands + 1):
-            year = self.getBandDatetime(raster_band=i).year
+            year = self.getRasterBandDatetime(raster_band=i).year
             if year == yearOne:
                 band_list.append(i)
                 self.yearlyIterator[yearOne] = band_list
@@ -169,13 +229,11 @@ class StackerDataset:
         # Open the dataset.
         ds = gdal.Open(self.fname)
 
-        if band_index == 0:
-            subset = ds.ReadAsArray(xstart, ystart, xsize, ysize)
-            ds.FlushCache()
-        else:
-            band   = ds.GetRasterBand(raster_band)
-            subset = band.ReadAsArray(xstart, ystart, xsize, ysize)
-            band.FlushCache()
+        band = ds.GetRasterBand(raster_band)
+
+        # Read the block and flush the cache (potentianl GDAL memory leak)
+        subset = band.ReadAsArray(xstart, ystart, xsize, ysize)
+        band.FlushCache()
 
         # Close the dataset
         ds = None
