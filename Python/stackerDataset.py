@@ -7,6 +7,57 @@ from osgeo import gdal
 from image_tools import get_tiles
 from temporal_stats_numexpr_module import temporal_stats
 
+def PQapplyDict():
+    """
+    Return a dictionary containing boolean values on whether or not
+    to apply a PQ quality flag.
+    """
+
+    d = {'Saturation_1'  : True,
+         'Saturation_2'  : True,
+         'Saturation_3'  : True,
+         'Saturation_4'  : True,
+         'Saturation_5'  : True,
+         'Saturation_61' : True,
+         'Saturation_62' : True,
+         'Saturation_7'  : True,
+         'Contiguity'    : True,
+         'Land_Sea'      : True,
+         'ACCA'          : True,
+         'Fmask'         : True,
+         'CloudShadow_1' : True,
+         'CloudShadow_2' : True,
+         'Empty_1'       : False,
+         'Empty_2'       : False
+        }
+
+    return d
+
+def PQapplyInvertDict():
+    """
+    Return a dictionary containing boolean values on whether or not
+    to apply a PQ quality flag inversely.
+    """
+
+    d = {'Saturation_1'  : False,
+         'Saturation_2'  : False,
+         'Saturation_3'  : False,
+         'Saturation_4'  : False,
+         'Saturation_5'  : False,
+         'Saturation_61' : False,
+         'Saturation_62' : False,
+         'Saturation_7'  : False,
+         'Contiguity'    : False,
+         'Land_Sea'      : False,
+         'ACCA'          : False,
+         'Fmask'         : False,
+         'CloudShadow_1' : False,
+         'CloudShadow_2' : False,
+         'Empty_1'       : False,
+         'Empty_2'       : False
+        }
+
+    return d
 
 class StackerDataset:
     """
