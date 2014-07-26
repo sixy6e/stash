@@ -59,6 +59,52 @@ def PQapplyInvertDict():
 
     return d
 
+def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=False):
+    """
+    Extracts pixel quality flags from the pixel quality bit array.
+
+    :param array:
+        A NumPy 2D array containing the PQ bit array.
+
+    :param flags:
+        A dictionary containing each PQ flag and a boolean value
+        determining if that flag is to be extracted.
+
+    :param invert:
+        A dictionary containing each PQ flag and a boolean value
+        determining if that flag is to be inverted once extracted.
+        Useful if you want to investigate that pheonomena.
+
+    :param check_zero:
+        A boolean keyword as to whether or not the PQ bit array should
+        be checked for instances of zero prior to bit extraction.
+        Ideally this should be set when investigating specific
+        pheonomena. Default is False.
+
+    :param combine:
+        A boolean keyword as to whether or not the extracted PQ masks
+        should be combined into a single mask.
+
+    :return:
+        An n-D NumPy array of type bool where n is given by the number
+        of flags present in the flags dictionary. If combine is set
+        then a single 2D NumPy array of type bool is returned.
+
+    :notes:
+        If either the flags or invert dictionaries contain incorrect
+        keys, then they will be reported and ignored during bit
+        extraction.
+    """
+
+    # Check for existance of flags 
+    if flags is None:
+        flags = PQapplyDict()
+    elif type(flags) != dict:
+        print "flags must be of type dict. Retrieving default PQ flags dict."
+        flags = PQapplyDict()
+
+    # Check for correct keys in dict
+
 class StackerDataset:
     """
     A class designed for dealing with datasets returned by stacker.py.
