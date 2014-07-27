@@ -160,7 +160,7 @@ def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=Fal
             # Account for zero during bit extraction
             mask[zero] = True
         else:
-            mask = numpy.zeros((nflags, lines, samples, dtype='bool')
+            mask = numpy.zeros((nflags, lines, samples), dtype='bool')
             for idx, [b,v,i] in enumerate(container):
                 if i:
                     mask[idx] = ~((array & v) >> b).astype('bool')
@@ -176,7 +176,7 @@ def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=Fal
                 else:
                     mask &= (array & v) >> b
         else:
-            mask = numpy.zeros((nflags, lines, samples, dtype='bool')
+            mask = numpy.zeros((nflags, lines, samples), dtype='bool')
             for idx, [b,v,i] in enumerate(container):
                 if i:
                     mask[idx] = ~((array & v) >> b).astype('bool')
