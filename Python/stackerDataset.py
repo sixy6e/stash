@@ -5,7 +5,6 @@ import datetime
 import numpy
 from osgeo import gdal
 from image_tools import get_tiles
-from temporal_stats_numexpr_module import temporal_stats
 
 def PQapplyDict():
     """
