@@ -103,7 +103,88 @@ def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=Fal
         print "flags must be of type dict. Retrieving default PQ flags dict."
         flags = PQapplyDict()
 
-    # Check for correct keys in dict
+    if arrar.ndim != 2:
+        raise Exception('Error. Array dimensions must be 2D, not %i' %arrar.ndim)
+
+    # image dimensions
+    dims = array.shape
+    samples = dims[1]
+    lines   = dims[0]
+
+    # Initialise the PQ flag bit positions
+    bit_shift = {'Saturation_1'  : {'value' : 1,     'bit' : 0},
+                 'Saturation_2'  : {'value' : 2,     'bit' : 1},
+                 'Saturation_3'  : {'value' : 4,     'bit' : 2},
+                 'Saturation_4'  : {'value' : 8,     'bit' : 3},
+                 'Saturation_5'  : {'value' : 16,    'bit' : 4},
+                 'Saturation_61' : {'value' : 32,    'bit' : 5},
+                 'Saturation_62' : {'value' : 64,    'bit' : 6},
+                 'Saturation_7'  : {'value' : 128,   'bit' : 7},
+                 'Contiguity'    : {'value' : 256,   'bit' : 8},
+                 'Land_Sea'      : {'value' : 512,   'bit' : 9},
+                 'ACCA'          : {'value' : 1024,  'bit' : 10},
+                 'Fmask'         : {'value' : 2048,  'bit' : 11},
+                 'CloudShadow_1' : {'value' : 4096,  'bit' : 12},
+                 'CloudShadow_2' : {'value' : 8192,  'bit' : 13},
+                 'Empty_1'       : {'value' : 16384, 'bit' : 14},
+                 'Empty_2'       : {'value' : 32768, 'bit' : 15}
+                }
+
+    bits   = []
+    values = []
+    invs   = []
+    # Check for correct keys in dicts
+    for k, v in flags.items():
+        if (k in bit_shift) and (k in invert) and v:
+           values.append(bit_shift[k]['value'])
+           bits.append(bit_shift[k]['bit'])
+           invs.append(invert[k])
+        else:
+            print "Skipping PQ flag %s"%k
+
+    # sort via bits
+    container = sorted(zip(bits, values, invs))
+
+    n_flags = len(container)
+
+    # Extract PQ flags
+    if check_zero:
+        zero = array == 0
+        if compress:
+            mask = numpy.zeros(dims, dtype='bool')
+            for b, v, i in container:
+                if i:
+                    mask &= ~((array & v) >> b).astype('bool')
+                else:
+                    mask &= (array & v) >> b
+            # Account for zero during bit extraction
+            mask[zero] = True
+        else:
+            mask = numpy.zeros((nflags, lines, samples, dtype='bool')
+            for idx, [b,v,i] in enumerate(container):
+                if i:
+                    mask[idx] = ~((array & v) >> b).astype('bool')
+                else:
+                    mask[idx] = (array & v) >> b
+            mask[:,zero] = True
+    else:
+        if compress:
+            mask = numpy.zeros(dims, dtype='bool')
+            for b, v, i in container:
+                if i:
+                    mask &= ~((array & v) >> b).astype('bool')
+                else:
+                    mask &= (array & v) >> b
+        else:
+            mask = numpy.zeros((nflags, lines, samples, dtype='bool')
+            for idx, [b,v,i] in enumerate(container):
+                if i:
+                    mask[idx] = ~((array & v) >> b).astype('bool')
+                else:
+                    mask[idx] = (array & v) >> b
+
+    return mask
+
 
 class StackerDataset:
     """
