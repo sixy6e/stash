@@ -103,8 +103,8 @@ def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=Fal
         print "flags must be of type dict. Retrieving default PQ flags dict."
         flags = PQapplyDict()
 
-    if arrar.ndim != 2:
-        raise Exception('Error. Array dimensions must be 2D, not %i' %arrar.ndim)
+    if array.ndim != 2:
+        raise Exception('Error. Array dimensions must be 2D, not %i' %array.ndim)
 
     # image dimensions
     dims = array.shape
@@ -145,12 +145,12 @@ def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=Fal
     # sort via bits
     container = sorted(zip(bits, values, invs))
 
-    n_flags = len(container)
+    nflags = len(container)
 
     # Extract PQ flags
     if check_zero:
         zero = array == 0
-        if compress:
+        if combine:
             mask = numpy.zeros(dims, dtype='bool')
             for b, v, i in container:
                 if i:
@@ -168,7 +168,7 @@ def extractPQFlags(array, flags=None, invert=None, check_zero=False, combine=Fal
                     mask[idx] = (array & v) >> b
             mask[:,zero] = True
     else:
-        if compress:
+        if combine:
             mask = numpy.zeros(dims, dtype='bool')
             for b, v, i in container:
                 if i:
