@@ -144,7 +144,7 @@ if __name__ == '__main__':
     sortedWaterExtents = sorted(waterExtents, key=lambda extent: extent.getDatetime())
 
     # now we can build all summaries
-    logging.info("Sorting done, staring analysis")
+    logging.info("Sorting done, starting analysis")
     
     # lat and lon will be helpful
     lon = cellId[0]
