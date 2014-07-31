@@ -121,6 +121,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     # Get the feature names
     feature_names = {}
     hydro_id      = {}
+    fids          = []
     seg_fid_map   = {}
     fid_seg_map   = {}
 
@@ -132,6 +133,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
         #hydro_id[fid]      = feature.GetField("PID"))
         seg_fid_map[fid+1] = fid
         fid_seg_map[fid]   = fid + 1
+        #fids.append(fid)
 
     layer.ResetReading()
 
@@ -139,6 +141,8 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     for key in feature_names.keys():
         if feature_names[key] == None:
             feature_names[key] = 'UNKNOWN'
+
+    # Define dict lookup for potential segments up to max segment
 
     # Initialise the output file
     full_fname = os.path.join(outputDir.getPath(), outfname)
@@ -156,18 +160,22 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     for waterExtent in sortedWaterExtents:
         logging.info("Processing %s" % waterExtent.filename)
 
-        print "Processing %s"%waterExtent.filename
+        #print "Processing %s"%waterExtent.filename
 
         # Read the waterLayer from the extent file
         waterLayer = waterExtent.getArray()
 
         for key in fid_seg_map.keys():
+            if fid_seg_map[key] > seg_vis.max_segID:
+                continue
             data = seg_vis.getSegmentData(waterLayer, segmentID=fid_seg_map[key])
             dim  = data.shape
             #pdb.set_trace()
             if dim[0] == 0:
                 #print 'skipped key: %i'%key
                 continue # Empty bin
+            #if feature_names[key] == "LAKE CETHANA":
+            #    pdb.set_trace()
             h    = histogram(data, min=0, max=128)
             hist = h['histogram']
             total_area = dim[0]
