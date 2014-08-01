@@ -370,7 +370,7 @@ def write_img(array, name='', format='ENVI', projection=None, geotransform=None)
 
     outds = None
 
-def get_tiles(samples, lines, xtile=100,ytile=100):
+def generate_tiles(samples, lines, xtile=100,ytile=100):
     """
     A function that pre-calculates tile indices for a 2D array.
 
@@ -381,18 +381,20 @@ def get_tiles(samples, lines, xtile=100,ytile=100):
         An integer expressing the total number of lines in an array.
 
     :param xtile:
-        (Optional) The desired size of the tile in the x-direction. Default is 100.
+        (Optional) The desired size of the tile in the x-direction.
+        Default is 100.
 
     :param ytile:
-        (Optional) The desired size of the tile in the y-direction. Default is 1
-00.
+        (Optional) The desired size of the tile in the y-direction.
+        Default is 100.
 
     :return:
-        A list of tuples containing the precalculated tiles used for indexing a larger array. Each tuple contains (ystart,yend,xstart,xend)
+        A list of tuples containing the precalculated tiles used for indexing a larger array.
+        Each tuple contains (ystart,yend,xstart,xend)
 
     Example:
 
-        >>> tiles = get_tile3(8624, 7567, xtile=1000,ytile=400)
+        >>> tiles = generate_tiles(8624, 7567, xtile=1000,ytile=400)
         >>>
         >>> for tile in tiles:
         >>>     ystart = int(tile[0])
@@ -417,6 +419,7 @@ def get_tiles(samples, lines, xtile=100,ytile=100):
 
     :history:
         * 01/08/2012: Created
+        * 01/08/2014: Function name change
 
     """
     ncols = samples
