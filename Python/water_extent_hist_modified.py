@@ -8,6 +8,7 @@ import sys
 #import copy
 import logging
 import argparse
+import textwrap
 from osgeo import gdal
 from osgeo import ogr
 #from WaterSummary import WaterSummary
@@ -116,24 +117,22 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     logging.info("Opening vector file %s" %vector_file)
     vec_ds  = ogr.Open(vector_file)
     layer   = vec_ds.GetLayer()
-    #lyr_cnt = layer.GetFeatureCount()
 
-    # Get the feature names
+    # Initialise dicts to hold feature names, and hydro_id
     feature_names = {}
     hydro_id      = {}
-    fids          = []
-    seg_fid_map   = {}
-    fid_seg_map   = {}
+
+    # Dicts to hold forward and backward mapping of fid's and seg id's
+    seg2fid = {}
+    fid2seg = {}
 
     logging.info("Gathering attribute information for each feature.")
     for feature in layer:
         fid                = feature.GetFID()
         feature_names[fid] = feature.GetField("NAME")
         hydro_id[fid]      = feature.GetField("AUSHYDRO_I")
-        #hydro_id[fid]      = feature.GetField("PID"))
-        seg_fid_map[fid+1] = fid
-        fid_seg_map[fid]   = fid + 1
-        #fids.append(fid)
+        seg2fid[fid+1]     = fid
+        fid2seg[fid]       = fid + 1
 
     layer.ResetReading()
 
@@ -142,7 +141,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
         if feature_names[key] == None:
             feature_names[key] = 'UNKNOWN'
 
-    # Define dict lookup for potential segments up to max segment
+    # TODO Define dict lookup for potential segments up to max segment
 
     # Initialise the output file
     full_fname = os.path.join(outputDir.getPath(), outfname)
@@ -150,32 +149,30 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     outcsv = open(full_fname, 'w')
 
     # Define the headings
-    headings = "Time Slice, Feature Name, AUSHYDRO_ID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
-    #headings = "Time Slice, Feature Name, PID, Total Pixel Count, WATER_NOT_PRESENT, NO_DATA, MASKED_NO_CONTIGUITY, MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, MASKED_CLOUD, WATER_PRESENT\n"
-    outcsv.write(headings)
-
-    #print 'fid_seg_map: ', fid_seg_map
+    headings = ("Time Slice, Feature Name, AUSHYDRO_ID, "
+                "Total Pixel Count, WATER_NOT_PRESENT, "
+                "NO_DATA, MASKED_NO_CONTIGUITY, "
+                "MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, "
+                "MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, "
+                "MASKED_CLOUD, WATER_PRESENT\n"
+    outcsv.write(textwrap.dedent(headings))
 
     # Loop over each WaterExtent file
     for waterExtent in sortedWaterExtents:
         logging.info("Processing %s" % waterExtent.filename)
 
-        #print "Processing %s"%waterExtent.filename
 
         # Read the waterLayer from the extent file
         waterLayer = waterExtent.getArray()
 
-        for key in fid_seg_map.keys():
-            if fid_seg_map[key] > seg_vis.max_segID:
+        for key in fid2seg.keys():
+            if fid2seg[key] > seg_vis.max_segID:
                 continue
-            data = seg_vis.getSegmentData(waterLayer, segmentID=fid_seg_map[key])
+            data = seg_vis.getSegmentData(waterLayer, segmentID=fid2seg[key])
             dim  = data.shape
             #pdb.set_trace()
             if dim[0] == 0:
-                #print 'skipped key: %i'%key
                 continue # Empty bin
-            #if feature_names[key] == "LAKE CETHANA":
-            #    pdb.set_trace()
             h    = histogram(data, min=0, max=128)
             hist = h['histogram']
             total_area = dim[0]
