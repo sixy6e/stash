@@ -173,7 +173,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
             #pdb.set_trace()
             if dim[0] == 0:
                 continue # Empty bin
-            h    = histogram(data, min=0, max=128)
+            h    = histogram(data, Min=0, Max=128)
             hist = h['histogram']
             total_area = dim[0]
 

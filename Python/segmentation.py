@@ -14,7 +14,7 @@ def obj_area(array):
     Calculates area per object. Area is referred to as number of pixels.
     """
 
-    h = histogram(array.flatten(i), min=1)
+    h = histogram(array.flatten(i), Min=1)
     hist = h['histogram']
 
     return hist
@@ -25,7 +25,7 @@ def obj_centroid(array):
     """
 
     dims = array.shape
-    h    = histogram(array.flatten(), min=1, reverse_indices='ri')
+    h    = histogram(array.flatten(), Min=1, reverse_indices='ri')
     hist = h['histogram']
     ri   = h['ri']
     cent = []
@@ -43,7 +43,7 @@ def obj_mean(array, base_array):
     Calculates mean value per object.
     """
     arr_flat = base_array.flatten()
-    h        = histogram(array.flatten(), min=1, reverse_indices='ri')
+    h        = histogram(array.flatten(), Min=1, reverse_indices='ri')
     hist     = h['histogram']
     ri       = h['ri']
     mean_obj = []
@@ -68,7 +68,7 @@ def perimeter(array, labelled=False, all_neighbors=False):
 
     if labelled:
         # Calculate the histogram of the labelled array and retrive the indices
-        h    = histogram(array.flatten(), min=1, reverse_indices='ri')
+        h    = histogram(array.flatten(), Min=1, reverse_indices='ri')
         hist = h['histogram']
         ri   = h['ri']
         arr  = array > 0
@@ -77,7 +77,7 @@ def perimeter(array, labelled=False, all_neighbors=False):
         lab, num = ndimage.label(array, k)
 
         # Calculate the histogram of the labelled array and retrive the indices
-        h    = histogram(lab.flatten(), min=1, reverse_indices='ri')
+        h    = histogram(lab.flatten(), Min=1, reverse_indices='ri')
         hist = h['histogram']
         ri   = h['ri']
         arr = array
@@ -116,7 +116,7 @@ def perimeter(array, labelled=False, all_neighbors=False):
 
     for i in numpy.arange(hist.shape[0]):
         #if hist[i] # Probable don't need this check, as ndimage.label() should provide consecutive labels
-        h_i    = histogram(convolved[ri[ri[i]:ri[i+1]]], min=1, max=50)
+        h_i    = histogram(convolved[ri[ri[i]:ri[i+1]]], Min=1, Max=50)
         hist_i = h_i['histogram']
         perim.append(numpy.dot(hist_i, weights))
 
@@ -142,7 +142,7 @@ def obj_rectangularity(array):
     """
 
     dims = array.shape
-    h    = histogram(array.flatten(), min=1, reverse_indices='ri')
+    h    = histogram(array.flatten(), Min=1, reverse_indices='ri')
     hist = h['histogram']
     ri   = h['ri']
     rect = []
@@ -304,7 +304,7 @@ def obj_get_boundary_method1(labelled_array, fill_holes=True):
 
     # Determine the co-ordinates (indices) of each segement
     # The first index of each segment will be used to define the start and end of a boundary/perimeter
-    h = histogram(labelled_array.flatten(), min=1, reverse_indices='ri')
+    h = histogram(labelled_array.flatten(), Min=1, reverse_indices='ri')
     hist = h['histogram']
     ri = h['ri']
     nlabels = hist.shape[0]
@@ -391,7 +391,7 @@ def obj_get_boundary_method1(labelled_array, fill_holes=True):
             single_object[ri[ri[i]:ri[i+1]]] = 1
             holes = numexpr.evaluate("(single_object - orig_binary) == 1")
             labs, nlabs = ndimage.label(holes, s)
-            h_holes = histogram(labs, min=1, reverse_indices='ri')
+            h_holes = histogram(labs, Min=1, reverse_indices='ri')
             hist_holes = h_holes['histogram']
             ri_h = h_holes['ri']
             seg_holes_start_idxs = numpy.zeros(nlabs, dtype='int')

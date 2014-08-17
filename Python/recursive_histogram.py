@@ -82,7 +82,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
         band.FlushCache()
 
         # Generate the histogram
-        h    = histogram(img.flatten(), min=0)
+        h    = histogram(img.flatten(), Min=0)
         hist = h['histogram']
 
         # Segment the binary mask
@@ -92,7 +92,7 @@ def binary_recursive_histogram(image, outfile, all_neighbours=False):
         label_arr, nlabels = ndimage.label(img, structure=kernel)
 
         # Get min and max areas of the segmented regions
-        h2       = histogram(label_arr.flatten(), min=1)
+        h2       = histogram(label_arr.flatten(), Min=1)
         hist2    = h2['histogram']
         mn_area  = numpy.min(hist2)
         mx_area  = numpy.max(hist2)

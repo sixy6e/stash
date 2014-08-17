@@ -52,7 +52,7 @@ def summary_cleanup(array, min_value=1, max_value=4, min_population=10, all_neig
 
     label_array, num_labels = ndimage.label(low_obs, structure=kernel)
 
-    h = histogram(label_array.flatten(), min=1, reverse_indices='ri')
+    h = histogram(label_array.flatten(), Min=1, reverse_indices='ri')
 
     hist = h['histogram']
     ri   = h['ri']

@@ -216,7 +216,7 @@ if __name__ == '__main__':
     # Hmmm, it might be ok
 
     # Calculate the histogram and the reverse indices of the rasterised vector
-    h = histogram(vec2rast, min=1, reverse_indices='ri', omax='omax')
+    h = histogram(vec2rast, Min=1, reverse_indices='ri', omax='omax')
     hist = h['histogram']
     ri   = h['ri']
     omax = h['omax']
@@ -249,7 +249,7 @@ if __name__ == '__main__':
         for i in range(hist.shape[0]):
             if hist[i] == 0:
                 continue # Empty bin
-            h2 = histogram(waterLayer[idxs[i]], min=0, max=128)
+            h2 = histogram(waterLayer[idxs[i]], Min=0, Max=128)
             hist2 = h2['histogram']
             total_area = hist[i]
 
