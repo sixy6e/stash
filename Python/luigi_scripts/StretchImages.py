@@ -3,7 +3,7 @@
 import numpy
 from osgeo import gdal
 import luigi
-from IDL_Functions import hist_equal
+from IDL_functions import hist_equal
 import image_tools
 
 """
@@ -63,7 +63,62 @@ class createImages(luigi.Task):
             h_eql = hist_equal(img)
             image_tools.write_img(array=h_eql, name=fname)
 
-#class
+class CreateImage(luigi.Task):
+    """
+    
+    """
+
+    def requires(self):
+        """
+        
+        """
+        return None
+
+    def run(self):
+        """
+        
+        """
+        return [numpy.random.randn(1000,1000).astype('float32')]
+
+class ApplyStretch(luigi.Task):
+    """
+    
+    """
+
+    def requires(self):
+        """
+        
+        """
+        return [Createimage()]
+
+    def run(self):
+        """
+        
+        """
+        return [hist_equal(self.input)]
+
+class WriteImages(luigi.Task):
+    """
+    
+    """
+
+    n_images = luigi.IntParameter(default=10)
+
+    def requires(self):
+        """
+        
+        """
+        return [ApplyStretch()]
+
+    def run(self):
+        """
+        
+        """
+
+        for i in range(self.n_images):
+            fname = 'stretched_image%04i' %(i+1)
+            image_tools.write_img(array=self.input, name=fname)
 
 if __name__ == '__main__':
-    luigi.run()
+    #luigi.run()
+    luigi.build([WriteImages(n_images=5)], workers=1)
