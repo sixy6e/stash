@@ -4,7 +4,6 @@ import numpy
 import scipy
 from scipy import ndimage
 from osgeo import gdal
-from skimage import morphology
 
 # Handle exceptions for cases of matplotlib not being installed
 try:
@@ -19,6 +18,11 @@ try:
     import matplotlib.cm as cm
 except ImportError:
     print 'matplotlib Not installed. Functions get_class_colours() and create_colour_map() not available!'
+
+try:
+    from skimage import morphology
+except ImportError:
+    print "Couldn't find skimage.morphology"
 
 #Author: Josh Sixsmith; josh,sixsmith@gmail.com, joshua.sixsmith@ga.gov.au
 
