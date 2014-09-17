@@ -2,27 +2,33 @@
 
 import os
 import glob
-#import traceback
 import sys
-#import re
-#import copy
 import logging
 import argparse
 import textwrap
+
+# Debugging
+import pdb
+
 from osgeo import gdal
 from osgeo import ogr
-#from WaterSummary import WaterSummary
+
+# ga-neo-nfrip repo
 from WaterExtent import WaterExtent
-#from datetime import datetime, time
-from fileSystem import *
-#from jobControl import WorkUnit
+from fileSystem import Directory
+
+# IDL_functions repo
 from IDL_functions import histogram
+
+# image_processing repo
 from image_processing.segmentation.rasterise import Rasterise
 from image_processing.segmentation.segmentation import SegmentVisitor
-import pdb
 
 def getFiles(path, pattern):
     """
+    Just an internal function to find files given an file extension.
+    This isn't really designed to go beyond development demonstration
+    for this analytical workflow.
     """
 
     # Get the current directory so we can change back later
@@ -41,6 +47,21 @@ def getFiles(path, pattern):
 
 def getWaterExtents(file_list, sort=True):
     """
+    Given a list of water extent image files, create a list of
+    waterExtent class objects, and if sort by time, old -> new, if
+    sort=True.
+
+    :param file_list:
+        A list containing filepath names to water extent image files.
+
+    :param sort:
+        A boolean keyword indicating if the waterExtent objects
+        should be sorted before they're returned. Default is True.
+
+    :return:
+        A list of waterExtent class objects, one for every water
+        image file in file_list, and optionally sorted by date,
+        old -> new.
     """
 
     waterExtents = []
@@ -71,7 +92,34 @@ def getWaterExtents(file_list, sort=True):
 
 def main(indir, outdir, logpath, pattern, vector_file, outfname):
     """
-    
+    The main processing routine.
+
+    :param indir:
+        A string containing the file system pathname to a directory
+        containing the water extent image files.
+
+    :param outdir:
+        A string containing the file system pathname to a directory
+        that will contain the result output.
+
+    :param logpath:
+        A string containing the file system pathname to a directory
+        that will contain the operation system logging information.
+
+    :param pattern:
+        A string containing the image extents file extension pattern,
+        eg '*.tif'.
+
+    :param vector_file:
+        A string containing the file system pathname to an OGR
+        compatible vector file.
+
+    :param outfname):
+        A string containing the ststem file pathname for the output
+        csv file.
+
+    :return:
+        Nothing, main() acts as a procedure.
     """
 
     # setup logging file ... log to <outputPath>/../logs/createWaterExtent_<hostname>_pid.log
@@ -127,6 +175,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     fid2seg = {}
 
     logging.info("Gathering attribute information for each feature.")
+    # These Field Id's are unique to NGIG's vector datasets
     for feature in layer:
         fid                = feature.GetFID()
         feature_names[fid] = feature.GetField("NAME")
@@ -134,6 +183,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
         seg2fid[fid+1]     = fid
         fid2seg[fid]       = fid + 1
 
+    # Go back to the start of the vector file
     layer.ResetReading()
 
     # Replace any occurences of None with UNKNOWN
@@ -148,13 +198,15 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
     logging.info("Creating output summary file %s"%full_fname)
     outcsv = open(full_fname, 'w')
 
-    # Define the headings
+    # Define the headings for the output file
     headings = ("Time Slice, Feature Name, AUSHYDRO_ID, "
                 "Total Pixel Count, WATER_NOT_PRESENT, "
                 "NO_DATA, MASKED_NO_CONTIGUITY, "
                 "MASKED_SEA_WATER, MASKED_TERRAIN_SHADOW, "
                 "MASKED_HIGH_SLOPE, MASKED_CLOUD_SHADOW, "
                 "MASKED_CLOUD, WATER_PRESENT\n"
+
+    # Write the headings to disk
     outcsv.write(textwrap.dedent(headings))
 
     # Loop over each WaterExtent file
@@ -165,14 +217,17 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
         # Read the waterLayer from the extent file
         waterLayer = waterExtent.getArray()
 
+        # Loop over each feature Id
+        # Skip any FID's that don't exist in the current spatial extent
         for key in fid2seg.keys():
             if fid2seg[key] > seg_vis.max_segID:
                 continue
             data = seg_vis.getSegmentData(waterLayer, segmentID=fid2seg[key])
             dim  = data.shape
             #pdb.set_trace()
+            # Returns are 1D arrays, so check if we have an empty array
             if dim[0] == 0:
-                continue # Empty bin
+                continue # Empty bin, (no data), skipping
             h    = histogram(data, Min=0, Max=128)
             hist = h['histogram']
             total_area = dim[0]
@@ -202,6 +257,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
             WATER_NOT_PRESENT      (dec 0)          All bits zero indicated valid observation, no water present
             """
 
+            # [0..128] bins were generated, i.e 129 bins
             WATER_NOT_PRESENT     = hist[0]
             NO_DATA               = hist[1]
             MASKED_NO_CONTIGUITY  = hist[2]
@@ -213,6 +269,7 @@ def main(indir, outdir, logpath, pattern, vector_file, outfname):
             WATER_PRESENT         = hist[128]
 
             # Now to output counts per feature
+            # TODO update to Python's newer version of string insertion
             s = "%s, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n" %(waterExtent.filename,
                                                                          feature_names[key],
                                                                          hydro_id[key],
@@ -244,6 +301,7 @@ if __name__ == '__main__':
     parser.add_argument('--vector', required=True, help="An OGR compatible vector file.")
     parser.add_argument('--outname', default='WaterExtentVectorSummary.csv', help="The name of the output file to contain the summary. Default is 'WaterExtentVectorSummary.csv'.")
 
+    # Collect the arguments
     args = parser.parse_args()
 
     # Retrieve command arguments
