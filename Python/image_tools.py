@@ -698,3 +698,97 @@ def imfill(image):
 
     return filled
 
+class Raster:
+    """
+    
+    """
+    def __init__(self, fname, file_format='ENVI', samples=None, lines=None, bands=1,
+                 data_type=None, inherits_from=None, metadata=None):
+        """
+        
+        """
+        # TODO check fname == str, & file_format existance
+        # TODO check data_type is set and is valid
+        # TODO for inherits_from overide if data_type, rows, cols, bands are set
+        # TODO maybe include a mode 'r, w' to determine if we are reading or
+        #      writing an image
+        #  maybe have a generic open similar to rasterio and ENVI behaviour
+        #  that returns this class?
+        # TODO check for metadata instance and it'll overide inherits_from
+        #      but maybe keywords such as samples, lines data_type will
+        #      overwrite the metadata???
+        drv = gdal.GetDriverByName(file_format)
+        if inherits_from is None:
+            # Are we writing?
+            self.ds = gdal.Open(fname, samples, lines, bands, data_type)
+            self.dtype = data_type
+            self.nbands = bands
+            self.ncolumns = samples
+            self.nrows = lines
+        else:
+            # inherits_from is a GDAL dataset class
+            self.nbands = inherits_from.RasterCount
+            self.ncolumns = inherits_from.RasterXSize
+            self.nrows = inherits_from.RasterYSize
+            self.dtype = inherits_from.GDAL.dtype??
+            # Check for projection and geotransform
+
+    def Save(self):
+        """
+        Save the file to disk and close the reference.
+        """
+        ds = None
+
+    def SetTile(self, data, tile):
+        """
+        Only available for writing a file.
+        """
+        ystart = int(tile[0])
+        yend   = int(tile[1])
+        xstart = int(tile[2])
+        xend   = int(tile[3])
+        xsize  = int(xend - xstart)
+        ysize  = int(yend - ystart)
+
+        # TODO should we check that dimensions of data (rows,cols) is equal to the tile size?
+
+        # We might be able to do something about the interleave, and only
+        # accept data as 2D [ncolumns, nbands] or [ncolumns, nrows]
+        # This is more of an ENVI thing, but GDAL can supposedly handle
+        # different interleaves through the creation options -co argument
+        # Through Python this'll probably be a **args thing, but I've not
+        # played around with this feature much through Python
+        if data.ndim > 2:
+            for i in range(self.bands):
+                ds.GetRasterBand(i+1).WriteArray(data[i], xstart, ystart).FlushCache()
+        elif data.ndim == 2:
+            ds.GetRasterBand(1).WriteArray(data, xstart, ystart).FlushCache()
+        else:
+            # Raise Error
+            # TODO write an error catching mechanism
+
+    def GetTile(self, bands=None, tile):
+        """
+        Only available when reading a file.
+        """
+        ystart = int(tile[0])
+        yend   = int(tile[1])
+        xstart = int(tile[2])
+        xend   = int(tile[3])
+        xsize  = int(xend - xstart)
+        ysize  = int(yend - ystart)
+
+        # TODO check that if bands is an int, the value is in the valid range
+
+        if bands is None:
+            data = ds.ReadAsArray(xstart, ystart, xsize, ysize)
+        elif bands == list:
+            data = numpy.zeros((self.bands, self.rows, self.cols),
+                       dtype=self.dtype)
+            for i in range(len(bands)):
+                data[i] = ds.GetRasterBand(bands[i+1]).ReadAsArray(xstart, 
+                              ystart, xsize, ysize)
+        else:
+            data = ds.GetRasterBand(bands).ReadAsArray(xstart, ystart, xsize,
+                       ysize)
+
