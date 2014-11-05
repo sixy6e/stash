@@ -700,7 +700,29 @@ def imfill(image):
 
 class Raster:
     """
-    
+    Essentially a class to handle IO in a tiled/windowed fashion.
+    The tiling is optional and one can read/write an entire array.
+    I've tried to model the class after that available within ENVI
+    which is relatively easy to follow and well documented.
+    http://www.exelisvis.com/docs/enviraster.html
+    http://www.exelisvis.com/docs/enviRaster__SetTile.html
+    http://www.exelisvis.com/docs/enviraster__setdata.html
+    http://www.exelisvis.com/docs/enviRasterIterator.html
+    http://www.exelisvis.com/docs/envi__openraster.html (which returns an enviraster instance)
+
+    Through this class all sorts of tiled processing can take place such as
+    min, max, mean, stddev, variance, histograms etc, though special cases will
+    need to be written for each.
+    I've written quite a few analysis tools in IDL that makes use of tiling
+    in order to minimise memory use.
+    eg
+    Thresholds: kappa-sigma, triangle, otsu, maximum entropy
+    segmentation: labeling (will need to play around with Python,
+                  not sure how ENVI does this internally.
+                  segmentation statistics (stats per segment/blob/label id)
+    PQ extraction
+    PQ validation
+    various band math equations (NDVI is one case)
     """
     def __init__(self, fname, file_format='ENVI', samples=None, lines=None, bands=1,
                  data_type=None, inherits_from=None, metadata=None):
@@ -715,8 +737,18 @@ class Raster:
         #  maybe have a generic open similar to rasterio and ENVI behaviour
         #  that returns this class?
         # TODO check for metadata instance and it'll overide inherits_from
-        #      but maybe keywords such as samples, lines data_type will
-        #      overwrite the metadata???
+        #      but maybe keywords such as samples, lines data_type should
+        #      overwrite the metadata??? i.e. keyword > metadata > inherits_from
+        # metadata can be set a few different ways, and there is band level and
+        # dataset level metadata
+        # The way that GDAL handles complex formats such as HDF and netCDF, one
+        # generally has to access data from the subdataset level
+        # eg dataset->subdataset->band->data
+        # normally it is
+        # dataset->band->data
+        # For such complex levels, this class mechanism might not work unless we
+        # check for and handle subdataset (complex) level files.
+
         drv = gdal.GetDriverByName(file_format)
         if inherits_from is None:
             # Are we writing?
@@ -726,12 +758,14 @@ class Raster:
             self.ncolumns = samples
             self.nrows = lines
         else:
-            # inherits_from is a GDAL dataset class
+            # inherits_from should be a GDAL dataset class
             self.nbands = inherits_from.RasterCount
             self.ncolumns = inherits_from.RasterXSize
             self.nrows = inherits_from.RasterYSize
             self.dtype = inherits_from.GDAL.dtype??
             # Check for projection and geotransform
+            # close off the external GDAL object
+            inherits_from = None
 
     def Save(self):
         """
@@ -756,8 +790,8 @@ class Raster:
         # accept data as 2D [ncolumns, nbands] or [ncolumns, nrows]
         # This is more of an ENVI thing, but GDAL can supposedly handle
         # different interleaves through the creation options -co argument
-        # Through Python this'll probably be a **args thing, but I've not
-        # played around with this feature much through Python
+        # However the GDAL write mechanism might still only allow 2D row, col blocks
+        # and internally it'll figure out where to write the data???
         if data.ndim > 2:
             for i in range(self.bands):
                 ds.GetRasterBand(i+1).WriteArray(data[i], xstart, ystart).FlushCache()
@@ -769,7 +803,7 @@ class Raster:
 
     def GetTile(self, bands=None, tile):
         """
-        Only available when reading a file.
+        Should only be available when reading a file.
         """
         ystart = int(tile[0])
         yend   = int(tile[1])
@@ -782,13 +816,40 @@ class Raster:
 
         if bands is None:
             data = ds.ReadAsArray(xstart, ystart, xsize, ysize)
-        elif bands == list:
+        elif bands is list:
             data = numpy.zeros((self.bands, self.rows, self.cols),
-                       dtype=self.dtype)
+                       dtype=self.dtype).FlushCache()
             for i in range(len(bands)):
                 data[i] = ds.GetRasterBand(bands[i+1]).ReadAsArray(xstart, 
-                              ystart, xsize, ysize)
+                              ystart, xsize, ysize).FlushCache(
         else:
             data = ds.GetRasterBand(bands).ReadAsArray(xstart, ystart, xsize,
-                       ysize)
+                       ysize).FlushCache()
 
+    def CreateTileIterator(self, tile_size=None):
+        """
+        The current tiling routine returns a list but could be adapted
+        to return either a generator or a list. The current Python
+        generator doesn't appear to have a previous or reset cabability
+        or to access a specific portion of the generator.
+        Anyway, each tile will be a 4 element tuple
+        (ystart, yend, xstart, xend) Python style indices.
+        For now we'll default to all columns by 1 row of data.
+
+        The interleaving choice that ENVI gives probably won't occur
+        here, as GDAL appears to only return 2D spatial blocks regardless
+        of interleave.
+
+        :param tile_size:
+            A 2 element list containing the xsize (columns) and
+            ysize (rows).
+        """
+        if tile_size is None:
+            xsize = self.ncolumns
+            ysize = 1
+        else:
+            xsize = tile_size[0]
+            ysize = tile_size[1]
+        # TODO check that the tile size is not outside the actual array size
+        tiles = tiling.get_tiles(self.ncolumns, self.nrows, xsize, ysize)
+        return tiles
