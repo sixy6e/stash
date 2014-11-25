@@ -135,7 +135,7 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
 
     # Initialise the dataframe to store the results
     df = pandas.DataFrame()
-    df['FID'] = fid_list.sort()
+    df['FID'] = fid_list
 
     nfeatures = len(fid_list)
     min_fid = df['FID'].min()
@@ -148,6 +148,7 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     t_area = h['histogram']
 
     for cell in cell_list:
+        logging.info("Processing Cell ID: {}".format(cell))
         celldir = os.path.join(indir, cell)
         # processing here
         result_df = tiled_processing(vector_file, t_area, min_fid, max_fid, celldir, pattern)
@@ -178,7 +179,7 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     excel_file2 = pandas.ExcelWriter(fname2)
 
     for key in fid_df:
-        sheet_name = 'FID {fid}'.format({'fid': key})
+        sheet_name = 'FID {fid}'.format(fid=key)
         fid_df[key].to_excel(excel_file2, sheet_name)
         combined_df = combined_df.append(fid_df[key])
         fid_df[key] = None # Attempt to conserve memory
@@ -244,7 +245,7 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
 
     # Update the total area (recursive histogram technique)
     # input keyword modifies in-place
-    recursive_h = histogram(veg2rast, input=input_hist, Min=Min_id, Max=Max_id)
+    recursive_h = histogram(veg2rast.ravel(), input=input_hist, Min=Min_id, Max=Max_id)
 
     # Get specific attribute records
     logging.info("Opening vector file %s" %vector_file)
@@ -297,12 +298,12 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
         waterLayer = waterExtent.getArray()
 
         # timestamp
-        timestamp = waterLayer.timestamp
+        timestamp = waterExtent.getDatetime()
         #str_time = timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
 
         # Loop over each feature Id
         # Skip any FID's that don't exist in the current spatial extent
-        for key in fid2seg.keys():
+        for key in fid2seg:
             if fid2seg[key] > seg_vis.max_segID:
                 continue
             data = seg_vis.getSegmentData(waterLayer, segmentID=fid2seg[key])
@@ -311,7 +312,7 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
             # Returns are 1D arrays, so check if we have an empty array
             if dim[0] == 0:
                 continue # Empty bin, (no data), skipping
-            FID = seg2fid[key]
+            FID = key
             h    = histogram(data, Min=0, Max=128)
             hist = h['histogram']
             total_area = dim[0]
