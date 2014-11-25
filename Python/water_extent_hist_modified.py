@@ -10,6 +10,7 @@ import textwrap
 # Debugging
 import pdb
 
+import numpy
 from osgeo import gdal
 from osgeo import ogr
 
@@ -92,7 +93,7 @@ def getWaterExtents(file_list, sort=True):
         logging.info("Collected %d files. Sorting not applied." % len(file_list))
         return (waterExtents, cellId)
 
-def tiled_main(vector_file, cell_list, indir, output_dir, pattern):
+def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     """
     
     """
@@ -149,7 +150,7 @@ def tiled_main(vector_file, cell_list, indir, output_dir, pattern):
     for cell in cell_list:
         celldir = os.path.join(indir, cell)
         # processing here
-        result_df = tiled_processing(vector_file, t_area, min_fid, max_fid, indir, pattern)
+        result_df = tiled_processing(vector_file, t_area, min_fid, max_fid, celldir, pattern)
         # We don't need to define cols up front
         # We can define an empty dataframe and append to it
         # That way cols can be defined within the script
@@ -637,4 +638,4 @@ if __name__ == '__main__':
 
     #cell_list = ['144_-041']
 
-    tiled_main(vector_file, cell_list, path, baseOutputPath, pattern)
+    tiled_main(vector_file, cell_list, path, baseOutputPath, pattern, log)
