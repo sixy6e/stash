@@ -220,10 +220,6 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
     :return:
         Nothing, main() acts as a procedure.
     """
-
-
-
-
     # Get a list of water_extent files
     files = getFiles(indir, pattern)
 
@@ -233,8 +229,6 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
     # lat and lon will be helpful
     lon = cellId[0]
     lat = cellId[1]
-
-    logging.info("output directory is %s" %outputDir.getPath())
 
     # Rasterise the features
     # We can use the first image file as the base
