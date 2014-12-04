@@ -147,6 +147,9 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     # This will be used as the input keyword and changes will be made in place
     t_area = h['histogram']
 
+    # Create an output file that we can continually append data
+    store = pandas.HDFStore('Test_Results.h5')
+
     for cell in cell_list:
         logging.info("Processing Cell ID: {}".format(cell))
         celldir = os.path.join(indir, cell)
@@ -158,7 +161,10 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
         # but how do we combine records of the same fid, & date but different cell???
         # do we need to know the cols then? maybe cols should only contain counts???
         for key in result_df:
-            fid_df[key] = fid_df[key].append(result_df, ignore_index=True)
+            #fid_df[key] = fid_df[key].append(result_df, ignore_index=True)
+            # Group names shouldn't start with a number
+            group_name = "FID_{}".format(key)
+            store.append(group_name, result_df[key])
 
     # Combine FIDs with identical timestamps and sum the pixel counts
     # Including the hydro_id and fid as groupby's should exclude them from
@@ -166,26 +172,38 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     # The filename and Feature Name fields will be removed as a result of the
     # summation. Feature Name could potentially be kept
     group_items = ['Time Stamp', 'AUSHYDRO_ID', 'FID']
-    for key in fid_df:
-        fid_df[key] = fid_df[key].groupby(group_items).sum()
+    #for key in fid_df:
+    for key in store.keys():
+        #group_name = "FID_{}".format(key)
+        #fid_df[key] = fid_df[key].groupby(group_items).sum()
+        # Combine results and overwrite the 
+        #store[group_name] = store[group_name].groupby(group_items).sum()
+        store[key] = store[key].groupby(group_items).sum()
 
-    # Now to output files
-    fname1 = os.path.join(outdir, 'result_combined.xls')
+    # Now to output the excel files
+    fname1 = os.path.join(outdir, 'Result_Combined.xls')
     excel_file1 = pandas.ExcelWriter(fname1)
 
     combined_df = pandas.DataFrame()
 
-    fname2 = os.path.join(outdir, 'result_multiple_sheets.xls')
+    fname2 = os.path.join(outdir, 'Result_Multiple_Sheets.xls')
     excel_file2 = pandas.ExcelWriter(fname2)
 
     for key in fid_df:
+    #for key in store.keys():
+        group_name = "FID_{}".format(key)
         sheet_name = 'FID {fid}'.format(fid=key)
-        fid_df[key].to_excel(excel_file2, sheet_name)
-        combined_df = combined_df.append(fid_df[key])
-        fid_df[key] = None # Attempt to conserve memory
+        data = store[group_name]
+        #fid_df[key].to_excel(excel_file2, sheet_name)
+        data.to_excel(excel_file2, sheet_name)
+        #combined_df = combined_df.append(fid_df[key])
+        combined_df = combined_df.append(data)
+        #fid_df[key] = None # Attempt to conserve memory
 
     combined_df.to_excel(excel_file1, 'Sheet1')
 
+    # Save and close the files
+    store.close()
     excel_file1.save()
     excel_file2.save()
 
@@ -283,7 +301,7 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
     layer.ResetReading()
 
     # Replace any occurences of None with UNKNOWN
-    for key in feature_names.keys():
+    for key in feature_names:
         if feature_names[key] == None:
             feature_names[key] = 'UNKNOWN'
 
