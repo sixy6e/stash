@@ -8,6 +8,7 @@ import argparse
 import textwrap
 
 # Debugging
+import datetime
 import pdb
 
 import numpy
@@ -148,23 +149,29 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     t_area = h['histogram']
 
     # Create an output file that we can continually append data
-    store = pandas.HDFStore('Test_Results.h5')
+    store = pandas.HDFStore(os.path.join(outdir, 'Test_Results.h5'))
 
     for cell in cell_list:
         logging.info("Processing Cell ID: {}".format(cell))
         celldir = os.path.join(indir, cell)
         # processing here
+        st = datetime.datetime.now()
         result_df = tiled_processing(vector_file, t_area, min_fid, max_fid, celldir, pattern)
+        et = datetime.datetime.now()
+        print "Tiled process time taken: {}".format(et - st)
         # We don't need to define cols up front
         # We can define an empty dataframe and append to it
         # That way cols can be defined within the script
         # but how do we combine records of the same fid, & date but different cell???
         # do we need to know the cols then? maybe cols should only contain counts???
+        st = datetime.datetime.now()
         for key in result_df:
             #fid_df[key] = fid_df[key].append(result_df, ignore_index=True)
             # Group names shouldn't start with a number
             group_name = "FID_{}".format(key)
             store.append(group_name, result_df[key])
+        et = datetime.datetime.now()
+        print "Append to h5 time taken: {}".format(et - st)
 
     # Combine FIDs with identical timestamps and sum the pixel counts
     # Including the hydro_id and fid as groupby's should exclude them from
@@ -172,6 +179,7 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     # The filename and Feature Name fields will be removed as a result of the
     # summation. Feature Name could potentially be kept
     group_items = ['Time Stamp', 'AUSHYDRO_ID', 'FID']
+    st = datetime.datetime.now()
     #for key in fid_df:
     for key in store.keys():
         #group_name = "FID_{}".format(key)
@@ -179,33 +187,35 @@ def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
         # Combine results and overwrite the 
         #store[group_name] = store[group_name].groupby(group_items).sum()
         store[key] = store[key].groupby(group_items).sum()
+    et = datetime.datetime.now()
+    print "Group by time taken: {}".format(et - st)
 
     # Now to output the excel files
-    fname1 = os.path.join(outdir, 'Result_Combined.xls')
-    excel_file1 = pandas.ExcelWriter(fname1)
+    #fname1 = os.path.join(outdir, 'Result_Combined.xls')
+    #excel_file1 = pandas.ExcelWriter(fname1)
 
-    combined_df = pandas.DataFrame()
+    #combined_df = pandas.DataFrame()
 
-    fname2 = os.path.join(outdir, 'Result_Multiple_Sheets.xls')
-    excel_file2 = pandas.ExcelWriter(fname2)
+    #fname2 = os.path.join(outdir, 'Result_Multiple_Sheets.xls')
+    #excel_file2 = pandas.ExcelWriter(fname2)
 
-    for key in fid_df:
-    #for key in store.keys():
-        group_name = "FID_{}".format(key)
-        sheet_name = 'FID {fid}'.format(fid=key)
-        data = store[group_name]
-        #fid_df[key].to_excel(excel_file2, sheet_name)
-        data.to_excel(excel_file2, sheet_name)
-        #combined_df = combined_df.append(fid_df[key])
-        combined_df = combined_df.append(data)
-        #fid_df[key] = None # Attempt to conserve memory
+    #for key in fid_df:
+    ##for key in store.keys():
+    #    group_name = "FID_{}".format(key)
+    #    sheet_name = 'FID {fid}'.format(fid=key)
+    #    data = store[group_name]
+    #    #fid_df[key].to_excel(excel_file2, sheet_name)
+    #    data.to_excel(excel_file2, sheet_name)
+    #    #combined_df = combined_df.append(fid_df[key])
+    #    combined_df = combined_df.append(data)
+    #    #fid_df[key] = None # Attempt to conserve memory
 
-    combined_df.to_excel(excel_file1, 'Sheet1')
+    #combined_df.to_excel(excel_file1, 'Sheet1')
 
     # Save and close the files
     store.close()
-    excel_file1.save()
-    excel_file2.save()
+    #excel_file1.save()
+    #excel_file2.save()
 
 
 def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
@@ -251,9 +261,12 @@ def tiled_processing(vector_file, input_hist, Min_id, Max_id, indir, pattern):
 
     # Rasterise the features
     # We can use the first image file as the base
+    st = datetime.datetime.now()
     segments_ds = Rasterise(RasterFilename=files[0], VectorFilename=vector_file)
     logging.info("Rasterising features.")
     segments_ds.rasterise()
+    et = datetime.datetime.now()
+    print "Rasterisation time taken: {}".format(et - st)
 
     # Extract the array
     veg2rast = segments_ds.segemented_array
@@ -645,10 +658,11 @@ if __name__ == '__main__':
     #main(indir=path, outdir=baseOutputPath, logpath=log, pattern=pattern,
     #     vector_file=vector_file, outfname=outfname)
 
-    cell_list = ['144_-041', '145_-041', '147_-041', '148_-041', '145_-042',
-                 '146_-042', '147_-042', '148_-042', '145_-043', '146_-043',
-                 '147_-043', '146_-044']
+    #cell_list = ['144_-041', '145_-041', '147_-041', '148_-041', '145_-042',
+    #             '146_-042', '147_-042', '148_-042', '145_-043', '146_-043',
+    #             '147_-043', '146_-044']
 
     #cell_list = ['144_-041']
+    cell_list = ['146_-037']
 
     tiled_main(vector_file, cell_list, path, baseOutputPath, pattern, log)
