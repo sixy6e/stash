@@ -1,0 +1,2 @@
+f2py -m test_ordering -c test_transpose.f90 -DF2PY_REPORT_ON_ARRAY_COPY=1
+f2py -m test_ordering2 -c test_transpose2.f90 -DF2PY_REPORT_ON_ARRAY_COPY=1
