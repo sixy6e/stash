@@ -28,6 +28,7 @@ from IDL_functions import histogram
 from image_processing.segmentation.rasterise import Rasterise
 from image_processing.segmentation.segmentation import SegmentVisitor
 
+
 def getFiles(path, pattern):
     """
     Just an internal function to find files given an file extension.
@@ -48,6 +49,7 @@ def getFiles(path, pattern):
     os.chdir(CWD)
 
     return files
+
 
 def getWaterExtents(file_list, sort=True):
     """
@@ -78,7 +80,10 @@ def getWaterExtents(file_list, sort=True):
         if cellId:
             thisCellId = [waterExtent.lon, waterExtent.lat]
             if thisCellId != cellId:
-                logging.error("Extents must be from same cell. At file %s got %s, expecting %s" % (f, thisCellId, cellId))
+                msg = ("Extents must be from same cell. At file {} got {}, "
+                      "expecting {}")
+                msg = msg.format(f, thisCellId, cellId)
+                logging.error(msg)
                 sys.exit(1)
         else:
             cellId = [waterExtent.lon, waterExtent.lat]
@@ -91,16 +96,25 @@ def getWaterExtents(file_list, sort=True):
         sortedWaterExtents = sorted(waterExtents, key=lambda extent: extent.getDatetime())
         return (sortedWaterExtents, cellId)
     else:
-        logging.info("Collected %d files. Sorting not applied." % len(file_list))
+        msg = "Collected {} files. Sorting not applied.".format(len(file_list))
+        logging.info(msg)
         return (waterExtents, cellId)
 
+
+# Define the main process that will work in a tiling fashion, i.e. process a
+# chunk at a time rather than all at once
+# Alternatively we do this through luigi
 def tiled_main(vector_file, cell_list, indir, outdir, pattern, logpath):
     """
     
     """
     # setup logging file ... log to <outputPath>/../logs/createWaterExtent_<hostname>_pid.log
-    logPath = os.path.join(logpath,"waterExtentVectorSummary_%s_%d.log" % (os.uname()[1], os.getpid()))
-    logging.basicConfig(filename=logPath,format='%(asctime)s %(levelname)s: %(message)s', datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
+    log_file = "waterExtentVectorSummary_{}_{}.log".format(os.uname()[1],
+                                                           os.getpid())
+    logPath = os.path.join(logpath, log_file)
+    logging.basicConfig(filename=logPath,
+                        format='%(asctime)s %(levelname)s: %(message)s',
+                        datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 
     baseOutputDir = Directory(outdir)
     if not baseOutputDir.exists():
