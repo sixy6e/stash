@@ -762,7 +762,7 @@ class Raster:
             self.nbands = inherits_from.RasterCount
             self.ncolumns = inherits_from.RasterXSize
             self.nrows = inherits_from.RasterYSize
-            self.dtype = inherits_from.GDAL.dtype??
+            self.dtype = inherits_from.GDAL.dtype#??
             # Check for projection and geotransform
             # close off the external GDAL object
             inherits_from = None
@@ -797,11 +797,11 @@ class Raster:
                 ds.GetRasterBand(i+1).WriteArray(data[i], xstart, ystart).FlushCache()
         elif data.ndim == 2:
             ds.GetRasterBand(1).WriteArray(data, xstart, ystart).FlushCache()
-        else:
+        #else:
             # Raise Error
             # TODO write an error catching mechanism
 
-    def GetTile(self, bands=None, tile):
+    def GetTile(self, tile, bands=None):
         """
         Should only be available when reading a file.
         """
@@ -821,7 +821,7 @@ class Raster:
                        dtype=self.dtype).FlushCache()
             for i in range(len(bands)):
                 data[i] = ds.GetRasterBand(bands[i+1]).ReadAsArray(xstart, 
-                              ystart, xsize, ysize).FlushCache(
+                              ystart, xsize, ysize).FlushCache()
         else:
             data = ds.GetRasterBand(bands).ReadAsArray(xstart, ystart, xsize,
                        ysize).FlushCache()
