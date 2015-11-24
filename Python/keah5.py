@@ -32,7 +32,10 @@ LAYERUSAGE = {}
 
 
 def kea_init(fid, nbands, shape, affine, crs_wkt, dtype, no_data=None,
-             chunks=(256, 256), compression=1, blocksize=256):
+             chunks=(256, 256), compression=1, blocksize=256,
+             band_names=None):
+
+    # dataset names for each band
     bnames = ['BAND{}'.format(i+1) for i in range(nbands)]
 
     res = (affine[0], affine[4])
@@ -69,10 +72,25 @@ def kea_init(fid, nbands, shape, affine, crs_wkt, dtype, no_data=None,
             band_groups[bname].create_dataset('NO_DATA_VAL', shape=(1,),
                                               data=no_data)
 
-
+    # Some groups like GCPS will be empty depending on the type of image
+    # being written to disk. As will some datasets.
     fid.create_group('GCPS')
-    fid.create_group('METADATA')
+    met = fid.create_group('METADATA')
     hdr = fid.create_group('HEADER')
+
+    if band_names is None:
+        band_names = ['Band {}'.format(bn + 1) for bn in range(nbands)]
+    elif len(band_names) != nbands:
+        # overwrite the user (probably should notify the user)
+        bname_format = 'Band {}'
+        band_names = ['Band {}'.format(bn + 1) for bn in range(nbands)]
+
+    # write the band names to the METADATA group, as individually
+    # named datasets of the form 'Band_n'; n=1..nbands
+    dname_fmt = 'Band_{}'
+    for i, bname in enumerate(band_names):
+        dname = dname_fmt.format(i + 1)
+        met.create_dataset(dname, shape=(1,), data=bname)
 
     # header dsets
     hdr.create_dataset('WKT', shape=(1,), data=crs_wkt)
