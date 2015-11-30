@@ -82,9 +82,15 @@ This is not to say that a spatial blocksize of 200 will be performant for all wo
 reading a block smaller than 200 will incurr performance penalties if the goal is to process the entire
 spatial dimension. This will also be true for any blocksize.
 
+The filesizes for a given *spatial* chunksize and compression filter differed slightly between the
+thre *z* axis chunksizes. A *z* chunksize of 5 tended to have better better compression ratios,
+potentially due to more complete chunks being written to disk as opposed to partial chunks. However,
+the total read times tended to be longer.
+
 As for the compression algorithms, in terms of raw speed, the LZF algorithm significantly performed better
 at all *spatial* and *z* chunksize than the other compression settings. The compression ratios were slightly lower
 in the range of 10-15% than the GZip equivalents.
 
 The default setting of *4* for the GZip algorithm, tended to get higher compression ratios than even the
-level *8* GZip setting. In some instances GZip level *4* also had better read times.
+level *8* GZip setting. In some instances GZip level *4* also had better read times than levels *1*
+or *8*.
