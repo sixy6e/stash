@@ -1,4 +1,4 @@
-my_code
+stash
 =======
 
-Contains code from IDL, Python and Fortran
+Contains code snippets from IDL, Python and Fortran
