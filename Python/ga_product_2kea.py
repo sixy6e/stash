@@ -10,7 +10,7 @@ from gaip import gridded_geo_box
 from eotools.tiling import generate_tiles
 
 
-def convert(package_name, blocksize=256, compress=1, nodata=0):
+def convert(package_name, blocksize=256, compress=1):
     """
     Convets a GA packaged product containing GTiff's and converts
     to a single KEA file format.
@@ -21,6 +21,7 @@ def convert(package_name, blocksize=256, compress=1, nodata=0):
     cols, rows = geobox.get_shape_xy()
     crs = from_string(geobox.crs.ExportToProj4())
     dtype = acqs[0].data(window=((0, 1), (0, 1))).dtype.name
+    no_data = acqs[0].no_data
 
     tiles = generate_tiles(cols, rows, blocksize, blocksize)
 
@@ -34,6 +35,7 @@ def convert(package_name, blocksize=256, compress=1, nodata=0):
               'crs': crs,
               'transform': geobox.affine,
               'dtype': dtype,
+              'nodata': no_data,
               'deflate': compress,
               'imageblocksize': blocksize}
 
