@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from os.path import join as pjoin
+import argparse
 from os.path import basename, dirname
 import rasterio
 from rasterio.crs import from_string
@@ -10,7 +11,7 @@ from gaip import gridded_geo_box
 from eotools.tiling import generate_tiles
 
 
-def convert(package_name, blocksize=256, compress=1):
+def convert(package_name, blocksize=256, compression=1):
     """
     Convets a GA packaged product containing GTiff's and converts
     to a single KEA file format.
@@ -25,8 +26,10 @@ def convert(package_name, blocksize=256, compress=1):
 
     tiles = generate_tiles(cols, rows, blocksize, blocksize)
 
-    fname_fmt = 'compress{}_blocksize{}.kea'.format(compress, blocksize)
-    fname = pjoin(basename(dirname(acqs[0].dir_name)), fname_fmt)
+    fname_fmt = '{}_compress{}_blocksize{}.kea'
+    base_name = basename(dirname(acqs[0].dir_name))
+    fname = pjoin(acqs[0].dir_name, fname_fmt.format(base_name, compression,
+                                                      blocksize))
 
     kwargs = {'driver': 'KEA',
               'count': bands,
@@ -36,10 +39,25 @@ def convert(package_name, blocksize=256, compress=1):
               'transform': geobox.affine,
               'dtype': dtype,
               'nodata': no_data,
-              'deflate': compress,
+              'deflate': compression,
               'imageblocksize': blocksize}
 
     with rasterio.open(fname, 'w', **kwargs) as src:
         for tile in tiles:
             img, _ = stack_data(acqs, window=tile)
             src.write(img, range(1, len(acqs) + 1), window=tile)
+
+
+if __name__ == '__main__':
+    desc = "Converts a packaged scene of GTiffs to KEA format."
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('--scene', required=True,
+                        help='Filepath name of scene.')
+    parser.add_argument('--blocksize', required=True, type=int,
+                        help='The image blocksize.')
+    parser.add_argument('--compression', required=True, type=int,
+                        help='The compression value to use (0-9).')
+
+    parsed_args = parser.parse_args()
+
+    convert(parsed_args.scene, parsed_args.blocksize, parsed_args.compression)
