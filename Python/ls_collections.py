@@ -153,7 +153,7 @@ def main():
 
     # this could take a while...
     for sensor in SENSORS:
-        for root, dirs, files in os.walk(BASE_DIR.format(sensor)):
+        for root, dirs, files in os.walk(BASE_DIR.format(sensor=sensor)):
             for fname in files:
                 if fname == 'lpgs_out.xml':
                     result = process_lpgs_log(pjoin(root, fname))
