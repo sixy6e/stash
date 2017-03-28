@@ -79,6 +79,11 @@ class Combine(luigi.Task):
         data = {}
         for key in self.requires().input():
             data[key] = self.requires().input()[key].path
+            # remove input file
+            print "exists?: {}".format(self.requires().input()[key].exists())
+            print "removing: {}".format(self.requires().input()[key].path)
+            self.requires().input()[key].remove()
+            print "exists?: {}".format(self.requires().input()[key].exists())
 
         #data['upper'] = self.input()
         with self.output().open('w') as src:
