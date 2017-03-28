@@ -42,7 +42,7 @@ class Do(luigi.Task):
         print('*'*50)
         print(self.task.get_task_family())
         print('*'*50)
-        fname = self.task.output().path
+        fname = self.input().path
         with open(fname, 'r') as src:
             data = src.readlines()
 
