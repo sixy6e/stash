@@ -1,16 +1,17 @@
 "ncolorscheme putty
 
 syntax enable
-set background=dark
+" set background=dark
 " let g:solarized_visibility = "high"
 " let g:solarized_contrast = "high"
-let g:solarized_termcolors=256
-colorscheme solarized
-let &t_Co=256
+" let g:solarized_termcolors=256
+" colorscheme solarized
+colorscheme zenburn
+" let &t_Co=256
 
-hi Comment ctermfg=Blue
+" hi Comment ctermfg=Blue
 set hls
-set paste
+"set paste
 
 "set tw=79
 "set formatoptions+=t
@@ -20,7 +21,11 @@ set colorcolumn=80
 highlight ColorColumn ctermbg=240 guibg=#262626
 set number
 set relativenumber
-highlight LineNr term=bold cterm=NONE ctermfg=Green ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+
+" highlight LineNr term=bold cterm=NONE ctermfg=Green ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+highlight LineNr ctermfg=Green
+highlight Todo ctermfg=132
+highlight MatchParen ctermfg=127
 
 " pathogen for managing plugins
 " execute pathogen#infect()
@@ -43,10 +48,12 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/syntastic'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'altercation/vim-colors-solarized.git'
+Plugin 'stormherz/tablify'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
-filetype plugin indent on    " required
+" filetype plugin indent on    " required
+filetype plugin on    " required
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 
@@ -96,3 +103,10 @@ nmap <leader>m :set mouse=a<CR>
 nmap <leader>nm :set mouse=""<CR>
 nmap <leader>sr :SyntasticReset<CR>
 nmap <leader>sc :SyntasticCheck<CR>
+
+" print full path filename
+nmap <leader>fn :echo expand('%:p')<CR>
+
+let g:jedi#use_tabs_not_buffers = 1
+
+" let b:tablify_horHeaderDelimiter = '='
