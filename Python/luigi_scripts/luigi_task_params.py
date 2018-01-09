@@ -41,6 +41,7 @@ class Do(luigi.Task):
     def run(self):
         print('*'*50)
         print(self.task.get_task_family())
+        print(self.deps())
         print('*'*50)
         fname = self.input().path
         with open(fname, 'r') as src:
