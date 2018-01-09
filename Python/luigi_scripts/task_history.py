@@ -20,20 +20,25 @@ def read_task_db(fname):
     return tasks, events, params
 
 
-def retrieve_gaip_status(tasks, events, params):
+def retrieve_status(fname, task_name=None):
     """
-    Retrieve the gaip tasks status for each L1 dataset.
+    Retrieve the task status given by `task_name` for each L1 dataset.
     """
-    gaip_tasks = tasks[tasks.name == 'DataStandardisation']
+    if task_name is None:
+        raise ValueError('Parameter "task_name" cannot be None')
+
+    tasks, events, params = read_task_db(fname)
+
+    task = tasks[tasks.name == task_name]
     l1_datasets = params[params.name == 'level1']
 
     # event status for the DataStandardisation Task
-    status = gaip_tasks.merge(events, how='left', left_on='id',
-                              right_on='task_id',
-                              suffixes=['_gaip', '_events'])
+    status = task.merge(events, how='left', left_on='id', right_on='task_id',
+                        suffixes=['_{}'.format(task_name), '_events'])
 
     # final status for each DataStandardisation Task
-    final_status = status.drop_duplicates('id_gaip', keep='last')
+    final_status = status.drop_duplicates('id_{}'.format(task_name),
+                                          keep='last')
 
     # get the DONE, FAILED & PENDING Tasks
     # (if the task status is PENDING:
