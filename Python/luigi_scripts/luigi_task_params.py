@@ -60,6 +60,14 @@ class TaskRunV1(luigi.WrapperTask):
 class TaskRunV2(luigi.WrapperTask):
 
     def requires(self):
+        print('*'*50)
+        print("Configuration")
+        print(luigi.interface.core())
+        print('*'*50)
+        print('*'*50)
+        print("Number of Workers")
+        print(luigi.interface.core().workers)
+        print('*'*50)
         return [Do(TaskA()), Do(TaskB())]
 
 
