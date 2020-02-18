@@ -67,6 +67,8 @@ Plugin 'vmchale/hlnext-fork' " search highlighting mods
 Plugin 'jnurmine/zenburn' " colorscheme
 Plugin 'w0rp/ale' " syntastic replacement
 Plugin 'nixon/vim-vmath' " math on visual regions
+Plugin 'lervag/vimtex' " latex documents
+Plugin 'psf/black' " Python code formatter
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -126,6 +128,8 @@ map <c-h> <c-w>h
 " change the leader key
 let mapleader = ","
 
+let localleader = "\\"
+
 " map some custom shortcuts
 nmap <leader>ln :set invnumber<CR>
 nmap <leader>rn :set invrelativenumber<CR>
@@ -144,3 +148,6 @@ let g:jedi#use_tabs_not_buffers = 1
 
 vmap <expr>  ++  VMATH_YankAndAnalyse()
 nmap         ++  vip++
+
+" vimtex
+let g:tex_flavor = 'latex'
