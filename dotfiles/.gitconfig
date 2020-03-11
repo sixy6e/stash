@@ -7,6 +7,9 @@
         diff = auto
         status = auto
         branch = auto
+[color "status"]
+        changed = cyan
+        untracked = yellow
 [format]
         pretty = "Commit:  %C(yellow)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
 
