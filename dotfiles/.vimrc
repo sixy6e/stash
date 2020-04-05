@@ -69,6 +69,7 @@ Plugin 'w0rp/ale' " syntastic replacement
 Plugin 'nixon/vim-vmath' " math on visual regions
 Plugin 'lervag/vimtex' " latex documents
 Plugin 'psf/black' " Python code formatter
+Plugin 'Xuyuanp/nerdtree-git-plugin' " A plugin of NERDTree showing git status flags
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -151,3 +152,6 @@ nmap         ++  vip++
 
 " vimtex
 let g:tex_flavor = 'latex'
+
+" run Black on F9
+nnoremap <F9> :Black<CR>
