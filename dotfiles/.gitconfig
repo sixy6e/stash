@@ -10,6 +10,10 @@
 [color "status"]
         changed = cyan
         untracked = yellow
+        nobranch = yellow
+        unmerged = red bold
+[color "branch"]
+        remote = cyan
 [format]
         pretty = "Commit:  %C(yellow)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
 
