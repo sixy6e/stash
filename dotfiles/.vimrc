@@ -70,6 +70,8 @@ Plugin 'nixon/vim-vmath' " math on visual regions
 Plugin 'lervag/vimtex' " latex documents
 Plugin 'psf/black' " Python code formatter
 Plugin 'Xuyuanp/nerdtree-git-plugin' " A plugin of NERDTree showing git status flags
+Plugin 'bfrg/vim-jqplay' " A plugn that provides similar functionality as https://jqplay.org/
+Plugin 'AndrewRadev/bufferize.vim' " Execute a :command and show the output in a temporary buffer
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -155,3 +157,19 @@ let g:tex_flavor = 'latex'
 
 " run Black on F9
 nnoremap <F9> :Black<CR>
+
+" add support for jsonlines
+autocmd BufNewFile,BufRead *.jsonl set syntax=json
+
+" splts and tabbed files
+set splitbelow splitright
+
+" simplify the adjustment of split resizing
+noremap <silent> <C-Left> :vertical resize +1<CR>
+noremap <silent> <C-Right> :vertical resize -1<CR>
+noremap <silent> <C-Up> :resize +1<CR>
+noremap <silent> <C-Down> :resize -1<CR>
+
+" change between horizontal and vertical splits (to vertical, to horizontal)
+map <leader>tv <C-w>t<C-w>H
+map <leader>th <C-w>t<C-w>K
