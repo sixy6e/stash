@@ -65,13 +65,14 @@ Plugin 'stormherz/tablify' " automatic table creation
 Plugin 'gavinbeatty/dragvisuals.vim' " move blocks of text
 Plugin 'vmchale/hlnext-fork' " search highlighting mods
 Plugin 'jnurmine/zenburn' " colorscheme
-Plugin 'w0rp/ale' " syntastic replacement
+Plugin 'dense-analysis/ale' " syntastic replacement
 Plugin 'nixon/vim-vmath' " math on visual regions
 Plugin 'lervag/vimtex' " latex documents
 Plugin 'psf/black' " Python code formatter
 Plugin 'Xuyuanp/nerdtree-git-plugin' " A plugin of NERDTree showing git status flags
 Plugin 'bfrg/vim-jqplay' " A plugn that provides similar functionality as https://jqplay.org/
 Plugin 'AndrewRadev/bufferize.vim' " Execute a :command and show the output in a temporary buffer
+Plugin 'yegappan/taglist' " A plugin to efficiently browse through source code files (side window displays list of funcs, classes, global vars etc)
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -134,7 +135,7 @@ let mapleader = ","
 let localleader = "\\"
 
 " map some custom shortcuts
-nmap <leader>ln :set invnumber<CR>
+nmap <leader>n :set invnumber<CR>
 nmap <leader>rn :set invrelativenumber<CR>
 nmap <leader>nn :set invnumber<CR> <bar> :set invrelativenumber<CR>
 nmap <leader>m :set mouse=a<CR>
@@ -144,6 +145,10 @@ nmap <leader>sc :SyntasticCheck<CR>
 
 " print full path filename
 nmap <leader>fn :echo expand('%:p')<CR>
+
+" taglist
+nnoremap <silent> <F8> :TlistToggle<CR>
+nnoremap <leader>tg :TlistToggle<CR>
 
 let g:jedi#use_tabs_not_buffers = 1
 
@@ -173,3 +178,9 @@ noremap <silent> <C-Down> :resize -1<CR>
 " change between horizontal and vertical splits (to vertical, to horizontal)
 map <leader>tv <C-w>t<C-w>H
 map <leader>th <C-w>t<C-w>K
+
+" Zstandard compression level for current buffer
+" examples setting level 1 and level 19 compression
+" :Zst -1
+" :Zst -19
+command -nargs=1 Zst execute 'let b:gzip_comp_arg=' . [<f-args>][0]
