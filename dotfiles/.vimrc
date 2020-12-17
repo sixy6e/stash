@@ -26,7 +26,7 @@ set hls " highlight any search matches
 
 
 " define and visualise an optimal column length
-set colorcolumn=80
+set colorcolumn=80,90
 highlight ColorColumn ctermbg=240 guibg=#262626
 
 " cursonline visualisation
@@ -122,6 +122,7 @@ map <C-n> :NERDTreeToggle<CR>
 
 " ale config
 let g:ale_completion_enabled = 1
+let g:ale_echo_msg_format = '[%linter%] %code%: %s'
 
 " split window navigation
 map <c-j> <c-w>j
@@ -184,3 +185,6 @@ map <leader>th <C-w>t<C-w>K
 " :Zst -1
 " :Zst -19
 command -nargs=1 Zst execute 'let b:gzip_comp_arg=' . [<f-args>][0]
+
+" black config
+let g:black_linelength = 90
