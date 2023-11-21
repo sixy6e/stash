@@ -1,2 +1,0 @@
-from IDL_functions.tests import unit_test_IDL_Hist
-from IDL_functions.tests import unit_test_IDL_hist_equal
