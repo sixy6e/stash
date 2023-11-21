@@ -1,6 +1,11 @@
 " code syntax highlighting
 syntax enable
 
+let &t_Co=256
+
+" enables word movement to see underscores as word separators
+" set iskeyword-=_
+
 " colour schemes, and terminal colours. Depends on the type of terminal
 " set background=dark
 " let g:solarized_visibility = "high"
@@ -10,9 +15,22 @@ syntax enable
 "
 
 " solarized was great, but zenburn is better
-colorscheme zenburn
 
-" let &t_Co=256
+set termguicolors
+
+" let g:zenburn_high_Contrast=1
+" let g:zenburn_alternate_Visual=1
+" let g:zenburn_force_dark_Background=1
+" let g:zenburn_unified_CursorColumn=1
+let g:zenburn_italic_Comment = 1
+let g:zenburn_old_Visual = 1
+" let g:zenburn_subdued_LineNr = 1
+" let g:zenburn_old_visual = 1
+" colors zenburn
+colorscheme zenburn
+" colorscheme wal
+
+
 
 " hi Comment ctermfg=Blue " was good for a while, but was too dominant
 set hls " highlight any search matches
@@ -27,20 +45,22 @@ set hls " highlight any search matches
 
 " define and visualise an optimal column length
 set colorcolumn=80,90
-highlight ColorColumn ctermbg=240 guibg=#262626
+" highlight ColorColumn ctermbg=240 guibg=#262626
+"highlight ColorColumn
 
 " cursonline visualisation
 set cursorline
-highlight cursorline ctermbg=236
+"highlight cursorline ctermbg=236
 
 " line numbers
 set number
 set relativenumber " makes for very quick navigation using relative numbers
 
 " line number, todo, and parenthesis highlighting
-highlight LineNr ctermfg=Green
-highlight Todo ctermfg=132
-highlight MatchParen ctermfg=127
+"highlight LineNr ctermfg=Green
+"highlight Todo ctermfg=132
+"highlight MatchParen ctermfg=127
+" highlight Todo guifg=#ab2e83
 
 " Pathogen was good, vundle has more improvements
 " set the runtime path to include Vundle and initialize
@@ -57,6 +77,7 @@ Plugin 'VundleVim/Vundle.vim'
 " plugin on GitHub repo
 Plugin 'tpope/vim-fugitive' " git integration
 Plugin 'tpope/vim-unimpaired' " pairs mapping
+Plugin 'tpope/vim-rhubarb' " GitHub integration
 Plugin 'scrooloose/nerdtree' " file/directory navigation and opening
 Plugin 'scrooloose/syntastic' " code syntax checking
 Plugin 'davidhalter/jedi-vim' " code goto's, help, prediction
@@ -73,6 +94,17 @@ Plugin 'Xuyuanp/nerdtree-git-plugin' " A plugin of NERDTree showing git status f
 Plugin 'bfrg/vim-jqplay' " A plugn that provides similar functionality as https://jqplay.org/
 Plugin 'AndrewRadev/bufferize.vim' " Execute a :command and show the output in a temporary buffer
 Plugin 'yegappan/taglist' " A plugin to efficiently browse through source code files (side window displays list of funcs, classes, global vars etc)
+Plugin 'vimwiki/vimwiki'
+Plugin 'mattn/calendar-vim'
+Plugin 'amadeus/vim-convert-color-to'
+Plugin 'dracula/vim', { 'name': 'dracula' }
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'dylanaraps/wal.vim'
+Plugin 'chrisbra/unicode.vim'
+Plugin 'ptzz/lf.vim'
+Plugin 'voldikss/vim-floaterm'
+Plugin 'fatih/vim-go'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -86,7 +118,7 @@ set laststatus=2
 "set statusline=%t\ %y\ format:\ %{&ff};\ [%c,%l]%{fugitive#statusline()}
 set statusline=%t\ %y\ format:\ %{&ff};\ %{fugitive#statusline()};\ [%c,%l]
 set statusline+=%=%p%%
-highlight StatusLine term=None ctermfg=DarkGrey ctermbg=16
+" highlight StatusLine term=None ctermfg=DarkGrey ctermbg=16
 
 " jedi options
 let g:netrw_liststyle=3
@@ -160,15 +192,44 @@ nmap         ++  vip++
 
 " vimtex
 let g:tex_flavor = 'latex'
+" couldn't get VimtexView to work automatically when compiling with arara
+let g:vimtex_compiler_method = 'arara'
+" let g:vimtex_compiler_arara = {
+"     \ 'options' : ['-v'],
+"     \}
+"let g:vimtex_compiler_latexmk_engines = {
+"    \ 'lualatex'         : '-lualatex',
+"    \}
+" let g:vimtex_compiler_latexmk = {
+"     \ 'options' : [
+"     \   '-lualatex',
+"     \   '-shell-escape',
+"     \   '-verbose',
+"     \   '-file-line-error',
+"     \   '-synctex=1',
+"     \   '-interaction=nonstopmode',
+"     \ ],
+"     \}
+" let g:vimtex_compiler_latexrun_engines = {
+"     \ 'lualatex'         : 'lualatex',
+"     \}
 
 " run Black on F9
 nnoremap <F9> :Black<CR>
 
 " add support for jsonlines
 autocmd BufNewFile,BufRead *.jsonl set syntax=json
+autocmd BufNewFile,BufRead *.cls set syntax=tex
+autocmd BufNewFile,BufRead *.pyt set filetype=python
 
 " splts and tabbed files
 set splitbelow splitright
+
+" using alacritty ctrl and arrows don't work
+map  <Esc>[1;5A <C-Up>
+map  <Esc>[1;5B <C-Down>
+map  <Esc>[1;5D <C-Left>
+map  <Esc>[1;5C <C-Right>
 
 " simplify the adjustment of split resizing
 noremap <silent> <C-Left> :vertical resize +1<CR>
@@ -188,3 +249,59 @@ command -nargs=1 Zst execute 'let b:gzip_comp_arg=' . [<f-args>][0]
 
 " black config
 let g:black_linelength = 90
+
+" Vim Wiki
+" let g:vimwiki_list = [{'path': '~/Documents/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
+let vimwiki_ext2syntax = {} " turn of wiki recognition of markdown files
+let g:vimwiki_list = [{'path': '~/Documents/vimwiki/'}]
+" need to remap the link opening as Ctrl+CR, Ctrl+Shift+CR are the same as CR
+" in most terminals
+nnoremap <localleader>h :VimwikiSplitLink<CR>
+nnoremap <localleader>v :VimwikiVSplitLink<CR>
+nnoremap <localleader>t :VimwikiTabnewLink<CR>
+" hi VimwikiLink term=underline ctermfg=cyan guifg=cyan gui=underline
+
+" Calendar
+"
+
+" Simple re-format for minified Javascript
+command! UnMinify call UnMinify()
+function! UnMinify()
+    %s/{\ze[^\r\n]/{\r/g
+    %s/){/) {/g
+    %s/};\?\ze[^\r\n]/\0\r/g
+    %s/;\ze[^\r\n]/;\r/g
+    %s/[^\s]\zs[=&|]\+\ze[^\s]/ \0 /g
+    normal ggVG=
+endfunction
+
+set expandtab
+" set tabstop=4
+set shiftwidth=4
+
+
+" Ultisnips config
+" Trigger configuration. You need to change this to something other than <tab>
+" if you use one of the following:
+" " - https://github.com/Valloric/YouCompleteMe
+" " - https://github.com/nvim-lua/completion-nvim
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+" " If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+
+" quick func to generate a table flip and copy into the clipboard
+command! TF call TF()
+function! TF()
+    let @+='(┛ಠ_ಠ)┛彡┻━┻'
+endfunction
+
+command! SHRUG call SHRUG()
+function! SHRUG()
+    let @+='¯\_(ツ)_/¯'
+endfunction
+
+
+au FileType go nmap <leader>d <Plug>(go-def-tab)
