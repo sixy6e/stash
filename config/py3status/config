@@ -13,8 +13,9 @@ order += "disk /"
 # order += "load"
 # order += "memory"
 order += "sysdata"
-order += "tztime local"
-# order += clock
+# order += "tztime local"
+order += clock
+order += "volume_status"
 
 battery all {
         format = "%status %percentage %remaining"
@@ -28,6 +29,11 @@ battery_level {
     format_status_bad = "💀"
     notify_low_level = true
     format = "{status} {percent}% {time_remaining}"
+}
+
+volume_status {
+    cache_timeout = 1
+    command = "pamixer"
 }
 
 arch_updates {
@@ -59,7 +65,10 @@ sysdata {
     format = "🌡 {cpu_temp}{cpu_temp_unit}, 💻 {cpu_used_percent}%, 🐏 {mem_used}{mem_used_unit} / {mem_total}{mem_total_unit}"
 }
 
+# Local doesn't work. The tzdata repo doesn't contain a file for local info and returns an error
 clock {
-    # format = "{Local}"
-    format_time = "%Y%m%d %H:%M"
+    format = "{Local}"
+    # format = "{UTC}"
+    # format_time = "%Y%m%d %H:%M"
+    format_time = "📅 %Y-%m-%d %H:%M"
 }
