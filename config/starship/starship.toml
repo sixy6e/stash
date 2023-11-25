@@ -1,0 +1,62 @@
+format = """
+[┌───────────────────>](bold green)
+[│](bold green)$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$python\
+$golang\
+$status
+[└─> \\$](bold green) 
+"""
+
+# format = """
+# [┌───────────────────>](bold green)
+# [│](bold green)$all\
+# [└─> \\$](bold green) 
+# """
+
+[cmd_duration]
+min_time = 10_000  # Show command duration over 10,000 milliseconds (=10 sec)
+format = " took [$duration]($style)"
+
+[directory]
+truncation_length = 6
+style = "bold purple"
+
+[git_branch]
+symbol = " "
+style = "bold green"
+
+[git_commit]
+commit_hash_length = 8
+style = "bold green"
+tag_disabled = false
+only_detached = false
+
+[git_state]
+format = '[\($state( $progress_current of $progress_total)\)]($style) '
+
+[git_status]
+conflicted = "⚔️ "
+ahead = "🏎️ 💨 ×${count}"
+behind = "🐢 ×${count}"
+diverged = "🔱 🏎️ 💨 ×${ahead_count} 🐢 ×${behind_count}"
+untracked = "🛤️  ×${count}"
+stashed = "📦 "
+modified = "📝 ×${count}"
+staged = "🗃️  ×${count}"
+renamed = "📛 ×${count}"
+deleted = "🗑️  ×${count}"
+style = "bright-white"
+format = "$all_status$ahead_behind"
+
+[python]
+format = "[$symbol$version]($style) "
+style = "bold green"
+detect_extensions = []  # Don't trigger for files with the py extension
+
+[status]
+disabled = false
