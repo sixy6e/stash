@@ -105,6 +105,7 @@ Plugin 'chrisbra/unicode.vim'
 Plugin 'ptzz/lf.vim'
 Plugin 'voldikss/vim-floaterm'
 Plugin 'fatih/vim-go'
+Plugin 'ryanoasis/vim-devicons'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -305,3 +306,7 @@ endfunction
 
 
 au FileType go nmap <leader>d <Plug>(go-def-tab)
+
+
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = '🐍'
