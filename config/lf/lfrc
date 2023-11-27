@@ -112,32 +112,9 @@ cmd zip ${{
 map gl ${{clear; git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit}}
 map gd ${{clear; git log --all --decorate --oneline --graph}}
 
-# cmd on-cd &{{
-#     # display repository status in your prompt
-#     if [ -d .git ] || [ -f .git ]; then
-#     	branch=$(git branch --show-current 2>/dev/null) || true
-#     	remote=$(git config --get branch.$branch.remote 2>/dev/null) || true
-#     	url=$(git remote get-url $remote 2>/dev/null) || true
-#         source ${HOME}/.bash/prompt.bash
-#         COLOUR="true"
-#         git=$(__git_ps1)|| true
-#         git=$(echo ${git} | sed -e 's/\\\[//g' -e 's/\\\]//g' -e 's/\\e/\\033/g')
-#     	fmt="\033[35;1m$url\033[0m: ${git}"
-#     elif [ -d .hg ]; then
-#     	hg=$(hg branch 2>/dev/null) || true
-#     	fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%w\033[0m\033[33;1m [HG BRANCH:> $hg]\033[0m"
-#     elif [ -d .svn ]; then
-#     	svn=$(svn info 2>/dev/null | awk '/^URL: /{print $2}') || true
-#     	fmt="\033[32;1m%u@%h\033[0m:\033[34;1m%w\033[0m\033[33;1m [SVN URL:> $svn]\033[0m"
-#     else
-#     	fmt="\033[36;1m%u@%h\033[0m: \033[35;1m%d\033[0m\033[1m%f\033[0m"
-#     fi
-#     lf -remote "send $id set promptfmt \"$fmt\""
-# }}
-
-    #lf -remote "send $id set promptfmt \"$fmt\""
+# update prompt
 cmd on-cd &{{
-    # export STARSHIP_CONFIG=~/.config/starship/starship-lf.toml
+    export STARSHIP_CONFIG=~/.config/starship/starship-lf.toml
     export STARSHIP_SHELL=bash
     fmt="$(starship prompt)"
     fmt=$(echo ${fmt} | sed -e 's/\\\[//g' -e 's/\\\]//g' -e 's/\\e/\\033/g')
