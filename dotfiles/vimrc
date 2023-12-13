@@ -107,7 +107,7 @@ Plugin 'voldikss/vim-floaterm'
 Plugin 'fatih/vim-go'
 Plugin 'ryanoasis/vim-devicons'
 Plugin 'itchyny/lightline.vim'
-Pluing 'nordtheme/vim'
+Plugin 'nordtheme/vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -316,7 +316,7 @@ let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = '🐍'
 
 
 let g:lightline = {
-      \ 'colorscheme': 'zenburn'
+      \ 'colorscheme': 'zenburn',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
