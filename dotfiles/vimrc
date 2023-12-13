@@ -106,6 +106,8 @@ Plugin 'ptzz/lf.vim'
 Plugin 'voldikss/vim-floaterm'
 Plugin 'fatih/vim-go'
 Plugin 'ryanoasis/vim-devicons'
+Plugin 'itchyny/lightline.vim'
+Pluing 'nordtheme/vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -311,3 +313,15 @@ au FileType go nmap <leader>d <Plug>(go-def-tab)
 
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = '🐍'
+
+
+let g:lightline = {
+      \ 'colorscheme': 'zenburn'
+      \ 'activ': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
