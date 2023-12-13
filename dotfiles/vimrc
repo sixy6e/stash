@@ -317,7 +317,7 @@ let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = '🐍'
 
 let g:lightline = {
       \ 'colorscheme': 'zenburn'
-      \ 'activ': {
+      \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
       \ },
