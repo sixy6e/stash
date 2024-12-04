@@ -59,8 +59,6 @@ modified = "📝×${count} || "
 staged = "🗃️×${count} || "
 renamed = "📛×${count} || "
 deleted = "🗑️×${count} || "
-style = "bright-white"
-format = "$all_status$ahead_behind"
 
 [python]
 format = "[$symbol$version]($style) "
