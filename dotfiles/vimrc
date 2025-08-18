@@ -79,6 +79,7 @@ Plugin 'tpope/vim-fugitive' " git integration
 Plugin 'tpope/vim-unimpaired' " pairs mapping
 Plugin 'tpope/vim-rhubarb' " GitHub integration
 Plugin 'scrooloose/nerdtree' " file/directory navigation and opening
+Plugin 'tpope/vim-surround' " delete, change, add surroundings in pairs
 Plugin 'scrooloose/syntastic' " code syntax checking
 Plugin 'davidhalter/jedi-vim' " code goto's, help, prediction
 Plugin 'altercation/vim-colors-solarized.git' " colourscheme
@@ -108,6 +109,8 @@ Plugin 'fatih/vim-go'
 Plugin 'ryanoasis/vim-devicons'
 Plugin 'itchyny/lightline.vim'
 Plugin 'nordtheme/vim'
+Plugin 'maralla/completor.vim'
+Plugin 'catppuccin/vim', { 'name': 'catppuccin' }
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -127,6 +130,12 @@ set statusline+=%=%p%%
 let g:netrw_liststyle=3
 let g:jedi#popup_on_dot=0
 let g:jedi#show_call_signatures=0
+let g:jedi#use_tabs_not_buffers = 1
+let g:jedi#completions_enabled = 0
+
+" Enable lsp for go by using gopls
+let g:completor_filetype_map = {}
+let g:completor_filetype_map.go = {'ft': 'lsp', 'cmd': 'gopls -remote=auto'}"
 
 " drag visuals config
 runtime plugin/dragvisuals.vim
@@ -186,7 +195,6 @@ nmap <leader>fn :echo expand('%:p')<CR>
 nnoremap <silent> <F8> :TlistToggle<CR>
 nnoremap <leader>tg :TlistToggle<CR>
 
-let g:jedi#use_tabs_not_buffers = 1
 
 " let b:tablify_horHeaderDelimiter = '='
 
@@ -316,7 +324,7 @@ let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['py'] = '🐍'
 
 
 let g:lightline = {
-      \ 'colorscheme': 'zenburn',
+      \ 'colorscheme': 'PaperColor',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
